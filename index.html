@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dream Real — Social Mirror</title>
+
+    <meta
+      name="description"
+      content="Dream Real relie tes posts, tes moods et tes lieux — un feed plus vrai, plus personnel, plus vivant."
+    />
+    <meta name="theme-color" content="#0B1120" />
+
+    <!-- TYPO APP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg1: #0b1120;
+        --bg2: #2a2d59;
+        --bg3: #5c3b84;
+        --gold: #eecd79;
+        --blue: #93c5fd;
+        --text: #f8fafc;
+        --muted: rgba(248, 250, 252, 0.72);
+        --shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+        --shadow2: 0 10px 30px rgba(0, 0, 0, 0.35);
+        --r-xl: 28px;
+        --r-lg: 18px;
+        --container: 1120px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        color: var(--text);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--bg1),
+          var(--bg2),
+          var(--bg3)
+        );
+        overflow-x: hidden;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        width: min(var(--container), calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      /* HEADER */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(14px);
+        background: rgba(11, 17, 32, 0.55);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        display: flex;
+        align-items: center;
+        font-family: "Suez One", serif;
+        font-size: 38px;
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-mark .d {
+        color: var(--gold);
+      }
+
+      .brand-mark .r {
+        color: #ffffff;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 18px;
+      }
+
+      .nav-links a {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(248, 250, 252, 0.8);
+      }
+
+      .btn {
+        padding: 10px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+  border: none;
+
+  /* 🎯 Violet Dream Real */
+  background: #7A48DF;
+
+  /* 🎯 Radius réduit (plus net, plus moderne) */
+  border-radius: 10px;
+
+  color: #ffffff;
+  font-weight: 600;
+  /* 🎯 largeur augmentée */
+  padding: 10px 26px;
+  font-size: 14px;
+}
+
+      /* HERO */
+      .hero {
+        padding: 90px 0 60px;
+      }
+
+      .hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: stretch; /* 🔑 IMPORTANT */
+}
+      .hero h1 {
+        font-size: clamp(36px, 5vw, 58px);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+      }
+
+      .hero .accent {
+        color: var(--gold);
+      }
+
+      .hero p {
+        margin-top: 18px;
+        max-width: 60ch;
+        font-size: 18px;
+        color: var(--muted);
+      }
+
+      .hero-actions {
+        margin-top: 26px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .hero {
+  min-height: calc(100vh - 80px); /* 🔑 header ≈ 80px */
+}
+
+      /* 📲 Store badges */
+.app-downloads {
+  display: flex;
+  gap: 14px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+}
+
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+}
+
+.store-badge img {
+  height: 48px; /* ✅ taille officielle recommandée */
+  width: auto;
+  display: block;
+}
+/* ⚖️ Compensation visuelle Google Play */
+.store-badge--google img {
+  height: 72px; /* 🔑 +12% pour matcher visuellement Apple */
+}
+/* 🎯 Wrapper commun pour homogénéiser les coins */
+.store-badge {
+  border-radius: 12px;           /* 🔑 radius unifié Dream Real */
+  overflow: hidden;              /* clip l’image */
+}
+
+/* Sécurité : image occupe 100% du wrapper */
+.store-badge img {
+  display: block;
+  border-radius: 0;              /* on neutralise le radius natif */
+}
+
+      /* FEED (colonne droite) */
+.feed {
+  display: flex;
+  flex-direction: column;
+
+  /* 🔑 zone beaucoup plus haute */
+  height: min(131vh, 980px);
+
+  /* 🔑 indispensable pour le scroll interne */
+  min-height: 0;
+}
+
+/* Zone scrollable interne (seulement les posts) */
+#feed {
+  margin-top: 10px;
+
+  /* ✅ prend le reste de la hauteur de .feed */
+  flex: 1;
+  min-height: 0;
+
+  /* ✅ scroll interne */
+  overflow-y: auto;
+  padding-right: 12px;
+}
+
+/* Scroll discret */
+#feed::-webkit-scrollbar {
+  width: 6px;
+}
+#feed::-webkit-scrollbar-track {
+  background: transparent;
+}
+#feed::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+}
+#feed::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.feed-title {
+  display: none;
+}
+
+      /* POST — DESIGN APP */
+      .post {
+        padding: 14px;
+        border-radius: var(--r-lg);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        margin-bottom: 14px; /* ✅ espacement feed DR */
+      }
+
+      .post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px; /* ✅ espace canon Dream Real */
+}
+
+      .post-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--blue), var(--gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0b1120;
+  font-size: 18px;
+}
+
+.post-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.post-date {
+  margin-top: 2px;
+}
+
+      .post-meta strong {
+        font-size: 17px;
+        font-weight: 600;
+        color: #fff;
+        line-height: 21px;
+      }
+
+      .post-meta small {
+        font-size: 15px;
+        color: #9ca3af;
+        line-height: 21px;
+      }
+      .post-media.link-preview {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+}
+
+.link-preview-content {
+  padding: 10px 12px;
+  background: transparent;
+}
+
+.link-preview-content strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.link-preview-content p {
+  font-size: 14px;
+  color: #d1d5db;
+  margin: 0 0 4px;
+}
+
+.link-preview-content span {
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+/* 🎬 YouTube preview — EXACTEMENT comme un player */
+.post-media.youtube-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* 🎯 Image YouTube = cover absolu */
+.post-media.youtube-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 🔑 clé anti bandes */
+  display: block;
+}
+
+.inline-location {
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.post-bio {
+  margin-top: 2px;
+  font-size: 15px;
+  line-height: 18px;
+  color: #9ca3af; /* même gris que date */
+  max-width: 42ch;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+      .post-bubble {
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        font-size: 17px;
+        color: #fff;
+      }
+
+      .post-message {
+        margin-top: 6px;
+        font-size: 17px;
+        line-height: 21px;
+        color: #e5e7eb;
+      }
+      /* Inline feeling / activity */
+.post-inline-meta {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 6px;
+  flex-wrap: wrap;
+}
+
+.inline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.35);
+  color: #ffffff;
+  background: rgba(255,255,255,0.08);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Feeling = plus doux */
+.inline-pill.feeling {
+  background: rgba(238, 205, 121, 0.15);
+  border-color: rgba(238, 205, 121, 0.35);
+}
+
+/* Activity = plus neutre */
+.inline-pill.activity {
+  background: rgba(147, 197, 253, 0.15);
+  border-color: rgba(147, 197, 253, 0.35);
+}
+      .post-media.video video {
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  border-radius: 12px;
+  display: block;
+  background: #000;
+}
+
+     .post-media {
+  width: 100%;
+  min-height: 180px; /* fallback visuel */
+  border-radius: 12px;
+  background-color: #111827;
+  margin-top: 4px;
+  overflow: hidden;
+}
+/* ✅ Link preview : pas de fond sombre hérité */
+.post-media.link-preview {
+  background-color: transparent;
+}
+
+.post-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+      .post-reactions {
+        margin-top: 8px;
+        padding-top: 6px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+        color: #9ca3af;
+        border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+      }
+
+      /* SECTIONS */
+      .section {
+        padding: 60px 0;
+      }
+
+      .section h2 {
+        font-size: 28px;
+        margin-bottom: 12px;
+      }
+
+      .section p.lead {
+        max-width: 70ch;
+        color: var(--muted);
+      }
+
+      .cards {
+        margin-top: 26px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        border-radius: var(--r-lg);
+        background: rgba(255, 255, 255, 0.06);
+        padding: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      footer {
+        padding: 30px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(248, 250, 252, 0.6);
+      }
+
+      @media (max-width: 900px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="container">
+        <div class="nav">
+          <a class="brand" href="#">
+            <div class="brand-mark">
+              <span class="d">D</span><span class="r">R</span>
+            </div>
+          </a>
+
+          <button class="btn btn-primary">Join</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-grid">
+            <!-- TEXTE -->
+            <div>
+              <h1>
+  The <span class="accent">Social Mirror</span><br />
+  that reconnects your posts with real life.
+</h1>
+
+              <p>
+  A feed enriched with mood, activity, and place.  
+  Designed for sharing. Built to last.
+</p>
+
+<div class="hero-actions app-downloads">
+  <a
+    href="#"
+    class="store-badge"
+    aria-label="Download on the App Store"
+  >
+    <img
+      src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+      alt="Download on the App Store"
+    />
+  </a>
+
+  <a
+  href="#"
+  class="store-badge store-badge--google"
+  aria-label="Get it on Google Play"
+>
+  <img
+    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+    alt="Get it on Google Play"
+  />
+</a>
+</div>
+            </div>
+
+            <!-- FEED -->
+            <div class="feed">
+              <div class="feed-title">Live feed</div>
+              <div id="feed"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="features">
+        <div class="container">
+          <h2>Pourquoi Dream Real</h2>
+          <p class="lead">
+            Donner du sens aux contenus. Créer un feed plus humain.
+          </p>
+
+          <div class="cards">
+            <div class="card">Mood • Activité • Lieu</div>
+            <div class="card">Pages de post partageables</div>
+            <div class="card">Deep links vers l’app</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        © <span id="year"></span> Dream Real — Social Mirror
+      </div>
+    </footer>
+
+    <script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const API_URL = "https://dreamreal-api.onrender.com/api/posts";
+  const feed = document.getElementById("feed");
+
+  console.log("🚀 Landing feed script loaded");
+
+  fetch(API_URL)
+    .then((res) => res.json())
+    .then((res) => {
+      const posts = Array.isArray(res) ? res : res.posts ?? res.data ?? [];
+
+      console.log("📦 POSTS NORMALIZED:", posts);
+
+      if (!posts.length) {
+        feed.innerHTML = "<p>Aucun post pour le moment</p>";
+        return;
+      }
+
+      feed.innerHTML = "";
+
+      posts.forEach((post) => {
+  const user =
+    `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
+    "Dream Real";
+
+  const date = post.created_time
+    ? new Date(post.created_time).toLocaleDateString("fr-FR", {
+        day: "numeric",
+        month: "short",
+      })
+    : "";
+
+  const reactions =
+    post.reactions_summary && post.reactions_count
+      ? `${post.reactions_summary} ${post.reactions_count}`
+      : "👍";
+
+      const avatar =
+    post.user_avatar || // Dream Real user avatar
+    post.profile_picture || // Facebook legacy
+    post.from?.picture?.data?.url || // Facebook Graph API
+    null;
+
+  const initial =
+    (post.user_first_name || post.user_last_name || "D")
+      .charAt(0)
+      .toUpperCase();
+
+        const locationLabel =
+    post.localLocation?.label ||
+    post.location?.label ||
+    null;
+
+      const bio =
+    post.user_bio ||
+    post.bio ||
+    post.user?.bio ||
+    post.from?.about ||
+    null;
+
+  const imageMedia =
+  (Array.isArray(post.images) && post.images[0]) ||
+  (post.youtube_url
+    ? `https://img.youtube.com/vi/${
+        post.youtube_url.split("v=")[1]?.split("&")[0]
+      }/hqdefault.jpg`
+    : null) ||
+  post.full_picture ||
+  post.linkPreview?.image ||
+  null;
+
+const videoMedia = post.video_url || null;
+
+  /* ✅ AJOUTE CE BLOC ICI */
+  const linkPreview = post.linkPreview || null;
+
+  feed.innerHTML += `
+    <div class="post">
+      <div class="post-header">
+        <div class="post-avatar">
+  ${
+    avatar
+      ? `<img src="${avatar}" alt="${user}" />`
+      : `<span>${initial}</span>`
+  }
+</div>
+        <div class="post-meta">
+  <strong>
+    ${user}
+    ${
+      locationLabel
+        ? `<span class="inline-location"> in ${locationLabel}</span>`
+        : ""
+    }
+  </strong>
+
+  ${
+    bio
+      ? `<div class="post-bio">${bio}</div>`
+      : ""
+  }
+
+  <div class="post-date">
+  <small>${date}</small>
+</div>
+</div>
+      </div>
+
+     ${
+  videoMedia
+    ? `
+      <div class="post-media video">
+        <video
+          src="${videoMedia}"
+          controls
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+      </div>
+    `
+    : linkPreview && linkPreview.title
+    ? `
+      <a
+        class="post-media link-preview"
+        href="${linkPreview.url || '#'}"
+        target="_blank"
+        rel="noopener"
+      >
+        ${
+          linkPreview.image
+            ? `<img src="${linkPreview.image}" alt="" />`
+            : ""
+        }
+        <div class="link-preview-content">
+          <strong>${linkPreview.title}</strong>
+          ${
+            linkPreview.description
+              ? `<p>${linkPreview.description}</p>`
+              : ""
+          }
+          ${
+            linkPreview.siteName
+              ? `<span>${linkPreview.siteName}</span>`
+              : ""
+          }
+        </div>
+      </a>
+    `
+    : imageMedia
+    ? `
+      <div
+  class="post-media adaptive ${
+    post.youtube_url ? "youtube-preview" : ""
+  }"
+  data-src="${imageMedia}"
+></div>
+    `
+    : `<div class="post-media"></div>`
+}
+
+      <div class="post-reactions">${reactions}</div>
+    </div>
+  `;
+});
+// 🎥 Adaptive media height (Dream Real logic)
+document.querySelectorAll(".post-media.adaptive").forEach((container) => {
+  const src = container.dataset.src;
+  if (!src) return;
+
+  // 🎬 CAS SPÉCIAL — PREVIEW YOUTUBE (anti bandes noires)
+  if (container.classList.contains("youtube-preview")) {
+    const img = new Image();
+    img.src = src;
+
+    img.onload = () => {
+      container.innerHTML = "";
+      container.appendChild(img);
+    };
+
+    return; // ⛔ ne PAS recalculer la hauteur
+  }
+
+  const img = new Image();
+  img.src = src;
+
+  img.onload = () => {
+    const ratio = img.naturalWidth / img.naturalHeight;
+    const containerWidth = container.offsetWidth;
+    const MAX_HEIGHT = 520;
+
+    const computedHeight = Math.min(
+      containerWidth / ratio,
+      MAX_HEIGHT
+    );
+
+    container.style.height = `${computedHeight}px`;
+    container.innerHTML = "";
+    container.appendChild(img);
+  };
+
+  img.onerror = () => {
+    container.style.height = "260px";
+  };
+});
+    })
+    .catch((err) => {
+      console.error("❌ Feed fetch error:", err);
+      feed.innerHTML = "<p>❌ Impossible de charger le feed</p>";
+    });
+</script>
+  </body>
+</html>
