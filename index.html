@@ -143,10 +143,24 @@
   font-size: 14px;
 }
 
+main {
+  padding-top: 56px; /* ≈ hauteur du header + respiration */
+}
+
       /* HERO */
       .hero {
-        padding: 90px 0 60px;
-      }
+  padding: 48px 0 60px; /* ⬅️ AU LIEU DE 90px */
+}
+
+/* 🔼 Remonte le sous-titre gris */
+.hero-text p {
+  margin-top: 0px; /* au lieu de 18px */
+}
+
+/* 🔼 Remonte les badges App Store / Google Play */
+.hero-actions.app-downloads {
+  margin-top: 14px; /* au lieu de 26px */
+}
 
       .hero-grid {
   display: grid;
@@ -160,17 +174,30 @@
         letter-spacing: -0.03em;
       }
 
+      .hero h1 {
+  margin-top: 0;
+  margin-bottom: 18px; /* contrôle fin */
+}
+
       .hero .accent {
         color: var(--gold);
       }
 
-      .hero p {
-        margin-top: 18px;
-        max-width: 60ch;
-        font-size: 18px;
-        color: var(--muted);
-      }
+      .hero-text p {
+  margin-top: 0;
+  max-width: 60ch;
 
+  font-size: 21px;      /* ⬅️ ICI tu agrandis vraiment */
+  line-height: 1.65;    /* ⬅️ respiration premium */
+  color: var(--muted);
+}
+
+/* 🔒 Empêche la colonne gauche de pousser le feed */
+.hero-grid > div:first-child {
+  max-width: 520px;      /* largeur premium colonne gauche */
+  width: 100%;
+  overflow: hidden;      /* 🔑 bloque le débordement */
+}
       .hero-actions {
         margin-top: 26px;
         display: flex;
@@ -178,10 +205,10 @@
         flex-wrap: wrap;
       }
 
-      .hero {
-  min-height: calc(100vh - 80px); /* 🔑 header ≈ 80px */
+     .hero {
+  padding: 48px 0 60px;
+  min-height: unset;
 }
-
       /* 📲 Store badges */
 .app-downloads {
   display: flex;
@@ -214,6 +241,10 @@
 .store-badge img {
   display: block;
   border-radius: 0;              /* on neutralise le radius natif */
+}
+
+.hero-actions.app-downloads {
+  margin-top: 28px; /* ⬆️ espace plus généreux au-dessus des badges */
 }
 
       /* FEED (colonne droite) */
@@ -496,6 +527,255 @@
         border: 1px solid rgba(255, 255, 255, 0.12);
       }
 
+/* =========================
+   LOOKING FOR — FUN DISCRET
+========================= */
+
+.looking-for {
+  margin-top: 64px;
+  padding: 0;            /* ⬅️ plus de carte */
+  background: none;      /* ⬅️ plus de fond */
+  border: none;          /* ⬅️ plus de contour */
+  border-radius: 0;      /* ⬅️ reset */
+}
+
+.looking-for h3 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+  color: #ffffff;
+}
+
+.looking-for-sub {
+  margin-top: 0;        /* 🔑 clé */
+  margin-bottom: 22px;
+
+  font-size: 21px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.looking-for-scroll {
+  display: flex;                 /* ⬅️ plus fiable que grid ici */
+  gap: 28px;
+
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding-bottom: 24px;
+  padding-right: 12px;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+}
+
+.looking-for-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.looking-for-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.looking-for-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.looking-for-item {
+  flex: 0 0 auto;
+  width: 86px;
+  text-align: center;
+  cursor: pointer;
+  padding-bottom: 12px; /* ✅ ESPACE DE SÉCURITÉ */
+}
+
+.looking-for-avatar {
+  position: relative;
+  width: 106px;
+  height: 106px;
+  border-radius: 50%;     /* 👈 cercle NORMAL */
+  overflow: visible;     /* 👈 autorise le badge */
+}
+
+.looking-for-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;    /* 👈 image ronde aussi */
+}
+
+/* 🔑 ordre de superposition */
+.looking-for-avatar img {
+  position: relative;
+  z-index: 1;
+}
+
+.looking-for-activity {
+  z-index: 2;
+}
+
+/* Badge activité */
+.looking-for-activity {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+/* 🔵 Cercle VISUEL (pas de clipping) */
+.looking-for-activity::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #eecd79;
+}
+
+/* 🟡 Icône LIBRE */
+.looking-for-activity img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+.looking-for-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.looking-for-name {
+  margin-top: 12px;      /* 10 → 12 */
+  font-size: 18px;       /* 16 → 18 */
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 22px;     /* 18 → 22 */
+}
+.looking-for-scroll {
+  gap: 28px;               /* ⬆️ 20 → 28 */
+}
+
+.looking-for-card {
+  flex: 0 0 auto;
+
+  width: 300px;            /* ⬆️ 250 → 300 (clé n°1) */
+
+  padding: 24px;           /* ⬆️ 19 → 24 */
+  border-radius: 26px;     /* ⬆️ plus doux */
+
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;               /* ⬆️ respiration */
+  scroll-snap-align: start;
+}
+
+.looking-for-card {
+  flex: 0 0 300px;     /* 🔑 largeur fixe */
+  max-width: 300px;
+}
+
+/* Header */
+.lf-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;               /* ⬆️ confirme la hiérarchie */
+}
+
+.lf-avatar {
+  width: 48px;             /* ⬆️ 36 → 48 */
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.lf-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Meta */
+.lf-meta strong {
+  font-size: 17px;         /* ⬆️ 14 → 17 */
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.lf-location {
+  display: block;
+  font-size: 15px;         /* ⬆️ 13 → 15 */
+  color: var(--muted);
+}
+
+.lf-feeling {
+  font-size: 16px;         /* ⬆️ 14 → 16 */
+  font-weight: 500;
+
+  padding: 8px 14px;       /* ⬆️ plus de présence */
+  border-radius: 999px;
+
+  background: rgba(238, 205, 121, 0.16);
+  border: 1px solid rgba(238, 205, 121, 0.4);
+
+  width: fit-content;
+}
+/* Message */
+.lf-message {
+  font-size: 16px;         /* ⬆️ 14 → 16 */
+  line-height: 1.55;
+  color: var(--muted);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;   /* ⬆️ plus de contenu */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* Desktop large */
+@media (min-width: 1200px) {
+  .looking-for-scroll {
+    grid-auto-columns: 320px;
+  }
+}
+
+/* Laptop / desktop standard */
+@media (max-width: 1199px) {
+  .looking-for-scroll {
+    grid-auto-columns: 300px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .looking-for-scroll {
+    grid-auto-columns: 88%;
+    padding-left: 6%;
+    padding-right: 6%;
+  }
+}
+
       footer {
         padding: 30px 0;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -529,19 +809,20 @@
       <section class="hero">
         <div class="container">
           <div class="hero-grid">
-            <!-- TEXTE -->
-            <div>
-              <h1>
-  The <span class="accent">Social Mirror</span><br />
-  that reconnects your posts with real life.
-</h1>
+  <!-- COLONNE GAUCHE -->
+  <div>
+    <div class="hero-text">
+      <h1>
+        The <span class="accent">Social Mirror</span><br />
+        that reconnects your posts with real life.
+      </h1>
 
-              <p>
-  A feed enriched with mood, activity, and place.  
-  Designed for sharing. Built to last.
-</p>
+      <p>
+        A feed enriched with mood, activity, and place.<br />
+        Designed for sharing. Built to last.
+      </p>
 
-<div class="hero-actions app-downloads">
+      <div class="hero-actions app-downloads">
   <a
     href="#"
     class="store-badge"
@@ -554,41 +835,39 @@
   </a>
 
   <a
-  href="#"
-  class="store-badge store-badge--google"
-  aria-label="Get it on Google Play"
->
-  <img
-    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-    alt="Get it on Google Play"
-  />
-</a>
+    href="#"
+    class="store-badge store-badge--google"
+    aria-label="Get it on Google Play"
+  >
+    <img
+      src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+      alt="Get it on Google Play"
+    />
+  </a>
 </div>
-            </div>
+    </div>
 
-            <!-- FEED -->
-            <div class="feed">
-              <div class="feed-title">Live feed</div>
-              <div id="feed"></div>
-            </div>
-          </div>
+    <!-- ✅ LOOKING FOR : ICI ET NULLE PART AILLEURS -->
+    <section class="looking-for">
+      <h3>They are looking for</h3>
+
+      <p class="looking-for-sub">
+        People nearby open to connect right now
+      </p>
+
+      <div class="looking-for-scroll" id="looking-for"></div>
+    </section>
+  </div>
+
+  <!-- COLONNE DROITE -->
+  <div class="feed">
+    <div class="feed-title">Live feed</div>
+    <div id="feed"></div>
+  </div>
+</div>
         </div>
       </section>
 
-      <section class="section" id="features">
-        <div class="container">
-          <h2>Pourquoi Dream Real</h2>
-          <p class="lead">
-            Donner du sens aux contenus. Créer un feed plus humain.
-          </p>
-
-          <div class="cards">
-            <div class="card">Mood • Activité • Lieu</div>
-            <div class="card">Pages de post partageables</div>
-            <div class="card">Deep links vers l’app</div>
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer>
@@ -611,6 +890,101 @@
       const posts = Array.isArray(res) ? res : res.posts ?? res.data ?? [];
 
       console.log("📦 POSTS NORMALIZED:", posts);
+
+      const lookingForUsers = posts
+  .filter(
+    (p) =>
+      p.feeling?.slug === "looking-for" &&
+      p.user_id
+  )
+  .sort(
+    (a, b) =>
+      new Date(b.created_time).getTime() -
+      new Date(a.created_time).getTime()
+  )
+  .slice(0, 10);
+
+const lookingForContainer = document.getElementById("looking-for");
+if (!lookingForContainer) return;
+const lookingForSection = document.querySelector(".looking-for");
+if (!lookingForSection || lookingForUsers.length === 0) {
+  if (lookingForSection) {
+    lookingForSection.remove();
+  }
+} else {
+  lookingForContainer.innerHTML = lookingForUsers
+  .map((post) => {
+    const user =
+      `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
+      "Dream Real";
+
+    const avatar =
+      post.user_avatar ||
+      post.profile_picture ||
+      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+    const feelingLabel =
+      post.feeling?.label ||
+      post.feeling?.name ||
+      post.feeling?.slug ||
+      null;
+
+    const feelingEmoji =
+      post.feeling?.icon ||
+      post.feeling?.emoji ||
+      "👀";
+
+    const location =
+      post.localLocation?.label ||
+      post.location?.label ||
+      null;
+
+    const message =
+      post.message ||
+      post.text ||
+      "";
+
+    return `
+      <div class="looking-for-card">
+        <div class="lf-header">
+          <div class="lf-avatar">
+            <img src="${avatar}" alt="" />
+          </div>
+
+          <div class="lf-meta">
+            <strong>${user}</strong>
+            ${
+              location
+                ? `<span class="lf-location">in ${location}</span>`
+                : ""
+            }
+          </div>
+        </div>
+
+        ${
+          feelingLabel
+            ? `
+              <div class="lf-feeling">
+                ${feelingEmoji} looking for ${feelingLabel}
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          message
+            ? `
+              <div class="lf-message">
+                ${message}
+              </div>
+            `
+            : ""
+        }
+      </div>
+    `;
+  })
+  .join("");
+}
 
       if (!posts.length) {
         feed.innerHTML = "<p>Aucun post pour le moment</p>";
