@@ -335,7 +335,7 @@ main {
 }
 
 .post-date {
-  margin-top: 2px;
+  margin-top: 0px;
 }
 
       .post-meta strong {
@@ -400,20 +400,6 @@ main {
   font-weight: 400;
   color: #ffffff;
 }
-
-.post-bio {
-  margin-top: 2px;
-  font-size: 15px;
-  line-height: 18px;
-  color: #9ca3af; /* même gris que date */
-  max-width: 42ch;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
       .post-bubble {
         margin-top: 8px;
         display: inline-flex;
@@ -1061,23 +1047,29 @@ main {
 /* =========================
    FEED — FEELING / ACTIVITY PILL (APP CONSISTENT)
 ========================= */
+/* =========================
+   FEED — FEELING / ACTIVITY
+   (SAME AS LOOKING FOR)
+========================= */
 .feed-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+   /* 🔑 aligne la bulle sur la baseline du texte */
+  vertical-align: baseline;
 
-  padding: 6px 12px;
-  margin: 4px 0 8px; /* ⬆️ encore plus haut, équilibre conservé */
+  padding: 8px 14px;
+  margin: 2px 0 6px; /* légèrement plus haut, cohérent carte */
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
 
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.35);
-  background: transparent;
+  background: rgba(238, 205, 121, 0.16);
+  border: 1px solid rgba(238, 205, 121, 0.4);
 
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1;
   color: #ffffff;
-
   width: fit-content;
 }
 
@@ -1085,6 +1077,130 @@ main {
   width: 18px;
   height: 18px;
   object-fit: contain;
+}
+/* =========================
+   POST BIO — FIX FINAL
+========================= */
+
+.post-meta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* 🔑 SANS ÇA → LA BIO EST INVISIBLE */
+.post-bio-wrapper {
+  flex: 1;          /* ⬅️ DONNE DE LA LARGEUR */
+  min-width: 0;    /* ⬅️ AUTORISE LE TEXTE */
+  display: flex;
+  flex-direction: column;
+}
+
+.post-bio {
+  font-size: 15px;
+  line-height: 18px;
+  color: #9ca3af;
+  max-width: 42ch;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.post-bio.collapsed {
+  -webkit-line-clamp: 2;
+}
+
+/* 🔑 VIEW MORE — MATCH FEED PILL HEIGHT EXACTLY */
+.post-bio-toggle {
+  display: inline-flex;
+  align-items: center;
+
+  /* ⬇️ clé absolue */
+  padding: 8px 0;          /* même padding vertical que la bulle */
+  line-height: 1;
+
+  margin: 0;
+  border: none;
+  background: none;
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #93c5fd;
+
+  cursor: pointer;
+  white-space: nowrap;
+}
+/* =========================
+   POST TEXT — RN-ALIGNED
+========================= */
+
+.post-text-block {
+  padding: 0 12px;
+  margin-bottom: 6px;
+}
+
+/* 🔹 Ligne 1 = bulle + view more */
+/* 🔹 Ligne 1 = bulle + View more (RN baseline aligned) */
+.post-inline-row {
+  display: flex;
+  align-items: baseline;   /* 🔑 CLÉ ABSOLUE */
+  flex-wrap: wrap;
+
+  column-gap: 8px;
+  row-gap: 6px;
+
+  margin-bottom: 6px;
+}
+
+/* 🔘 View more inline */
+/* 🔑 ALIGN VIEW MORE EXACTLY WITH FEED PILL TEXT */
+
+/* 🔹 Ligne 2 = texte */
+/* =========================
+   POST BIO — RN BEHAVIOR
+========================= */
+
+/* ❌ cachée par défaut */
+.post-bio {
+  display: none;
+
+  font-size: 17px;
+  line-height: 21px;
+  color: #e5e7eb;
+}
+
+/* ✅ visible UNIQUEMENT quand expand */
+.post-bio.expanded {
+  display: block;
+}
+/* 🔽 VIEW LESS — END OF TEXT (APP STYLE) */
+.post-bio-toggle.is-bottom {
+  padding: 6px 0 0;
+  margin-top: 4px;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  align-self: flex-start;
+}
+.post-bio-text {
+  display: inline;
+}
+
+.post-bio-toggle.is-bottom {
+  display: inline;
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #93c5fd;
+
+  line-height: 1;
+  vertical-align: baseline;
 }
     </style>
   </head>
@@ -1348,12 +1464,13 @@ const activityIcon =
     ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
     : null;
 
-      const bio =
-    post.user_bio ||
-    post.bio ||
-    post.user?.bio ||
-    post.from?.about ||
-    null;
+     const bio =
+  post.user_bio ||
+  post.bio ||
+  post.user?.bio ||
+  post.from?.about ||
+  post.message || // ⬅️ TEMPORAIRE POUR TEST
+  null;
 
   const imageMedia =
   (Array.isArray(post.images) && post.images[0]) ||
@@ -1391,33 +1508,65 @@ const videoMedia = post.video_url || null;
     }
   </strong>
 
-  ${
-    bio
-      ? `<div class="post-bio">${bio}</div>`
-      : ""
-  }
-
   <div class="post-date">
   <small>${date}</small>
 </div>
 </div>
       </div>
 
+     ${(feelingLabel && activityLabel && activityIcon) || bio ? `
+  <div class="post-text-block">
+
+    <!-- 🔹 LIGNE 1 : BULLE + VIEW MORE -->
+    <div class="post-inline-row">
+
       ${
-  feelingLabel && activityLabel
-    ? `
-      <div class="feed-pill">
-        <span>${feelingLabel}</span>
-        ${
-          activityIcon
-            ? `<img src="${activityIcon}" alt="" />`
-            : ""
-        }
-        <span>${activityLabel}</span>
-      </div>
-    `
-    : ""
+        feelingLabel && activityLabel && activityIcon
+          ? `
+            <div class="feed-pill">
+              <span>${feelingLabel}</span>
+              <img src="${activityIcon}" alt="" />
+              <span>${activityLabel}</span>
+            </div>
+          `
+          : ""
+      }
+
+      ${
+        bio
+          ? `<button
+  class="post-bio-toggle"
+  data-position="inline"
+>
+  View more
+</button>`
+          : ""
+      }
+
+    </div>
+
+    <!-- 🔹 LIGNE 2 : BIO (MASQUÉE PAR DÉFAUT) -->
+    ${
+  bio
+  ? `
+    <div class="post-bio collapsed">
+      <span class="post-bio-text">
+        ${bio}
+        <button
+          class="post-bio-toggle is-bottom"
+          data-position="bottom"
+          style="display:none"
+        >
+          View less
+        </button>
+      </span>
+    </div>
+  `
+  : ""
 }
+
+  </div>
+` : ""}
 
      ${
   videoMedia
@@ -1476,6 +1625,25 @@ const videoMedia = post.video_url || null;
     </div>
   `;
 });
+// =========================
+// HIDE BIO TOGGLE IF NOT NEEDED
+// =========================
+document.querySelectorAll(".post-bio-wrapper").forEach((wrapper) => {
+  const bio = wrapper.querySelector(".post-bio");
+  const toggle = wrapper.querySelector(".post-bio-toggle");
+
+  if (!bio || !toggle) return;
+
+  bio.classList.add("collapsed");
+
+  const needsToggle =
+    bio.scrollHeight > bio.clientHeight + 1;
+
+  if (!needsToggle) {
+    toggle.remove();
+    bio.classList.remove("collapsed");
+  }
+});
 // 🎥 Adaptive media height (Dream Real logic)
 document.querySelectorAll(".post-media.adaptive").forEach((container) => {
   const src = container.dataset.src;
@@ -1521,6 +1689,44 @@ document.querySelectorAll(".post-media.adaptive").forEach((container) => {
       console.error("❌ Feed fetch error:", err);
       feed.innerHTML = "<p>❌ Impossible de charger le feed</p>";
     });
+    // =========================
+// POST BIO — VIEW MORE / LESS
+// =========================
+
+// =========================
+// POST BIO — VIEW MORE / LESS (RN-LIKE)
+// =========================
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".post-bio-toggle");
+  if (!btn) return;
+
+  const block = btn.closest(".post-text-block");
+  const bio = block.querySelector(".post-bio");
+
+  const inlineBtn = block.querySelector(
+    '.post-bio-toggle[data-position="inline"]'
+  );
+  const bottomBtn = bio.querySelector(
+    '.post-bio-toggle[data-position="bottom"]'
+  );
+
+  const isExpanded = bio.classList.contains("expanded");
+
+  if (!isExpanded) {
+    // ➜ EXPAND
+    bio.classList.add("expanded");
+
+    inlineBtn.style.display = "none";
+    bottomBtn.style.display = "inline";
+  } else {
+    // ➜ COLLAPSE
+    bio.classList.remove("expanded");
+
+    inlineBtn.style.display = "inline";
+    bottomBtn.style.display = "none";
+  }
+});
 </script>
   </body>
 </html>
