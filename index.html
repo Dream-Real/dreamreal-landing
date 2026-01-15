@@ -1137,7 +1137,7 @@ main {
 
 .post-text-block {
   padding: 0 12px;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 /* 🔹 Ligne 1 = bulle + view more */
@@ -1173,6 +1173,7 @@ main {
 /* ✅ visible UNIQUEMENT quand expand */
 .post-bio.expanded {
   display: block;
+  margin-bottom: 14px;
 }
 /* 🔽 VIEW LESS — END OF TEXT (APP STYLE) */
 .post-bio-toggle.is-bottom {
@@ -1344,15 +1345,21 @@ if (!lookingForSection || lookingForUsers.length === 0) {
       "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
     const feelingLabel =
-      post.feeling?.label ||
-      post.feeling?.name ||
-      post.feeling?.slug ||
-      null;
+  post.feeling?.label ||
+  post.feeling?.title ||
+  post.feeling?.name ||
+  null;
 
-    const feelingEmoji =
-      post.feeling?.icon ||
-      post.feeling?.emoji ||
-      "👀";
+const activityLabel =
+  post.activity?.label ||
+  post.activity?.title ||
+  post.activity?.name ||
+  null;
+
+const activityIcon =
+  post.activity?.image
+    ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
+    : null;
 
     const location =
       post.localLocation?.label ||
@@ -1381,15 +1388,26 @@ if (!lookingForSection || lookingForUsers.length === 0) {
           </div>
         </div>
 
-        ${
-          feelingLabel
-            ? `
-              <div class="lf-feeling">
-                ${feelingEmoji} looking for ${feelingLabel}
-              </div>
-            `
-            : ""
-        }
+       ${
+  feelingLabel && activityLabel && activityIcon
+    ? `
+      <div class="lf-feeling">
+        ${feelingLabel}
+        <img
+          src="${activityIcon}"
+          alt=""
+          style="
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            margin: 0 4px;
+          "
+        />
+        ${activityLabel}
+      </div>
+    `
+    : ""
+}
 
         ${
           message
@@ -1413,17 +1431,45 @@ if (!lookingForSection || lookingForUsers.length === 0) {
 
       feed.innerHTML = "";
 
+      // =========================
+// STRIP URL FROM TEXT (APP BEHAVIOR)
+// =========================
+function stripUrls(text) {
+  if (!text) return text;
+
+  return text
+    // supprime les URLs http(s)
+    .replace(/https?:\/\/[^\s]+/gi, "")
+    // supprime les www.xxx
+    .replace(/www\.[^\s]+/gi, "")
+    // nettoie les espaces multiples
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
       posts.forEach((post) => {
   const user =
     `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
     "Dream Real";
 
   const date = post.created_time
-    ? new Date(post.created_time).toLocaleDateString("fr-FR", {
+  ? (() => {
+      const d = new Date(post.created_time);
+
+      const datePart = d.toLocaleDateString("en-US", {
         day: "numeric",
         month: "short",
-      })
-    : "";
+        year: "numeric",
+      });
+
+      const timePart = d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      return `${datePart} at ${timePart}`;
+    })()
+  : "";
 
   const reactions =
     post.reactions_summary && post.reactions_count
@@ -1464,13 +1510,15 @@ const activityIcon =
     ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
     : null;
 
-     const bio =
+     const rawBio =
   post.user_bio ||
   post.bio ||
   post.user?.bio ||
   post.from?.about ||
-  post.message || // ⬅️ TEMPORAIRE POUR TEST
+  post.message ||
   null;
+
+const bio = stripUrls(rawBio);
 
   const imageMedia =
   (Array.isArray(post.images) && post.images[0]) ||
@@ -1689,12 +1737,9 @@ document.querySelectorAll(".post-media.adaptive").forEach((container) => {
       console.error("❌ Feed fetch error:", err);
       feed.innerHTML = "<p>❌ Impossible de charger le feed</p>";
     });
+
     // =========================
 // POST BIO — VIEW MORE / LESS
-// =========================
-
-// =========================
-// POST BIO — VIEW MORE / LESS (RN-LIKE)
 // =========================
 
 document.addEventListener("click", (e) => {
