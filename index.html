@@ -290,7 +290,6 @@ main {
 .feed-title {
   display: none;
 }
-
       /* POST — DESIGN APP */
       .post {
         padding: 14px;
@@ -787,6 +786,272 @@ main {
           grid-template-columns: 1fr;
         }
       }
+      /* =========================
+   MOBILE ADJUSTMENTS
+========================= */
+/* =========================
+   MOBILE — HERO SPACING FIX
+========================= */
+@media (max-width: 768px) {
+  /* 🔑 CLÉ N°1 : réduire l’espace sous le header */
+  main {
+    padding-top: 24px; /* au lieu de 56px */
+  }
+
+  /* 🔑 CLÉ N°2 : hero plus compact */
+  .hero {
+    padding-top: 20px;
+    padding-bottom: 36px;
+  }
+
+  /* 🔑 CLÉ N°3 : aucun margin parasite sur le titre */
+  .hero h1 {
+    margin-top: 0;
+  }
+}
+
+/* =========================
+   MOBILE — HERO TEXT FLOW
+========================= */
+@media (max-width: 768px) {
+  .hero-text p br {
+    display: none;
+  }
+}
+
+/* =========================
+   MOBILE — HERO TEXT TIGHTER
+========================= */
+@media (max-width: 768px) {
+  .hero-text p {
+    line-height: 1.25;   /* au lieu de 1.65 */
+  }
+}
+
+/* =========================
+   MOBILE — STORE BADGES UP
+========================= */
+@media (max-width: 768px) {
+  .hero-actions.app-downloads {
+    margin-top: 9px !important;
+  }
+}
+/* =========================
+   MOBILE — GRID REORDER (CORRECT)
+========================= */
+@media (max-width: 900px) {
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "hero"
+      "feed"
+      "looking";
+  }
+
+  /* wrapper gauche */
+  .hero-grid > div:first-child {
+    grid-area: hero;
+  }
+
+  /* feed */
+  .feed {
+    grid-area: feed;
+  }
+
+  /* looking for */
+  .looking-for {
+    grid-area: looking;
+  }
+}
+/* =========================
+   MOBILE — LOOKING FOR SPACING
+========================= */
+@media (max-width: 768px) {
+  .looking-for {
+    margin-top: 28px; /* au lieu de 64px */
+  }
+}
+/* =========================
+   MOBILE — LOOKING FOR TEXT LINE HEIGHT
+========================= */
+@media (max-width: 768px) {
+  .looking-for-sub {
+    line-height: 1.25; /* identique au hero text */
+  }
+}
+/* =========================
+   MOBILE — LOOKING FOR CAROUSEL (CLEAN & FINAL)
+========================= */
+@media (max-width: 640px) {
+
+  /* 🔑 le carrousel déborde volontairement du container */
+  .looking-for-scroll {
+    display: flex;
+    gap: 14px;                 /* ⬅️ GAP RÉDUIT ICI */
+
+    margin-left: -16px;
+    margin-right: -16px;
+
+    padding-left: 16px;
+    padding-right: 16px;
+
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 🔑 cartes bien alignées, largeur maîtrisée */
+  .looking-for-card {
+    flex: 0 0 calc(100% - 32px);
+    width: calc(100% - 32px);
+    max-width: calc(100% - 32px);
+
+    scroll-snap-align: start;
+  }
+
+  /* 🔑 espace final pour la dernière carte */
+  .looking-for-scroll::after {
+    content: "";
+    flex: 0 0 16px;
+  }
+}
+
+/* =========================
+   MOBILE — GLOBAL EDGE ALIGNMENT
+========================= */
+@media (max-width: 768px) {
+
+  /* 🔑 règle unique de marge écran */
+  .container {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* 🔑 neutralise les décalages internes */
+  #feed {
+    padding-right: 0;
+  }
+
+  .looking-for-scroll {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+/* =========================
+   MOBILE — CENTER STORE BADGES (SAFE & ISOLATED)
+========================= */
+@media (max-width: 768px) {
+  .hero-actions.app-downloads {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+  }
+}
+/* =========================
+   MOBILE — FORCE TRUE CENTER STORE BADGES (NO SIDE EFFECT)
+========================= */
+@media (max-width: 768px) {
+  .hero-actions.app-downloads {
+    position: relative;
+    left: 49.5%;
+    transform: translateX(-50%);
+    justify-content: center;
+    width: max-content;
+  }
+}
+/* =========================
+   MOBILE — FEED TITLE
+========================= */
+@media (max-width: 768px) {
+  .feed-title {
+    display: block;
+    margin: 24px 0 12px;
+
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+
+    color: #ffffff;
+  }
+}
+/* =========================
+   MOBILE — FEED HEADING (MATCH LOOKING FOR)
+========================= */
+@media (max-width: 768px) {
+
+  .feed-heading {
+    margin: 24px 0 12px;
+  }
+
+  /* 🔹 EXACTEMENT le style de "They are looking for" */
+  .feed-heading h3 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    color: #ffffff;
+  }
+
+  /* 🔹 EXACTEMENT le style de "People nearby..." */
+  .feed-heading .feed-sub {
+    margin-top: 0;
+    margin-bottom: 18px;
+
+    font-size: 21px;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 60ch;
+  }
+}
+/* =========================
+   MOBILE — FIX SPACE ABOVE FEED (REAL CAUSE)
+========================= */
+@media (max-width: 768px) {
+  .feed {
+    margin-top: -50px;
+  }
+}
+/* =========================
+   MOBILE — FEED SPACING ALIGN (REAL FIX)
+========================= */
+@media (max-width: 768px) {
+  #feed {
+    margin-top: 0; /* ⬅️ annule l'espace parasite */
+  }
+}
+/* =========================
+   MOBILE — REMOVE FORCED FEED HEIGHT
+========================= */
+@media (max-width: 768px) {
+  .feed {
+    height: auto;      /* ⬅️ CLÉ ABSOLUE */
+    min-height: unset;
+  }
+}
+/* =========================
+   MOBILE — FEED HEADING SPACING ALIGN
+========================= */
+@media (max-width: 768px) {
+  .feed-heading {
+    margin-top: 0;
+    margin-bottom: 2px; /* même valeur que .looking-for-sub */
+  }
+}
+/* =========================
+   MOBILE — LOWER FEED BLOCK (FINAL)
+========================= */
+@media (max-width: 768px) {
+  .feed {
+    padding-top: 28px; /* ⬅️ AJUSTE ICI (20 / 24 / 28 / 32) */
+  }
+}
     </style>
   </head>
 
@@ -861,7 +1126,12 @@ main {
 
   <!-- COLONNE DROITE -->
   <div class="feed">
-    <div class="feed-title">Live feed</div>
+    <div class="feed-heading">
+  <h3>Happening now</h3>
+  <p class="feed-sub">
+    Live posts from around the world
+  </p>
+</div>
     <div id="feed"></div>
   </div>
 </div>
