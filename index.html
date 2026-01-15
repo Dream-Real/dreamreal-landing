@@ -290,6 +290,12 @@ main {
 .feed-title {
   display: none;
 }
+/* =========================
+   FEED HEADING — DESKTOP DEFAULT
+========================= */
+.feed-heading {
+  display: none; /* ⛔ caché partout par défaut */
+}
       /* POST — DESIGN APP */
       .post {
         padding: 14px;
@@ -1052,6 +1058,34 @@ main {
     padding-top: 28px; /* ⬅️ AJUSTE ICI (20 / 24 / 28 / 32) */
   }
 }
+/* =========================
+   FEED — FEELING / ACTIVITY PILL (APP CONSISTENT)
+========================= */
+.feed-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 12px;
+  margin: 4px 0 8px; /* ⬆️ encore plus haut, équilibre conservé */
+
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: transparent;
+
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  color: #ffffff;
+
+  width: fit-content;
+}
+
+.feed-pill img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
     </style>
   </head>
 
@@ -1296,6 +1330,24 @@ if (!lookingForSection || lookingForUsers.length === 0) {
     post.location?.label ||
     null;
 
+    // 🔑 FEELING / ACTIVITY (NORMALISÉ — SOURCE APP)
+const feelingLabel =
+  post.feeling?.label ||
+  post.feeling?.title ||
+  post.feeling?.name ||
+  null;
+
+const activityLabel =
+  post.activity?.label ||
+  post.activity?.title ||
+  post.activity?.name ||
+  null;
+
+const activityIcon =
+  post.activity?.image
+    ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
+    : null;
+
       const bio =
     post.user_bio ||
     post.bio ||
@@ -1350,6 +1402,22 @@ const videoMedia = post.video_url || null;
 </div>
 </div>
       </div>
+
+      ${
+  feelingLabel && activityLabel
+    ? `
+      <div class="feed-pill">
+        <span>${feelingLabel}</span>
+        ${
+          activityIcon
+            ? `<img src="${activityIcon}" alt="" />`
+            : ""
+        }
+        <span>${activityLabel}</span>
+      </div>
+    `
+    : ""
+}
 
      ${
   videoMedia
