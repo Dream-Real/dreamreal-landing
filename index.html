@@ -1160,6 +1160,13 @@ main {
   line-height: 1;
   vertical-align: baseline;
 }
+
+/* ✅ FIX — align View less EXACTEMENT comme le texte (FEED) */
+.post-bio-toggle.is-bottom {
+  display: inline-block;   /* ⬅️ clé absolue */
+  margin-left: 0;          /* ⬅️ supprime le décalage */
+  padding-left: 0;         /* ⬅️ sécurité */
+}
 /* =========================
    LOOKING FOR — DESKTOP / MOBILE GATING
 ========================= */
@@ -1235,7 +1242,7 @@ main {
 .lf-post-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -1253,6 +1260,82 @@ main {
   line-height: 21px;
 }
 
+/* =========================
+   LOOKING FOR — BIO WITH VIEW MORE
+========================= */
+
+.lf-bio {
+  font-size: 17px;
+  line-height: 21px;
+  color: #e5e7eb;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+
+.lf-bio-text {
+  display: inline;
+}
+
+.lf-bio-toggle.is-bottom {
+  display: inline;
+  margin-left: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #93c5fd;
+
+  line-height: 1;
+  vertical-align: baseline;
+}
+
+/* ✅ FIX — align View less EXACTEMENT comme le texte du feed */
+.lf-bio-toggle.is-bottom {
+  display: inline-block;   /* ⬅️ clé absolue */
+  margin-left: 0;          /* ⬅️ supprime tout décalage résiduel */
+  padding-left: 0;         /* ⬅️ sécurité */
+}
+
+/* 🔒 état par défaut : 3 lignes MAX */
+.lf-bio.collapsed {
+  -webkit-line-clamp: 2;
+}
+/* 🔑 View more fait partie du clamp */
+.lf-bio-text {
+  display: inline;
+}
+
+.lf-bio-text > .lf-bio-toggle {
+  display: inline;
+}
+
+/* Bouton inline */
+.lf-bio-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;              /* 🔑 IMPORTANT */
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #93c5fd;
+
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: flex-start; /* ⬅️ aligné comme dans le feed */
+}
+
+.lf-bio-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 /* Bulle feeling/activity — EXACTEMENT même style */
 .lf-post-pill {
   align-self: flex-start;
@@ -1265,6 +1348,11 @@ main {
   background: rgba(238, 205, 121, 0.16);
   border: 1px solid rgba(238, 205, 121, 0.4);
   color: #fff;
+}
+
+.lf-post {
+  transform: scaleY(0.94);
+  transform-origin: center;
 }
 
 /* Message */
@@ -1509,16 +1597,68 @@ const activityIcon =
 }
 
             ${
-              message
-                ? `<div class="lf-post-message">${message}</div>`
-                : ""
-            }
+  message
+    ? `
+      <div class="lf-bio-wrapper">
+  <div class="lf-bio collapsed">
+    <span class="lf-bio-text">
+      ${message}
+      <button
+        class="lf-bio-toggle is-bottom"
+        style="display:none"
+      >
+        View less
+      </button>
+    </span>
+  </div>
+
+  <button
+    class="lf-bio-toggle"
+    data-position="inline"
+  >
+    View more
+  </button>
+</div>
+    `
+    : ""
+}
           </div>
         </div>
       `;
     })
     .join("");
 }
+
+// =========================
+// LOOKING FOR — HIDE VIEW MORE IF NOT NEEDED (FEED-LIKE)
+// =========================
+document.querySelectorAll(".lf-bio-wrapper").forEach((wrapper) => {
+  const bio = wrapper.querySelector(".lf-bio");
+  const inlineBtn = wrapper.querySelector(
+    '.lf-bio-toggle[data-position="inline"]'
+  );
+  const bottomBtn = wrapper.querySelector(".lf-bio-toggle.is-bottom");
+
+  if (!bio || !inlineBtn) return;
+
+  // Force l’état collapsed pour mesurer
+  bio.classList.add("collapsed");
+
+  const needsToggle =
+    bio.scrollHeight > bio.clientHeight + 1;
+
+  if (!needsToggle) {
+    // ⛔ aucun bouton si le texte tient
+    inlineBtn.remove();
+    if (bottomBtn) bottomBtn.remove();
+
+    bio.classList.remove("collapsed");
+  } else {
+    // état initial normal
+    inlineBtn.style.display = "inline";
+    if (bottomBtn) bottomBtn.style.display = "none";
+  }
+});
 
       if (!posts.length) {
         feed.innerHTML = "<p>Aucun post pour le moment</p>";
@@ -1851,6 +1991,41 @@ document.addEventListener("click", (e) => {
     inlineBtn.style.display = "inline";
     bottomBtn.style.display = "none";
   }
+});
+
+// =========================
+// LOOKING FOR — VIEW MORE / LESS (INLINE, FEED-LIKE)
+// =========================
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".lf-bio-toggle");
+  if (!btn) return;
+
+  const wrapper = btn.closest(".lf-bio-wrapper");
+  if (!wrapper) return;
+
+  const bio = wrapper.querySelector(".lf-bio");
+  const inlineBtn = wrapper.querySelector(
+    '.lf-bio-toggle[data-position="inline"]'
+  );
+  const bottomBtn = wrapper.querySelector(".lf-bio-toggle.is-bottom");
+
+  const isExpanded = !bio.classList.contains("collapsed");
+
+  if (!isExpanded) {
+    bio.classList.remove("collapsed");
+    inlineBtn.style.display = "none";
+    bottomBtn.style.display = "inline";
+  } else {
+    bio.classList.add("collapsed");
+    inlineBtn.style.display = "inline";
+    bottomBtn.style.display = "none";
+  }
+});
+// =========================
+// WINDOW RESIZE — RELOAD (DESKTOP ↔ MOBILE SWITCH)
+// =========================
+window.addEventListener("resize", () => {
+  location.reload();
 });
 </script>
   </body>
