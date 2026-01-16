@@ -687,63 +687,20 @@ main {
 }
 
 /* Header */
-.lf-header {
+/* Header — EXACTEMENT comme .post-header du feed */
+
+/* HEADER — alignement feed-like SANS changer la hauteur */
+.lf-post-header {
   display: flex;
   align-items: center;
-  gap: 14px;               /* ⬆️ confirme la hiérarchie */
+  gap: 10px;
+  margin-bottom: 13px;
+
+  /* 🔑 déplacement VISUEL uniquement */
+  margin-top: -24px;
+  margin-left: -22px;
 }
 
-.lf-avatar {
-  width: 48px;             /* ⬆️ 36 → 48 */
-  height: 48px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.lf-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Meta */
-.lf-meta strong {
-  font-size: 17px;         /* ⬆️ 14 → 17 */
-  font-weight: 600;
-  color: #ffffff;
-  line-height: 1.25;
-}
-
-.lf-location {
-  display: block;
-  font-size: 15px;         /* ⬆️ 13 → 15 */
-  color: var(--muted);
-}
-
-.lf-feeling {
-  font-size: 16px;         /* ⬆️ 14 → 16 */
-  font-weight: 500;
-
-  padding: 8px 14px;       /* ⬆️ plus de présence */
-  border-radius: 999px;
-
-  background: rgba(238, 205, 121, 0.16);
-  border: 1px solid rgba(238, 205, 121, 0.4);
-
-  width: fit-content;
-}
-/* Message */
-.lf-message {
-  font-size: 16px;         /* ⬆️ 14 → 16 */
-  line-height: 1.55;
-  color: var(--muted);
-
-  display: -webkit-box;
-  -webkit-line-clamp: 3;   /* ⬆️ plus de contenu */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
 /* Desktop large */
 @media (min-width: 1200px) {
   .looking-for-scroll {
@@ -1203,6 +1160,125 @@ main {
   line-height: 1;
   vertical-align: baseline;
 }
+/* =========================
+   LOOKING FOR — DESKTOP / MOBILE GATING
+========================= */
+
+/* 🔹 Par défaut (desktop) */
+.looking-for-scroll {
+  display: none;          /* ⛔ cache le carrousel */
+}
+
+/* =========================
+   LOOKING FOR — DESKTOP / MOBILE GATING
+========================= */
+
+/* 🔹 Par défaut (desktop) */
+.looking-for-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* ✅ EXACTEMENT comme le feed */
+}
+
+/* 🔹 Mobile / tablette */
+@media (max-width: 900px) {
+  .looking-for-scroll {
+    display: flex;        /* ✅ carrousel actif */
+  }
+
+  .looking-for-feed {
+    display: none;        /* ⛔ mini-feed caché */
+  }
+}
+/* MINI POST — LOOKING FOR */
+.lf-post {
+  display: block; /* 🔑 CLÉ : on laisse le header gérer l’alignement */
+
+  padding: 38px 36px 42px; /* ❗ inchangé */
+
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* HEADER — EXACTEMENT COMME .post-header */
+.lf-post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;              /* identique au feed */
+  margin-bottom: 13px;   /* identique au feed */
+}
+
+/* Date — EXACTEMENT comme le feed */
+.lf-post-date small {
+  font-size: 15px;
+  color: #9ca3af;
+  line-height: 21px;
+}
+
+/* Avatar */
+.lf-post-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.lf-post-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Contenu */
+.lf-post-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Nom + location */
+.lf-post-header strong {
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.lf-post-header span {
+  font-size: 17px;      /* même taille que le feed */
+  font-weight: 400;     /* même poids que .inline-location */
+  color: #ffffff;       /* même couleur que le feed */
+  line-height: 21px;
+}
+
+/* Bulle feeling/activity — EXACTEMENT même style */
+.lf-post-pill {
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  background: rgba(238, 205, 121, 0.16);
+  border: 1px solid rgba(238, 205, 121, 0.4);
+  color: #fff;
+}
+
+/* Message */
+.lf-post-message {
+  font-size: 17px;        /* ⬅️ IDENTIQUE AU FEED */
+  line-height: 21px;      /* ⬅️ IDENTIQUE AU FEED */
+  font-weight: 400;       /* ⬅️ IDENTIQUE AU FEED */
+  color: #e5e7eb;         /* ⬅️ IDENTIQUE AU FEED */
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;  /* ⬅️ on garde la contrainte mini-feed */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
     </style>
   </head>
 
@@ -1263,16 +1339,25 @@ main {
 </div>
     </div>
 
-    <!-- ✅ LOOKING FOR : ICI ET NULLE PART AILLEURS -->
     <section class="looking-for">
-      <h3>They are looking for</h3>
+  <h3>They are looking for</h3>
 
-      <p class="looking-for-sub">
-        People nearby open to connect right now
-      </p>
+  <p class="looking-for-sub">
+    People nearby open to connect right now
+  </p>
 
-      <div class="looking-for-scroll" id="looking-for"></div>
-    </section>
+  <!-- MOBILE / TABLETTE : carrousel EXISTANT -->
+  <div
+    class="looking-for-scroll"
+    id="looking-for-carousel"
+  ></div>
+
+  <!-- DESKTOP : mini feed -->
+  <div
+    class="looking-for-feed"
+    id="looking-for-feed"
+  ></div>
+</section>
   </div>
 
   <!-- COLONNE DROITE -->
@@ -1310,7 +1395,26 @@ main {
     .then((res) => {
       const posts = Array.isArray(res) ? res : res.posts ?? res.data ?? [];
 
+       // =========================
+// STRIP URL FROM TEXT (APP BEHAVIOR)
+// =========================
+function stripUrls(text) {
+  if (!text) return text;
+
+  return text
+    // supprime les URLs http(s)
+    .replace(/https?:\/\/[^\s]+/gi, "")
+    // supprime les www.xxx
+    .replace(/www\.[^\s]+/gi, "")
+    // nettoie les espaces multiples
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
       console.log("📦 POSTS NORMALIZED:", posts);
+
+      const carouselContainer = document.getElementById("looking-for-carousel");
+const feedContainer = document.getElementById("looking-for-feed");
 
       const lookingForUsers = posts
   .filter(
@@ -1325,26 +1429,27 @@ main {
   )
   .slice(0, 10);
 
-const lookingForContainer = document.getElementById("looking-for");
-if (!lookingForContainer) return;
-const lookingForSection = document.querySelector(".looking-for");
-if (!lookingForSection || lookingForUsers.length === 0) {
-  if (lookingForSection) {
-    lookingForSection.remove();
-  }
-} else {
-  lookingForContainer.innerHTML = lookingForUsers
-  .map((post) => {
-    const user =
-      `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
-      "Dream Real";
+  // =========================
+// LOOKING FOR — DESKTOP MINI FEED
+// =========================
+if (feedContainer && window.innerWidth >= 1024) {
+  feedContainer.innerHTML = lookingForUsers
+    .map((post) => {
+      const user =
+        `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
+        "Dream Real";
 
-    const avatar =
-      post.user_avatar ||
-      post.profile_picture ||
-      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+      const avatar =
+        post.user_avatar ||
+        post.profile_picture ||
+        "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
-    const feelingLabel =
+      const location =
+        post.localLocation?.label ||
+        post.location?.label ||
+        "";
+
+     const feelingLabel =
   post.feeling?.label ||
   post.feeling?.title ||
   post.feeling?.name ||
@@ -1361,67 +1466,58 @@ const activityIcon =
     ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
     : null;
 
-    const location =
-      post.localLocation?.label ||
-      post.location?.label ||
-      null;
+      const message =
+        stripUrls(post.message || "");
 
-    const message =
-      post.message ||
-      post.text ||
-      "";
+      return `
+       <div class="lf-post">
 
-    return `
-      <div class="looking-for-card">
-        <div class="lf-header">
-          <div class="lf-avatar">
-            <img src="${avatar}" alt="" />
-          </div>
+  <!-- HEADER EXACTEMENT COMME .post-header -->
+  <div class="lf-post-header">
+    <div class="lf-post-avatar">
+      <img src="${avatar}" alt="" />
+    </div>
 
-          <div class="lf-meta">
-            <strong>${user}</strong>
-            ${
-              location
-                ? `<span class="lf-location">in ${location}</span>`
-                : ""
-            }
-          </div>
-        </div>
+   <div class="lf-post-meta">
+  <strong>${user}</strong>
+  ${location ? `<span class="lf-post-location"> in ${location}</span>` : ""}
+  <div class="lf-post-date">
+    <small>${new Date(post.created_time).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })} at ${new Date(post.created_time).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}</small>
+  </div>
+</div>
+  </div>
 
-       ${
+  <div class="lf-post-body">
+
+  ${
   feelingLabel && activityLabel && activityIcon
     ? `
-      <div class="lf-feeling">
-        ${feelingLabel}
-        <img
-          src="${activityIcon}"
-          alt=""
-          style="
-            width: 18px;
-            height: 18px;
-            vertical-align: middle;
-            margin: 0 4px;
-          "
-        />
-        ${activityLabel}
+      <div class="feed-pill">
+        <span>${feelingLabel}</span>
+        <img src="${activityIcon}" alt="" />
+        <span>${activityLabel}</span>
       </div>
     `
     : ""
 }
 
-        ${
-          message
-            ? `
-              <div class="lf-message">
-                ${message}
-              </div>
-            `
-            : ""
-        }
-      </div>
-    `;
-  })
-  .join("");
+            ${
+              message
+                ? `<div class="lf-post-message">${message}</div>`
+                : ""
+            }
+          </div>
+        </div>
+      `;
+    })
+    .join("");
 }
 
       if (!posts.length) {
@@ -1430,22 +1526,6 @@ const activityIcon =
       }
 
       feed.innerHTML = "";
-
-      // =========================
-// STRIP URL FROM TEXT (APP BEHAVIOR)
-// =========================
-function stripUrls(text) {
-  if (!text) return text;
-
-  return text
-    // supprime les URLs http(s)
-    .replace(/https?:\/\/[^\s]+/gi, "")
-    // supprime les www.xxx
-    .replace(/www\.[^\s]+/gi, "")
-    // nettoie les espaces multiples
-    .replace(/\s{2,}/g, " ")
-    .trim();
-}
 
       posts.forEach((post) => {
   const user =
