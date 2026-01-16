@@ -1,0 +1,21 @@
+<div class="cp-mini-btn" data-action="photo" aria-label="Add photo">
+  <svg
+    class="cp-icon"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M12 9.6C10.01 9.6 8.4 11.21 8.4 13.2C8.4 15.19 10.01 16.8 12 16.8C13.99 16.8 15.6 15.19 15.6 13.2C15.6 11.21 13.99 9.6 12 9.6Z"
+      fill="currentColor"
+    />
+    <path
+      d="M21.6 6H18.72C18.51 6 18.31 5.93 18.14 5.8L17.03 3.08C16.95 2.89 16.82 2.72 16.66 2.6C16.49 2.48 16.29 2.4 16.08 2.4H7.92C7.71 2.4 7.51 2.48 7.34 2.6C7.18 2.72 7.05 2.89 6.97 3.08L5.86 5.8C5.69 5.93 5.49 6 5.28 6H2.4C1.08 6 0 7.08 0 8.4V19.2C0 20.52 1.08 21.6 2.4 21.6H21.6C22.92 21.6 24 20.52 24 19.2V8.4C24 7.08 22.92 6 21.6 6Z"
+      fill="currentColor"
+    />
+  </svg>
+
+  <span class="cp-label">Photo</span>
+</div>

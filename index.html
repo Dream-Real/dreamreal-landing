@@ -1574,6 +1574,23 @@ main {
   margin-top: -4px; /* ⬅️ ajuste : -4 / -6 / -8 */
 }
 
+header {
+  pointer-events: auto;
+}
+
+.nav-actions,
+.btn-create {
+  pointer-events: auto;
+}
+.feed {
+  pointer-events: none;
+}
+
+header,
+header * {
+  pointer-events: auto;
+}
+
 /* =========================
    CREATE POST — MINI ACTIONS (APP 1:1)
 ========================= */
@@ -1841,6 +1858,22 @@ main {
   font-size: 17px;
   font-weight: 600;
   color: #F8FAFC;
+}
+/* La modale est le référentiel */
+.cp-modal {
+  position: relative;
+}
+
+/* Le panneau Mood reste DANS la modale */
+.cp-feeling-panel {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  z-index: 10;
+
+  border-radius: inherit;
+  overflow-y: auto;
 }
     </style>
   </head>

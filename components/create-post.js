@@ -1,12 +1,3 @@
-import { FEELINGS } from "./constants/feelings.js";
-import { ACTIVITIES } from "./constants/activities.js";
-
-const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
-
-function capitalize(str) {
-  if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 // =========================
 // CREATE POST — MODAL
 // =========================
@@ -154,170 +145,109 @@ export function mountCreatePost() {
 }
 
 // =========================
-// LOGIC
+// LOGIC (SAFE)
 // =========================
 
 function bindCreatePost() {
   const overlay = document.getElementById("cp-overlay");
-  const close = document.getElementById("cp-close");
+  const closeBtn = document.getElementById("cp-close");
   const submit = document.getElementById("cp-submit");
   const message = document.getElementById("cp-message");
   const preview = document.getElementById("cp-preview");
 
- document.addEventListener("click", (e) => {
-  if (e.target.closest(".btn-create")) {
-    document
-      .getElementById("cp-overlay")
-      .classList.remove("hidden");
-  }
-});
+  const trigger = document.querySelector(".btn-create");
+
+  const moodPanel = document.getElementById("cp-feeling-panel");
+  const backBtn = document.getElementById("cp-fa-back");
+  const panelTitle = document.getElementById("cp-fa-title");
+  const panelList = document.getElementById("cp-fa-list");
 
   let mood = null;
-let activity = null;
-let location = null;
+  let location = null;
 
-let selectedFeeling = null;
-let selectedActivity = null;
+  // -------------------------
+  // OPEN / CLOSE MODAL
+  // -------------------------
 
-  // =========================
-// RENDER — FEELINGS
-// =========================
-function renderFeelings() {
-  const list = document.getElementById("cp-fa-list");
-  const title = document.getElementById("cp-fa-title");
-
-  title.textContent = "Choose a category";
-  list.innerHTML = "";
-
-  FEELINGS.forEach((feeling) => {
-    const item = document.createElement("div");
-    item.className = "cp-fa-item";
-
-    item.innerHTML = `
-      <img src="${CDN_URL}/${feeling.image}" alt="" />
-      <span>${capitalize(feeling.title)}</span>
-    `;
-
-    item.addEventListener("click", () => {
-      selectedFeeling = feeling;
-      renderActivities(feeling);
-    });
-
-    list.appendChild(item);
-  });
-}
-
-// =========================
-// RENDER — ACTIVITIES
-// =========================
-function renderActivities(feeling) {
-  const list = document.getElementById("cp-fa-list");
-  const title = document.getElementById("cp-fa-title");
-
-  title.textContent = "Choose an entry";
-  list.innerHTML = "";
-
-  ACTIVITIES
-    .filter((a) => a.feeling_id === feeling.id)
-    .forEach((act) => {
-      const item = document.createElement("div");
-      item.className = "cp-fa-item";
-
-      item.innerHTML = `
-  <img src="${CDN_URL}/${act.image}" alt="" />
-  <span>${act.title}</span>
-`;
-
-      item.addEventListener("click", () => {
-  selectedFeeling = feeling;
-  selectedActivity = act;
-
-  mood = capitalize(feeling.title);
-  activity = capitalize(act.title);
-
-  renderPreview();
-  closeFeelingPanel();
-  update();
-});
-
-      list.appendChild(item);
-    });
-}
-
-    // =========================
-  // FEELING / ACTIVITY PANEL
-  // =========================
-
-  function openFeelingPanel() {
-    selectedFeeling = null;
-    selectedActivity = null;
-
-    document
-      .getElementById("cp-feeling-panel")
-      .classList.remove("hidden");
-
-    renderFeelings(); // ⬅️ étape 1 (feelings)
-  }
-
-  function closeFeelingPanel() {
-    document
-      .getElementById("cp-feeling-panel")
-      .classList.add("hidden");
-  }
-
-    // =========================
-  // MINI ACTION — MOOD
-  // =========================
-
-  const moodBtn = document.querySelector(
-    '.cp-mini-btn[data-action="mood"]'
-  );
-
-  if (moodBtn) {
-    moodBtn.addEventListener("click", () => {
-      openFeelingPanel();
+  if (trigger) {
+    trigger.addEventListener("click", () => {
+      overlay.classList.remove("hidden");
     });
   }
 
-  // =========================
-// FEELING PANEL — CLOSE / BACK
-// =========================
-document
-  .getElementById("cp-fa-back")
-  .addEventListener("click", () => {
-    if (selectedFeeling) {
-      selectedFeeling = null;
-      renderFeelings();
-    } else {
-      closeFeelingPanel();
-    }
-  });
-
-  close.onclick = () => {
+  closeBtn.onclick = () => {
     overlay.classList.add("hidden");
+    closeMoodPanel();
   };
 
-  message.oninput = () => update();
+  // -------------------------
+  // MINI ACTIONS (NEUTRES)
+  // -------------------------
 
-  // LOCATION (temporaire mock)
-const locationBtn = document.querySelector(
-  '.cp-mini-btn[data-action="location"]'
-);
+  document.querySelectorAll(".cp-mini-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action;
 
-if (locationBtn) {
-  locationBtn.addEventListener("click", () => {
-    location = "Paris";
-    renderPreview();
-    update();
+      if (action === "mood") {
+        openMoodPanel();
+        return;
+      }
+
+      if (action === "location") {
+        location = "Paris";
+        renderPreview();
+        update();
+        return;
+      }
+
+      // photo → volontairement inchangé
+    });
   });
-}
+
+  // -------------------------
+  // MOOD PANEL (SIMPLE & SAFE)
+  // -------------------------
+
+  function openMoodPanel() {
+    panelTitle.textContent = "Choose a feeling";
+    panelList.innerHTML = "";
+
+    ["Happy", "Calm", "Excited"].forEach((value) => {
+      const item = document.createElement("div");
+      item.className = "cp-fa-item";
+      item.textContent = value;
+
+      item.onclick = () => {
+        mood = value;
+        closeMoodPanel();
+        renderPreview();
+        update();
+      };
+
+      panelList.appendChild(item);
+    });
+
+    moodPanel.classList.remove("hidden");
+  }
+
+  function closeMoodPanel() {
+    moodPanel.classList.add("hidden");
+  }
+
+  backBtn.onclick = closeMoodPanel;
+
+  // -------------------------
+  // PREVIEW / SUBMIT
+  // -------------------------
+
+  message.oninput = update;
 
   function renderPreview() {
-  preview.innerHTML = `
-    ${mood && activity ? `<div>😊 ${mood} · ${activity}</div>` : ""}
-    ${location ? `<div>📍 ${location}</div>` : ""}
-  `;
-}
+    preview.innerHTML = `
+      ${mood ? `<div>😊 Feeling ${mood}</div>` : ""}
+      ${location ? `<div>📍 ${location}</div>` : ""}
+    `;
+  }
 
   function update() {
     const valid =
@@ -327,11 +257,13 @@ if (locationBtn) {
   }
 
   submit.onclick = () => {
+    if (submit.classList.contains("disabled")) return;
+
     alert("Post created (mock)");
+
     overlay.classList.add("hidden");
     message.value = "";
     mood = null;
-    activity = null;
     location = null;
     preview.innerHTML = "";
     update();
