@@ -1752,6 +1752,96 @@ main {
   flex-direction: column;
   gap: 18px; /* ⬅️ ICI l’espace réel entre boutons et Post */
 }
+/* =========================
+   FEELING / ACTIVITY PANEL
+========================= */
+
+.cp-feeling-panel {
+  position: absolute;
+  inset: 0;
+  padding: 14px 18px 0;
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+
+  animation: fadeIn 0.35s ease;
+}
+
+.cp-feeling-panel.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
+
+/* Header */
+.cp-fa-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.cp-fa-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.cp-fa-back {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* List */
+.cp-fa-list {
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+/* Bubble (EXACT RN FEEL) */
+.cp-fa-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  background: rgba(26,30,53,0.88);
+  border-radius: 999px;
+  padding: 12px 18px;
+  margin-bottom: 10px;
+
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+
+  transition: transform 0.08s ease;
+}
+
+.cp-fa-item:active {
+  transform: scale(0.98);
+}
+
+.cp-fa-item img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.cp-fa-item span {
+  font-size: 17px;
+  font-weight: 600;
+  color: #F8FAFC;
+}
     </style>
   </head>
 
@@ -1861,15 +1951,38 @@ main {
       </div>
     </footer>
 
-    <!-- CREATE POST MODAL -->
+    <!-- 🔑 ICI, MANQUANT JUSQU’À MAINTENANT -->
 <div id="create-post-root"></div>
 
-<script type="module">
+    <script type="module">
   import { mountCreatePost } from "./components/create-post.js";
 
   document.addEventListener("DOMContentLoaded", () => {
+    // 1️⃣ Injecte la modale dans #create-post-root
     mountCreatePost();
     console.log("✅ Create Post mounted");
+
+    // 2️⃣ FIX DÉFINITIF — ouverture de la modale
+    const createBtn = document.querySelector(".btn-create");
+
+    if (!createBtn) {
+      console.error("❌ Bouton .btn-create introuvable");
+      return;
+    }
+
+    createBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const overlay = document.getElementById("cp-overlay");
+
+      if (!overlay) {
+        console.error("❌ cp-overlay introuvable (mountCreatePost KO)");
+        return;
+      }
+
+      overlay.classList.remove("hidden");
+      console.log("🟢 Create Post OPEN");
+    });
   });
 </script>
 
@@ -2425,10 +2538,19 @@ document.addEventListener("click", (e) => {
   }
 });
 // =========================
-// WINDOW RESIZE — RELOAD (DESKTOP ↔ MOBILE SWITCH)
+// RESPONSIVE RELOAD — SAFE
 // =========================
+
+let lastIsMobile = window.innerWidth < 900;
+
 window.addEventListener("resize", () => {
-  location.reload();
+  const isMobile = window.innerWidth < 900;
+
+  // Reload UNIQUEMENT si on change de mode (mobile ↔ desktop)
+  if (isMobile !== lastIsMobile) {
+    lastIsMobile = isMobile;
+    location.reload();
+  }
 });
 </script>
   </body>
