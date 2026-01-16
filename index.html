@@ -147,6 +147,33 @@
   padding: 10px 26px;
   font-size: 14px;
 }
+/* =========================
+   HEADER — CREATE POST BUTTON
+========================= */
+
+.nav-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-create {
+  background: #1877f2; /* Facebook blue */
+  border: none;
+  color: #ffffff;
+
+  padding: 10px 18px;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.btn-create:hover {
+  background: #166fe5;
+}
 
 main {
   padding-top: 56px; /* ≈ hauteur du header + respiration */
@@ -1410,6 +1437,102 @@ main {
 .looking-for-feed::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
 }
+/* =========================
+   CREATE POST MODAL
+========================= */
+
+.cp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.cp-overlay.hidden {
+  display: none;
+}
+
+.cp-modal {
+  width: 420px;
+  max-width: 92%;
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  border-radius: 18px;
+  padding: 16px;
+  color: #fff;
+}
+
+.cp-header {
+  display: flex;
+  align-items: center;
+}
+
+.cp-header h3 {
+  margin: 0;
+}
+
+.cp-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.cp-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.cp-user img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+}
+
+.cp-modal textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  min-height: 90px;
+  resize: none;
+}
+
+.cp-actions {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+}
+
+.cp-actions button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cp-submit {
+  width: 100%;
+  padding: 12px;
+  background: #EECD79;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cp-submit.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
     </style>
   </head>
 
@@ -1417,14 +1540,23 @@ main {
     <header>
       <div class="container">
         <div class="nav">
-          <a class="brand" href="#">
-            <div class="brand-mark">
-              <span class="d">D</span><span class="r">R</span>
-            </div>
-          </a>
+  <a class="brand" href="#">
+    <div class="brand-mark">
+      <span class="d">D</span><span class="r">R</span>
+    </div>
+  </a>
 
-          <button class="btn btn-primary">Join</button>
-        </div>
+  <div class="nav-actions">
+    <button
+      class="btn btn-create"
+      onclick="window.openCreatePost()"
+    >
+      Create post
+    </button>
+
+    <button class="btn btn-primary">Join</button>
+  </div>
+</div>
       </div>
     </header>
 
@@ -1512,6 +1644,18 @@ main {
         © <span id="year"></span> Dream Real — Social Mirror
       </div>
     </footer>
+
+    <!-- CREATE POST MODAL -->
+<div id="create-post-root"></div>
+
+<script type="module">
+  import { mountCreatePost } from "./components/create-post.js";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    mountCreatePost();
+    console.log("✅ Create Post mounted");
+  });
+</script>
 
     <script>
   document.getElementById("year").textContent = new Date().getFullYear();
