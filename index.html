@@ -1456,12 +1456,43 @@ main {
 }
 
 .cp-modal {
-  width: 420px;
-  max-width: 92%;
+  width: 460px;        /* ⬅️ AVANT : 420px */
+  max-width: 94%;      /* ⬅️ un peu plus permissif */
+
+  /* 🔑 HAUTEUR FORCÉE */
+  height: 50vh;        /* ⬅️ ICI la clé (essaie 65 / 70 / 75) */
+
   background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
   border-radius: 18px;
-  padding: 16px;
+  padding: 20px;
+
   color: #fff;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.cp-modal textarea {
+  flex: 1;              /* ⬅️ prend la hauteur restante */
+  min-height: 120px;
+}
+/* Zone scrollable interne */
+.cp-modal {
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-content {
+  flex: 1;
+  overflow-y: auto;
+}
+@media (max-width: 480px) {
+  .cp-modal {
+    max-height: 90vh;
+    min-height: 0;
+  }
 }
 
 .cp-header {
@@ -1475,11 +1506,24 @@ main {
 
 .cp-close {
   margin-left: auto;
+
+  width: 40px;          /* ⬅️ zone cliquable confortable */
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background: none;
   border: none;
+
   color: #93C5FD;
-  font-size: 18px;
+  font-size: 28px;      /* ⬅️ taille visuelle de la croix */
+
   cursor: pointer;
+  border-radius: 999px; /* hit area ronde (invisible) */
+
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .cp-user {
@@ -1527,11 +1571,186 @@ main {
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
+  margin-top: -4px; /* ⬅️ ajuste : -4 / -6 / -8 */
 }
 
+/* =========================
+   CREATE POST — MINI ACTIONS (APP 1:1)
+========================= */
+
+.cp-mini-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Bouton = affordance discrète */
+.cp-mini-btn {
+  flex: 1;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cp-mini-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.cp-mini-btn:active {
+  background: rgba(147, 197, 253, 0.18);
+  border-color: rgba(147, 197, 253, 0.35);
+}
+
+.cp-mini-btn:hover .cp-icon {
+  color: #fff;
+}
+
+/* Label discret (comme RN) */
+.cp-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(248, 250, 252, 0.9);
+}
+
+/* =========================
+   CREATE POST — ICONS (WEB SAFE)
+========================= */
+
+.cp-icon {
+  width: 20px;
+  height: 20px;
+
+  display: block;
+  flex-shrink: 0;
+
+  color: #ffffff; /* ✅ BLANC */
+}
+
+.cp-mini-btn:hover .cp-icon {
+  color: #ffffff;
+}
+/* =========================
+   CREATE POST — PREVIEW
+========================= */
+
+.cp-preview {
+  margin-top: 10px;
+  padding: 0;              /* ⬅️ CLÉ */
+  background: transparent;/* ⬅️ CLÉ */
+
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cp-preview div {
+  background: rgba(238,205,121,0.16);
+  border: 1px solid rgba(238,205,121,0.35);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+/* =========================
+   CREATE POST — TEXTAREA FOCUS FIX
+========================= */
+
+.cp-modal textarea:focus {
+  outline: none;        /* ⛔ supprime le rectangle bleu */
+  box-shadow: none;     /* ⛔ supprime tout glow */
+}
+/* =========================
+   CREATE POST — SVG FIX (CRITICAL)
+========================= */
+
+.cp-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: currentColor;
+}
+/* =========================
+   CREATE POST — LOCATION ICON ONLY
+========================= */
+
+.cp-mini-btn[data-action="location"] .cp-icon {
+  width: 34px;     /* ⬅️ ajuste ici : 22 / 24 / 26 */
+  height: 34px;
+}
+.cp-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+  /* 🔑 RENDU VECTORIEL NET */
+  shape-rendering: geometricPrecision;
+}
+/* =========================
+   CREATE POST — CAMERA ICON ONLY
+========================= */
+
+/* Cible UNIQUEMENT le bouton photo */
+.cp-mini-btn[data-action="photo"] .cp-icon svg {
+  width: 21px;     /* ← augmente ici (22 / 24 / 26) */
+  height: 21px;
+  display: block;  /* évite tout décalage inline */
+}
+/* =========================
+   CREATE POST — SUBMIT BUTTON (JAUNE PUR)
+========================= */
+
+.cp-submit {
+  width: 100%;
+  height: 44px;
+
+  background: #EECD79;     /* 🟡 JAUNE CHARTE — TOUJOURS */
+  color: #0B1120;          /* 🔵 texte sombre */
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* Hover = STRICTEMENT IDENTIQUE */
+.cp-submit:hover {
+  background: #EECD79;
+}
+
+/* Active = STRICTEMENT IDENTIQUE */
+.cp-submit:active {
+  background: #EECD79;
+}
+
+/* Disabled = JAUNE AUSSI (juste bloqué) */
 .cp-submit.disabled {
-  opacity: 0.4;
-  pointer-events: none;
+  background: #EECD79;
+  color: #0B1120;
+  cursor: not-allowed;
+}
+/* =========================
+   CREATE POST — FOOTER
+========================= */
+
+.cp-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* ⬅️ ICI l’espace réel entre boutons et Post */
 }
     </style>
   </head>
@@ -1547,12 +1766,9 @@ main {
   </a>
 
   <div class="nav-actions">
-    <button
-      class="btn btn-create"
-      onclick="window.openCreatePost()"
-    >
-      Create post
-    </button>
+    <button class="btn btn-create">
+  Create post
+</button>
 
     <button class="btn btn-primary">Join</button>
   </div>
