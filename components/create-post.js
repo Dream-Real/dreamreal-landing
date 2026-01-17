@@ -1,12 +1,21 @@
+/* =========================================================
+   CREATE POST — WINDOW SAFE VERSION (NO MODULES)
+   ========================================================= */
+
 const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
-// =========================
-// CREATE POST — MODAL
-// =========================
+/* =========================================================
+   MOUNT
+   ========================================================= */
 
-export function mountCreatePost() {
+function mountCreatePost() {
+  console.log("✅ mountCreatePost called");
+
   const root = document.getElementById("create-post-root");
-  if (!root) return;
+  if (!root) {
+    console.warn("❌ #create-post-root not found");
+    return;
+  }
 
   root.innerHTML = `
     <div class="cp-overlay hidden" id="cp-overlay">
@@ -148,155 +157,142 @@ export function mountCreatePost() {
   bindCreatePost();
 }
 
-// =========================
-// LOGIC (SAFE)
-// =========================
+/* =========================================================
+   LOGIC
+   ========================================================= */
 
 function bindCreatePost() {
+  console.log("🟢 bindCreatePost");
+
   const overlay = document.getElementById("cp-overlay");
   const closeBtn = document.getElementById("cp-close");
   const submit = document.getElementById("cp-submit");
   const message = document.getElementById("cp-message");
   const preview = document.getElementById("cp-preview");
 
-  const trigger = document.querySelector(".btn-create");
-  trigger.onclick = () => {
-  overlay.classList.remove("hidden");
-};
-
   const moodPanel = document.getElementById("cp-feeling-panel");
-  const backBtn = document.getElementById("cp-fa-back");
   const panelTitle = document.getElementById("cp-fa-title");
   const panelList = document.getElementById("cp-fa-list");
+  const backBtn = document.getElementById("cp-fa-back");
+
+  const trigger = document.querySelector(".btn-create");
+
+  /* ===============================
+     SAFE DATA ACCESS
+     =============================== */
+
   const FEELINGS = Array.isArray(window.FEELINGS) ? window.FEELINGS : [];
-const ACTIVITIES = Array.isArray(window.ACTIVITIES) ? window.ACTIVITIES : [];
+  const ACTIVITIES = Array.isArray(window.ACTIVITIES) ? window.ACTIVITIES : [];
+
+  console.log("📦 FEELINGS:", FEELINGS.length);
+  console.log("📦 ACTIVITIES:", ACTIVITIES.length);
 
   let mood = null;
   let location = null;
 
-  // -------------------------
-  // OPEN / CLOSE MODAL
-  // -------------------------
+  /* ===============================
+     OPEN / CLOSE MODAL
+     =============================== */
+
+  if (trigger) {
+    trigger.onclick = () => {
+      overlay.classList.remove("hidden");
+    };
+  }
 
   closeBtn.onclick = () => {
     overlay.classList.add("hidden");
     closeMoodPanel();
   };
 
-  // -------------------------
-  // MINI ACTIONS (NEUTRES)
-  // -------------------------
+  backBtn.onclick = closeMoodPanel;
+
+  /* ===============================
+     MINI ACTIONS
+     =============================== */
 
   document.querySelectorAll(".cp-mini-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.onclick = () => {
       const action = btn.dataset.action;
 
       if (action === "mood") {
         openMoodPanel();
-        return;
       }
 
       if (action === "location") {
         location = "Paris";
         renderPreview();
-        update();
-        return;
+        updateSubmit();
       }
-
-      // photo → volontairement inchangé
-    });
+    };
   });
 
-  // -------------------------
-  // MOOD PANEL (SIMPLE & SAFE)
-  // -------------------------
+  /* ===============================
+     MOOD PANEL
+     =============================== */
 
   function openMoodPanel() {
-  panelTitle.textContent = "Choose a category";
-  panelList.innerHTML = "";
+    panelTitle.textContent = "Choose a category";
+    panelList.innerHTML = "";
 
-  const feelings = FEELINGS;
+    if (!FEELINGS.length) {
+      panelList.innerHTML = `
+        <div style="opacity:.6;text-align:center;padding:20px">
+          No feelings available
+        </div>
+      `;
+      moodPanel.classList.remove("hidden");
+      return;
+    }
 
-  // ✅ CAS 1 — AUCUNE DATA → on affiche quand même le panel
-  if (feelings.length === 0) {
-    const empty = document.createElement("div");
-    empty.style.opacity = "0.6";
-    empty.style.padding = "20px";
-    empty.style.textAlign = "center";
-    empty.textContent = "No moods available (data not loaded yet)";
-    panelList.appendChild(empty);
-
-    moodPanel.classList.remove("hidden");
-    console.warn("⚠️ FEELINGS empty — panel opened anyway");
-    return;
-  }
-
-  // ✅ CAS 2 — DATA OK
-  feelings.forEach((feeling) => {
-    const item = document.createElement("div");
-    item.className = "cp-fa-item";
-
-    item.innerHTML = `
-      <img
-        src="${CDN_URL}/${feeling.image}"
-        style="width:24px;height:24px;margin-right:10px;"
-      />
-      <span>${feeling.title}</span>
-    `;
-
-    item.onclick = () => openActivities(feeling);
-    panelList.appendChild(item);
-  });
-
-  moodPanel.classList.remove("hidden");
-}
-
-function openActivities(feeling) {
-  panelTitle.textContent = feeling.title;
-  panelList.innerHTML = "";
-
-  ACTIVITIES
-    .filter((a) => a.feeling_id === feeling.id)
-    .forEach((activity) => {
+    FEELINGS.forEach((feeling) => {
       const item = document.createElement("div");
       item.className = "cp-fa-item";
-
       item.innerHTML = `
-        <img
-          src="${CDN_URL}/${activity.image}"
-          style="width:24px;height:24px;margin-right:10px;"
-        />
-        <span>${activity.title}</span>
+        <img src="${CDN_URL}/${feeling.image}" />
+        <span>${feeling.title}</span>
       `;
-
-      item.onclick = () => {
-        mood = {
-          feeling,
-          activity,
-        };
-
-        closeMoodPanel();
-        renderPreview();
-        update();
-      };
-
+      item.onclick = () => openActivities(feeling);
       panelList.appendChild(item);
     });
-}
 
-function closeMoodPanel() {
-  moodPanel.classList.add("hidden");
-  panelList.innerHTML = "";
-  panelTitle.textContent = "Choose a category";
-}
+    moodPanel.classList.remove("hidden");
+  }
 
-  backBtn.onclick = closeMoodPanel;
+  function openActivities(feeling) {
+    panelTitle.textContent = feeling.title;
+    panelList.innerHTML = "";
 
-  // -------------------------
-  // PREVIEW / SUBMIT
-  // -------------------------
+    ACTIVITIES
+      .filter((a) => a.feeling_id === feeling.id)
+      .forEach((activity) => {
+        const item = document.createElement("div");
+        item.className = "cp-fa-item";
+        item.innerHTML = `
+          <img src="${CDN_URL}/${activity.image}" />
+          <span>${activity.title}</span>
+        `;
+        item.onclick = () => {
+          mood = { feeling, activity };
+          closeMoodPanel();
+          renderPreview();
+          updateSubmit();
+        };
+        panelList.appendChild(item);
+      });
+  }
 
-  message.oninput = update;
+  function closeMoodPanel() {
+    moodPanel.classList.add("hidden");
+    panelList.innerHTML = "";
+    panelTitle.textContent = "Choose a category";
+  }
+
+  /* ===============================
+     PREVIEW / SUBMIT
+     =============================== */
+
+  message.oninput = updateSubmit;
 
   function renderPreview() {
     preview.innerHTML = `
@@ -305,7 +301,7 @@ function closeMoodPanel() {
     `;
   }
 
-  function update() {
+  function updateSubmit() {
     const valid =
       message.value.trim().length > 0 || mood || location;
 
@@ -322,6 +318,13 @@ function closeMoodPanel() {
     mood = null;
     location = null;
     preview.innerHTML = "";
-    update();
+    updateSubmit();
   };
 }
+
+/* =========================================================
+   GLOBAL EXPORT
+   ========================================================= */
+
+window.mountCreatePost = mountCreatePost;
+console.log("🚀 create-post.js loaded");
