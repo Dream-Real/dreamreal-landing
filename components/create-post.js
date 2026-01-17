@@ -30,6 +30,7 @@ function mountCreatePost() {
           <img src="https://i.pravatar.cc/100" alt="" />
           <span>Dream Real User</span>
         </div>
+        <div class="post-inline-row cp-inline-row" id="cp-inline-row"></div>
 
         <div class="cp-body">
 
@@ -261,10 +262,6 @@ function resetCreatePost() {
 }
 
   /* ===============================
-     OPEN / CLOSE MODAL
-     =============================== */
-
-  /* ===============================
    OPEN / CLOSE MODAL
    =============================== */
 
@@ -424,15 +421,28 @@ wrapper.appendChild(img);
     mediaSlot.appendChild(wrapper);
   }
 
-  // =========================
-  // MOOD / ACTIVITY
-  // =========================
-  if (mood) {
-    const pill = document.createElement("div");
-    pill.className = "cp-pill";
-    pill.textContent = `${mood.feeling.title} — ${mood.activity.title}`;
-    preview.appendChild(pill);
-  }
+  const inlineRow = document.getElementById("cp-inline-row");
+inlineRow.innerHTML = "";
+
+// =========================
+// MOOD / ACTIVITY (FEED-LIKE POSITION)
+// =========================
+if (mood) {
+  const pill = document.createElement("div");
+pill.className = "feed-pill";
+
+  pill.innerHTML = `
+    <span>${mood.feeling.title}</span>
+    ${
+      mood.activity?.image
+        ? `<img src="${CDN_URL}/${mood.activity.image}" alt="" />`
+        : ""
+    }
+    <span>${mood.activity.title}</span>
+  `;
+
+  inlineRow.appendChild(pill);
+}
 
   // =========================
   // LOCATION

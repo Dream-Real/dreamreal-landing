@@ -1658,9 +1658,12 @@ header * {
   background: rgba(238,205,121,0.16);
   border: 1px solid rgba(238,205,121,0.35);
   border-radius: 999px;
-  padding: 6px 12px;
+
+  /* 🔑 MATCH EXACT FEED */
+  padding: 8px 14px;
 
   font-size: 14px;
+  line-height: 1;          /* 🔑 évite l’air fantôme */
   width: fit-content;
 }
 
@@ -1941,9 +1944,6 @@ header * {
 .cp-user {
   padding-left: 24px; /* ⬅️ ajuste ici : 20 / 24 / 28 */
 }
-/* =========================
-   CREATE POST — MEDIA PREVIEW (FACEBOOK-LIKE)
-========================= */
 
 /* =========================
    CREATE POST — MEDIA (FIX FINAL)
@@ -2028,6 +2028,23 @@ header * {
   font-size: 17px;
   font-weight: 400;
   line-height: 1.4;
+}
+/* Emoji / icon spacing — MATCH FEED EXACTLY */
+.cp-preview .cp-pill img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+.cp-inline-row {
+  display: flex;
+  align-items: baseline;   /* 🔑 identique feed */
+  flex-wrap: wrap;
+
+  column-gap: 8px;
+  row-gap: 6px;
+
+  padding: 0 24px;         /* 🔑 même respiration que le feed */
+  margin-bottom: 6px;
 }
     </style>
   </head>
