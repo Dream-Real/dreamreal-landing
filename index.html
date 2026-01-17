@@ -1582,10 +1582,6 @@ header {
 .btn-create {
   pointer-events: auto;
 }
-.feed {
-  pointer-events: none;
-}
-
 header,
 header * {
   pointer-events: auto;
@@ -1984,18 +1980,17 @@ header * {
       </div>
     </footer>
 
-    <!-- 🔑 ICI, MANQUANT JUSQU’À MAINTENANT -->
 <div id="create-post-root"></div>
 
-    <script type="module">
+<script type="module">
   import { mountCreatePost } from "./components/create-post.js";
 
   document.addEventListener("DOMContentLoaded", () => {
-    // 1️⃣ Injecte la modale dans #create-post-root
+    // 1️⃣ Injection de la modale
     mountCreatePost();
     console.log("✅ Create Post mounted");
 
-    // 2️⃣ FIX DÉFINITIF — ouverture de la modale
+    // 2️⃣ OUVERTURE DE LA MODALE (CLÉ ABSOLUE)
     const createBtn = document.querySelector(".btn-create");
 
     if (!createBtn) {
@@ -2009,7 +2004,7 @@ header * {
       const overlay = document.getElementById("cp-overlay");
 
       if (!overlay) {
-        console.error("❌ cp-overlay introuvable (mountCreatePost KO)");
+        console.error("❌ cp-overlay introuvable");
         return;
       }
 

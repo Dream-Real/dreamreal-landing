@@ -1,3 +1,8 @@
+import { FEELINGS } from "./constants/feelings.js";
+import { ACTIVITIES } from "./constants/activities.js";
+
+const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
+
 // =========================
 // CREATE POST — MODAL
 // =========================
@@ -128,16 +133,18 @@ export function mountCreatePost() {
         <button class="cp-submit disabled" id="cp-submit" type="button">
           Post
         </button>
+                <div class="cp-feeling-panel hidden" id="cp-feeling-panel">
+          <div class="cp-fa-header">
+            <button class="cp-fa-back" id="cp-fa-back">✕</button>
+            <div class="cp-fa-title" id="cp-fa-title">
+              Choose a category
+            </div>
+          </div>
+
+          <div class="cp-fa-list" id="cp-fa-list"></div>
+        </div>
 
       </div>
-      <div class="cp-feeling-panel hidden" id="cp-feeling-panel">
-  <div class="cp-fa-header">
-    <button class="cp-fa-back" id="cp-fa-back">✕</button>
-    <div class="cp-fa-title" id="cp-fa-title">Choose a category</div>
-  </div>
-
-  <div class="cp-fa-list" id="cp-fa-list"></div>
-</div>
     </div>
   `;
 
@@ -167,13 +174,7 @@ function bindCreatePost() {
 
   // -------------------------
   // OPEN / CLOSE MODAL
-  // -------------------------
-
-  if (trigger) {
-    trigger.addEventListener("click", () => {
-      overlay.classList.remove("hidden");
-    });
-  }
+  // ------------------------
 
   closeBtn.onclick = () => {
     overlay.classList.add("hidden");
@@ -209,16 +210,52 @@ function bindCreatePost() {
   // -------------------------
 
   function openMoodPanel() {
-    panelTitle.textContent = "Choose a feeling";
-    panelList.innerHTML = "";
+  panelTitle.textContent = "Choose a category";
+  panelList.innerHTML = "";
 
-    ["Happy", "Calm", "Excited"].forEach((value) => {
+  FEELINGS.forEach((feeling) => {
+    const item = document.createElement("div");
+    item.className = "cp-fa-item";
+
+    item.innerHTML = `
+      <img
+        src="${CDN_URL}/${feeling.image}"
+        style="width:24px;height:24px;margin-right:10px;"
+      />
+      <span>${feeling.title}</span>
+    `;
+
+    item.onclick = () => openActivities(feeling);
+    panelList.appendChild(item);
+  });
+
+  moodPanel.classList.remove("hidden");
+}
+
+function openActivities(feeling) {
+  panelTitle.textContent = feeling.title;
+  panelList.innerHTML = "";
+
+  ACTIVITIES
+    .filter((a) => a.feeling_id === feeling.id)
+    .forEach((activity) => {
       const item = document.createElement("div");
       item.className = "cp-fa-item";
-      item.textContent = value;
+
+      item.innerHTML = `
+        <img
+          src="${CDN_URL}/${activity.image}"
+          style="width:24px;height:24px;margin-right:10px;"
+        />
+        <span>${activity.title}</span>
+      `;
 
       item.onclick = () => {
-        mood = value;
+        mood = {
+          feeling,
+          activity,
+        };
+
         closeMoodPanel();
         renderPreview();
         update();
@@ -226,13 +263,13 @@ function bindCreatePost() {
 
       panelList.appendChild(item);
     });
+}
 
-    moodPanel.classList.remove("hidden");
-  }
-
-  function closeMoodPanel() {
-    moodPanel.classList.add("hidden");
-  }
+function closeMoodPanel() {
+  moodPanel.classList.add("hidden");
+  panelList.innerHTML = "";
+  panelTitle.textContent = "Choose a category";
+}
 
   backBtn.onclick = closeMoodPanel;
 
@@ -244,7 +281,7 @@ function bindCreatePost() {
 
   function renderPreview() {
     preview.innerHTML = `
-      ${mood ? `<div>😊 Feeling ${mood}</div>` : ""}
+      ${mood ? `<div>😊 ${mood.feeling.title} — ${mood.activity.title}</div>` : ""}
       ${location ? `<div>📍 ${location}</div>` : ""}
     `;
   }
