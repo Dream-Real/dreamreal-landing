@@ -1989,6 +1989,28 @@ header * {
     // 1️⃣ Injection de la modale
     mountCreatePost();
     console.log("✅ Create Post mounted");
+
+    // 2️⃣ OUVERTURE DE LA MODALE (CLÉ ABSOLUE)
+    const createBtn = document.querySelector(".btn-create");
+
+    if (!createBtn) {
+      console.error("❌ Bouton .btn-create introuvable");
+      return;
+    }
+
+    createBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const overlay = document.getElementById("cp-overlay");
+
+      if (!overlay) {
+        console.error("❌ cp-overlay introuvable");
+        return;
+      }
+
+      overlay.classList.remove("hidden");
+      console.log("🟢 Create Post OPEN");
+    });
   });
 </script>
 

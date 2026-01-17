@@ -1,6 +1,3 @@
-import { FEELINGS } from "./constants/feelings.js";
-import { ACTIVITIES } from "./constants/activities.js";
-
 const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
 // =========================
@@ -174,7 +171,7 @@ function bindCreatePost() {
 
   // -------------------------
   // OPEN / CLOSE MODAL
-  // ------------------------
+  // -------------------------
 
   closeBtn.onclick = () => {
     overlay.classList.add("hidden");
