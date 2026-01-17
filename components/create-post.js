@@ -31,12 +31,20 @@ function mountCreatePost() {
           <span>Dream Real User</span>
         </div>
 
-        <textarea
-          id="cp-message"
-          placeholder="What's on your mind?"
-        ></textarea>
+        <div class="cp-body">
+  <textarea
+    id="cp-message"
+    placeholder="What's on your mind?"
+  ></textarea>
 
-        <div class="cp-preview" id="cp-preview"></div>
+  <div class="cp-preview" id="cp-preview"></div>
+</div>
+        <input
+  type="file"
+  id="cp-media-input"
+  accept="image/*,video/*"
+  hidden
+/>
 
         <!-- MINI ACTIONS -->
         <div class="cp-footer">
@@ -181,15 +189,31 @@ if (modal) {
    =============================== */
 
 overlay.addEventListener("click", (e) => {
-  // Si on clique DIRECTEMENT sur l’overlay (et pas la modale)
   if (e.target === overlay) {
-    overlay.classList.add("hidden");
-    closeMoodPanel();
+    resetCreatePost();
   }
 });
   const submit = document.getElementById("cp-submit");
   const message = document.getElementById("cp-message");
   const preview = document.getElementById("cp-preview");
+  const mediaInput = document.getElementById("cp-media-input");
+
+
+mediaInput.addEventListener("change", () => {
+  const file = mediaInput.files[0];
+  if (!file) return;
+
+  mediaFile = file;
+
+  if (mediaPreviewUrl) {
+    URL.revokeObjectURL(mediaPreviewUrl);
+  }
+
+  mediaPreviewUrl = URL.createObjectURL(file);
+
+  renderPreview();
+  updateSubmit();
+});
 
   const moodPanel = document.getElementById("cp-feeling-panel");
   const panelTitle = document.getElementById("cp-fa-title");
@@ -210,6 +234,25 @@ overlay.addEventListener("click", (e) => {
 
   let mood = null;
   let location = null;
+  let mediaFile = null;
+let mediaPreviewUrl = null;
+
+function resetCreatePost() {
+  overlay.classList.add("hidden");
+  message.value = "";
+  mood = null;
+  location = null;
+  mediaFile = null;
+
+  if (mediaPreviewUrl) {
+    URL.revokeObjectURL(mediaPreviewUrl);
+    mediaPreviewUrl = null;
+  }
+
+  preview.innerHTML = "";
+  updateSubmit();
+  closeMoodPanel();
+}
 
   /* ===============================
      OPEN / CLOSE MODAL
@@ -232,10 +275,7 @@ if (trigger) {
   };
 }
 
-  closeBtn.onclick = () => {
-    overlay.classList.add("hidden");
-    closeMoodPanel();
-  };
+  closeBtn.onclick = resetCreatePost;
 
   backBtn.onclick = closeMoodPanel;
 
@@ -244,20 +284,26 @@ if (trigger) {
      =============================== */
 
   document.querySelectorAll(".cp-mini-btn").forEach((btn) => {
-    btn.onclick = () => {
-      const action = btn.dataset.action;
+  btn.onclick = () => {
+    const action = btn.dataset.action;
 
-      if (action === "mood") {
-        openMoodPanel();
-      }
+    if (action === "photo") {
+      mediaInput.click();
+      return;
+    }
 
-      if (action === "location") {
-        location = "Paris";
-        renderPreview();
-        updateSubmit();
-      }
-    };
-  });
+    if (action === "mood") {
+      openMoodPanel();
+      return;
+    }
+
+    if (action === "location") {
+      location = "Paris";
+      renderPreview();
+      updateSubmit();
+    }
+  };
+});
 
   /* ===============================
      MOOD PANEL
@@ -328,58 +374,41 @@ if (trigger) {
 
   function renderPreview() {
   preview.innerHTML = `
+    ${mediaPreviewUrl ? renderMediaPreview() : ""}
+
     ${
       mood
         ? `
-          <div
-            style="
-              display: inline-flex;
-              align-items: center;
-              gap: 6px;
-              width: fit-content;
-              max-width: 100%;
-            "
-          >
+          <div style="display:inline-flex;gap:6px;align-items:center">
             <span>${mood.feeling.title}</span>
-
-            ${
-              mood.activity?.image
-                ? `
-                  <img
-                    src="${CDN_URL}/${mood.activity.image}"
-                    alt=""
-                    style="
-                      width: 16px;
-                      height: 16px;
-                      object-fit: contain;
-                    "
-                  />
-                `
-                : ""
-            }
-
             <span>${mood.activity.title}</span>
           </div>
         `
         : ""
     }
 
-    ${
-      location
-        ? `
-          <div
-            style="
-              display: inline-flex;
-              align-items: center;
-              gap: 6px;
-              width: fit-content;
-            "
-          >
-            📍 ${location}
-          </div>
-        `
-        : ""
-    }
+    ${location ? `<div>📍 ${location}</div>` : ""}
+  `;
+}
+
+function renderMediaPreview() {
+  if (!mediaFile || !mediaPreviewUrl) return "";
+
+  if (mediaFile.type.startsWith("video")) {
+    return `
+      <video
+        src="${mediaPreviewUrl}"
+        controls
+        style="width:100%;max-height:45vh;border-radius:12px"
+      ></video>
+    `;
+  }
+
+  return `
+    <img
+      src="${mediaPreviewUrl}"
+      style="width:100%;max-height:45vh;object-fit:contain;border-radius:12px"
+    />
   `;
 }
 
@@ -391,17 +420,11 @@ if (trigger) {
   }
 
   submit.onclick = () => {
-    if (submit.classList.contains("disabled")) return;
+  if (submit.classList.contains("disabled")) return;
 
-    alert("Post created (mock)");
-
-    overlay.classList.add("hidden");
-    message.value = "";
-    mood = null;
-    location = null;
-    preview.innerHTML = "";
-    updateSubmit();
-  };
+  alert("Post created (mock)");
+  resetCreatePost();
+};
 }
 
 /* =========================================================

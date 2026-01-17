@@ -1454,31 +1454,6 @@ main {
 .cp-overlay.hidden {
   display: none;
 }
-
-.cp-modal {
-  width: 465px;        /* ⬅️ AVANT : 420px */
-  max-width: 96%;      /* ⬅️ un peu plus permissif */
-
-  /* 🔑 HAUTEUR FORCÉE */
-  height: 60vh;       /* ⬅️ ICI la clé (essaie 65 / 70 / 75) */
-  max-height: 60vh;
-
-  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
-  border-radius: 12px;
-  padding: 20px;
-
-  color: #fff;
-
-  display: flex;
-  flex-direction: column;
-
-  overflow: hidden;
-}
-
-.cp-modal textarea {
-  flex: 1;              /* ⬅️ prend la hauteur restante */
-  min-height: 120px;
-}
 /* Zone scrollable interne */
 .cp-modal {
   display: flex;
@@ -1885,6 +1860,92 @@ header * {
 
   border-radius: inherit;
   overflow-y: auto;
+}
+.cp-modal {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cp-header,
+.cp-footer {
+  flex-shrink: 0;
+}
+
+.cp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+}
+/* =========================
+   CREATE POST — SCROLL FINAL
+========================= */
+
+.cp-modal {
+  position: relative;
+
+  width: 465px;
+  max-width: 96%;
+  max-height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+.cp-header,
+.cp-user,
+.cp-footer {
+  flex-shrink: 0;
+}
+
+.cp-body {
+  flex: 1;
+  min-height: 0;       /* 🔑 ABSOLU */
+  overflow-y: auto;
+  padding: 12px 16px;
+}
+
+.cp-modal textarea {
+  min-height: 90px;    /* taille de confort uniquement */
+}
+/* =========================
+   CREATE POST — FINAL SPACING FIX (AUTHORITATIVE)
+========================= */
+
+/* ❌ La modale est une coquille, jamais de padding ici */
+.cp-modal {
+  padding: 0 !important;
+}
+
+/* ✅ Header respirant */
+.cp-header {
+  padding: 16px 24px;
+}
+
+/* ✅ Zone centrale = SEULE zone scrollable + respiration */
+.cp-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  padding: 20px 24px;
+}
+
+/* ✅ Footer respirant */
+.cp-footer {
+  padding: 16px 24px 20px;
+}
+/* =========================
+   CREATE POST — USER OFFSET
+========================= */
+
+.cp-user {
+  padding-left: 24px; /* ⬅️ ajuste ici : 20 / 24 / 28 */
 }
     </style>
   </head>
