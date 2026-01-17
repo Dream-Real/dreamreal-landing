@@ -2046,6 +2046,27 @@ header * {
   padding: 0 24px;         /* 🔑 même respiration que le feed */
   margin-bottom: 6px;
 }
+/* =========================
+   CREATE POST — LOCATION PANEL (FIX)
+========================= */
+
+.cp-location-panel {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: inherit;
+  overflow-y: auto;
+}
+
+.cp-location-panel.hidden {
+  display: none;
+}
     </style>
   </head>
 

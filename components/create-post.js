@@ -26,10 +26,10 @@ function mountCreatePost() {
           <button class="cp-close" id="cp-close">✕</button>
         </div>
 
-        <div class="cp-user">
-          <img src="https://i.pravatar.cc/100" alt="" />
-          <span>Dream Real User</span>
-        </div>
+       <div class="cp-user">
+  <img src="https://i.pravatar.cc/100" alt="" />
+  <span id="cp-username">Dream Real User</span>
+</div>
         <div class="post-inline-row cp-inline-row" id="cp-inline-row"></div>
 
         <div class="cp-body">
@@ -162,6 +162,15 @@ function mountCreatePost() {
 
           <div class="cp-fa-list" id="cp-fa-list"></div>
         </div>
+        <!-- LOCATION PANEL -->
+<div class="cp-location-panel hidden" id="cp-location-panel">
+  <div class="cp-fa-header">
+    <button class="cp-fa-back" id="cp-location-back" aria-label="Back">←</button>
+    <div class="cp-fa-title">Choose a location</div>
+  </div>
+
+  <div class="cp-fa-list" id="cp-location-list"></div>
+</div>
 
       </div>
     </div>
@@ -203,6 +212,7 @@ overlay.addEventListener("click", (e) => {
  const preview = document.getElementById("cp-preview");
 const mediaSlot = document.getElementById("cp-media-slot");
   const mediaInput = document.getElementById("cp-media-input");
+  const usernameEl = document.getElementById("cp-username");
 
 
 mediaInput.addEventListener("change", () => {
@@ -225,6 +235,13 @@ mediaInput.addEventListener("change", () => {
   const panelTitle = document.getElementById("cp-fa-title");
   const panelList = document.getElementById("cp-fa-list");
   const backBtn = document.getElementById("cp-fa-back");
+
+  // ===============================
+// LOCATION PANEL (WEB)
+// ===============================
+const locationPanel = document.getElementById("cp-location-panel");
+const locationList = document.getElementById("cp-location-list");
+const locationBack = document.getElementById("cp-location-back");
 
   const trigger = document.querySelector(".btn-create");
 
@@ -259,6 +276,7 @@ function resetCreatePost() {
   preview.innerHTML = "";
   updateSubmit();
   closeMoodPanel();
+  closeLocationPanel();
 }
 
   /* ===============================
@@ -282,6 +300,8 @@ if (trigger) {
 
   backBtn.onclick = closeMoodPanel;
 
+  locationBack.onclick = closeLocationPanel;
+
   /* ===============================
      MINI ACTIONS
      =============================== */
@@ -301,10 +321,10 @@ if (trigger) {
     }
 
     if (action === "location") {
-      location = "Paris";
-      renderPreview();
-      updateSubmit();
-    }
+      closeMoodPanel(); 
+  openLocationPanel();
+  return;
+}
   };
 });
 
@@ -370,6 +390,45 @@ if (trigger) {
   }
 
   /* ===============================
+   LOCATION PANEL
+   =============================== */
+
+function openLocationPanel() {
+  locationList.innerHTML = "";
+
+  const LOCATIONS = [
+    "Paris",
+    "London",
+    "Berlin",
+    "Barcelona",
+    "New York",
+    "Buenos Aires",
+  ];
+
+  LOCATIONS.forEach((city) => {
+    const item = document.createElement("div");
+    item.className = "cp-fa-item";
+    item.textContent = city;
+
+    item.onclick = () => {
+      location = city;
+      closeLocationPanel();
+      renderPreview();
+      updateSubmit();
+    };
+
+    locationList.appendChild(item);
+  });
+
+  locationPanel.classList.remove("hidden");
+}
+
+function closeLocationPanel() {
+  locationPanel.classList.add("hidden");
+  locationList.innerHTML = "";
+}
+
+  /* ===============================
      PREVIEW / SUBMIT
      =============================== */
 
@@ -381,6 +440,16 @@ if (trigger) {
   // RESET
   mediaSlot.innerHTML = "";
   preview.innerHTML = "";
+
+    // =========================
+  // USERNAME + LOCATION (FEED-LIKE)
+  // =========================
+  if (usernameEl) {
+    usernameEl.innerHTML = `
+      Dream Real User
+      ${location ? `<span class="inline-location"> in ${location}</span>` : ""}
+    `;
+  }
 
   // =========================
   // MEDIA (FACEBOOK-LIKE)
@@ -443,16 +512,7 @@ pill.className = "feed-pill";
 
   inlineRow.appendChild(pill);
 }
-
-  // =========================
-  // LOCATION
-  // =========================
-  if (location) {
-    const pill = document.createElement("div");
-    pill.className = "cp-pill";
-    pill.textContent = `📍 ${location}`;
-    preview.appendChild(pill);
-  }
+  
 }
 
   function updateSubmit() {
