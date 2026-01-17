@@ -32,10 +32,14 @@ function mountCreatePost() {
         </div>
 
         <div class="cp-body">
+
   <textarea
     id="cp-message"
     placeholder="What's on your mind?"
   ></textarea>
+
+  <!-- 🔑 MEDIA APRÈS LE TEXTE -->
+  <div class="cp-media-slot" id="cp-media-slot"></div>
 
   <div class="cp-preview" id="cp-preview"></div>
 </div>
@@ -195,7 +199,8 @@ overlay.addEventListener("click", (e) => {
 });
   const submit = document.getElementById("cp-submit");
   const message = document.getElementById("cp-message");
-  const preview = document.getElementById("cp-preview");
+ const preview = document.getElementById("cp-preview");
+const mediaSlot = document.getElementById("cp-media-slot");
   const mediaInput = document.getElementById("cp-media-input");
 
 
@@ -236,6 +241,7 @@ mediaInput.addEventListener("change", () => {
   let location = null;
   let mediaFile = null;
 let mediaPreviewUrl = null;
+let mediaRatio = null;
 
 function resetCreatePost() {
   overlay.classList.add("hidden");
@@ -372,44 +378,71 @@ if (trigger) {
 
   message.oninput = updateSubmit;
 
-  function renderPreview() {
-  preview.innerHTML = `
-    ${mediaPreviewUrl ? renderMediaPreview() : ""}
+ function renderPreview() {
+  const mediaSlot = document.getElementById("cp-media-slot");
 
-    ${
-      mood
-        ? `
-          <div style="display:inline-flex;gap:6px;align-items:center">
-            <span>${mood.feeling.title}</span>
-            <span>${mood.activity.title}</span>
-          </div>
-        `
-        : ""
+  // RESET
+  mediaSlot.innerHTML = "";
+  preview.innerHTML = "";
+
+  // =========================
+  // MEDIA (FACEBOOK-LIKE)
+  // =========================
+  if (mediaPreviewUrl && mediaFile) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "cp-media-preview";
+
+    if (mediaFile.type.startsWith("video")) {
+      const video = document.createElement("video");
+      video.src = mediaPreviewUrl;
+      video.controls = true;
+      video.playsInline = true;
+      wrapper.appendChild(video);
+    } else {
+      const img = new Image();
+img.src = mediaPreviewUrl;
+
+img.onload = () => {
+  const ratio = img.naturalWidth / img.naturalHeight;
+
+  // reset sécurité
+  wrapper.classList.remove("is-cover", "is-contain");
+
+  // 🎯 LOGIQUE DREAM REAL / FACEBOOK
+  if (ratio > 1.6) {
+    // image trop large OU trop étroite → pas de zoom
+    wrapper.classList.add("is-contain");
+  } else {
+    // image "normale" (portrait / feed)
+    wrapper.classList.add("is-cover");
+  }
+};
+
+wrapper.appendChild(img);
     }
 
-    ${location ? `<div>📍 ${location}</div>` : ""}
-  `;
-}
-
-function renderMediaPreview() {
-  if (!mediaFile || !mediaPreviewUrl) return "";
-
-  if (mediaFile.type.startsWith("video")) {
-    return `
-      <video
-        src="${mediaPreviewUrl}"
-        controls
-        style="width:100%;max-height:45vh;border-radius:12px"
-      ></video>
-    `;
+    mediaSlot.appendChild(wrapper);
   }
 
-  return `
-    <img
-      src="${mediaPreviewUrl}"
-      style="width:100%;max-height:45vh;object-fit:contain;border-radius:12px"
-    />
-  `;
+  // =========================
+  // MOOD / ACTIVITY
+  // =========================
+  if (mood) {
+    const pill = document.createElement("div");
+    pill.className = "cp-pill";
+    pill.textContent = `${mood.feeling.title} — ${mood.activity.title}`;
+    preview.appendChild(pill);
+  }
+
+  // =========================
+  // LOCATION
+  // =========================
+  if (location) {
+    const pill = document.createElement("div");
+    pill.className = "cp-pill";
+    pill.textContent = `📍 ${location}`;
+    preview.appendChild(pill);
+  }
 }
 
   function updateSubmit() {
