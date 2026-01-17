@@ -160,11 +160,16 @@ function bindCreatePost() {
   const preview = document.getElementById("cp-preview");
 
   const trigger = document.querySelector(".btn-create");
+  trigger.onclick = () => {
+  overlay.classList.remove("hidden");
+};
 
   const moodPanel = document.getElementById("cp-feeling-panel");
   const backBtn = document.getElementById("cp-fa-back");
   const panelTitle = document.getElementById("cp-fa-title");
   const panelList = document.getElementById("cp-fa-list");
+  const FEELINGS = Array.isArray(window.FEELINGS) ? window.FEELINGS : [];
+const ACTIVITIES = Array.isArray(window.ACTIVITIES) ? window.ACTIVITIES : [];
 
   let mood = null;
   let location = null;
@@ -210,7 +215,24 @@ function bindCreatePost() {
   panelTitle.textContent = "Choose a category";
   panelList.innerHTML = "";
 
-  FEELINGS.forEach((feeling) => {
+  const feelings = FEELINGS;
+
+  // ✅ CAS 1 — AUCUNE DATA → on affiche quand même le panel
+  if (feelings.length === 0) {
+    const empty = document.createElement("div");
+    empty.style.opacity = "0.6";
+    empty.style.padding = "20px";
+    empty.style.textAlign = "center";
+    empty.textContent = "No moods available (data not loaded yet)";
+    panelList.appendChild(empty);
+
+    moodPanel.classList.remove("hidden");
+    console.warn("⚠️ FEELINGS empty — panel opened anyway");
+    return;
+  }
+
+  // ✅ CAS 2 — DATA OK
+  feelings.forEach((feeling) => {
     const item = document.createElement("div");
     item.className = "cp-fa-item";
 
