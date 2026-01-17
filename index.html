@@ -1456,14 +1456,15 @@ main {
 }
 
 .cp-modal {
-  width: 460px;        /* ⬅️ AVANT : 420px */
-  max-width: 94%;      /* ⬅️ un peu plus permissif */
+  width: 465px;        /* ⬅️ AVANT : 420px */
+  max-width: 96%;      /* ⬅️ un peu plus permissif */
 
   /* 🔑 HAUTEUR FORCÉE */
-  height: 50vh;        /* ⬅️ ICI la clé (essaie 65 / 70 / 75) */
+  height: 60vh;       /* ⬅️ ICI la clé (essaie 65 / 70 / 75) */
+  max-height: 60vh;
 
   background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 20px;
 
   color: #fff;
@@ -1531,6 +1532,11 @@ main {
   align-items: center;
   gap: 10px;
   margin: 14px 0;
+}
+.cp-user span {
+  font-size: 17px;      /* FEED */
+  font-weight: 600;     /* FEED */
+  color: #FFFFFF;
 }
 
 .cp-user img {
@@ -1600,16 +1606,17 @@ header * {
 /* Bouton = affordance discrète */
 .cp-mini-btn {
   flex: 1;
-  height: 36px;
+    height: 38px;
+  width: 38px;
 
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
 
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
+ background-color: #2A2D59;                /* 🔥 EXACT APP */
+  border: 1px solid rgba(255,255,255,0.1);  /* 🔥 EXACT APP */
+  border-radius: 999px;                     /* pill / rond */
 
   cursor: pointer;
   user-select: none;
@@ -1808,13 +1815,21 @@ header * {
 
 .cp-fa-back {
   position: absolute;
-  left: 0;
+  left: -4px;
+
+  padding: 4px 10px;
+
   background: none;
   border: none;
-  color: #93C5FD;
-  font-size: 22px;
+
+  color: #93C5FD;        /* ✅ bleu Dream Real */
+  font-size: 20px;       /* ✅ identique app */
   font-weight: 700;
+
   cursor: pointer;
+  line-height: 1;
+
+  user-select: none;
 }
 
 /* List */

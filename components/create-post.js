@@ -141,7 +141,7 @@ function mountCreatePost() {
         </button>
                 <div class="cp-feeling-panel hidden" id="cp-feeling-panel">
           <div class="cp-fa-header">
-            <button class="cp-fa-back" id="cp-fa-back">✕</button>
+            <button class="cp-fa-back" id="cp-fa-back" aria-label="Back">←</button>
             <div class="cp-fa-title" id="cp-fa-title">
               Choose a category
             </div>
@@ -165,7 +165,28 @@ function bindCreatePost() {
   console.log("🟢 bindCreatePost");
 
   const overlay = document.getElementById("cp-overlay");
+  const modal = document.querySelector(".cp-modal");
   const closeBtn = document.getElementById("cp-close");
+
+  /* ===============================
+   PREVENT CLICK INSIDE MODAL
+   =============================== */
+if (modal) {
+  modal.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+}
+  /* ===============================
+   CLOSE ON OVERLAY CLICK
+   =============================== */
+
+overlay.addEventListener("click", (e) => {
+  // Si on clique DIRECTEMENT sur l’overlay (et pas la modale)
+  if (e.target === overlay) {
+    overlay.classList.add("hidden");
+    closeMoodPanel();
+  }
+});
   const submit = document.getElementById("cp-submit");
   const message = document.getElementById("cp-message");
   const preview = document.getElementById("cp-preview");
@@ -194,11 +215,22 @@ function bindCreatePost() {
      OPEN / CLOSE MODAL
      =============================== */
 
-  if (trigger) {
-    trigger.onclick = () => {
-      overlay.classList.remove("hidden");
-    };
-  }
+  /* ===============================
+   OPEN / CLOSE MODAL
+   =============================== */
+
+if (trigger) {
+  trigger.onclick = () => {
+    // 🔄 reset état Create Post
+    mood = null;
+    location = null;
+    preview.innerHTML = "";
+    updateSubmit();
+
+    // ✅ ouverture modale
+    overlay.classList.remove("hidden");
+  };
+}
 
   closeBtn.onclick = () => {
     overlay.classList.add("hidden");
@@ -260,7 +292,7 @@ function bindCreatePost() {
   }
 
   function openActivities(feeling) {
-    panelTitle.textContent = feeling.title;
+    panelTitle.textContent = "Choose an entry"
     panelList.innerHTML = "";
 
     ACTIVITIES
@@ -295,11 +327,61 @@ function bindCreatePost() {
   message.oninput = updateSubmit;
 
   function renderPreview() {
-    preview.innerHTML = `
-      ${mood ? `<div>😊 ${mood.feeling.title} — ${mood.activity.title}</div>` : ""}
-      ${location ? `<div>📍 ${location}</div>` : ""}
-    `;
-  }
+  preview.innerHTML = `
+    ${
+      mood
+        ? `
+          <div
+            style="
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              width: fit-content;
+              max-width: 100%;
+            "
+          >
+            <span>${mood.feeling.title}</span>
+
+            ${
+              mood.activity?.image
+                ? `
+                  <img
+                    src="${CDN_URL}/${mood.activity.image}"
+                    alt=""
+                    style="
+                      width: 16px;
+                      height: 16px;
+                      object-fit: contain;
+                    "
+                  />
+                `
+                : ""
+            }
+
+            <span>${mood.activity.title}</span>
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      location
+        ? `
+          <div
+            style="
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              width: fit-content;
+            "
+          >
+            📍 ${location}
+          </div>
+        `
+        : ""
+    }
+  `;
+}
 
   function updateSubmit() {
     const valid =
