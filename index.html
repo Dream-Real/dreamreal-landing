@@ -2354,14 +2354,23 @@ header * {
 <script src="./components/constants/activities.js"></script>
 
 <!-- 🔐 Google Places API (OBLIGATOIRE) -->
-<script>
-  window.GOOGLE_PLACES_KEY = "AIzaSyCtCZzqDsP1OHMWM7pQn1qz8NC54MBrZA0";
-</script>
+<!-- 🔒 LOCAL ENV (NON VERSIONNÉ) -->
+<script src="./env.local.js"></script>
 
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtCZzqDsP1OHMWM7pQn1qz8NC54MBrZA0&libraries=places"
-  defer
-></script>
+<!-- 🔐 Google Places — dynamic load -->
+<script>
+  if (!window.GOOGLE_PLACES_KEY) {
+    console.error("❌ GOOGLE_PLACES_KEY manquante (env.local.js)");
+  } else {
+    const script = document.createElement("script");
+    script.src =
+      "https://maps.googleapis.com/maps/api/js?key=" +
+      window.GOOGLE_PLACES_KEY +
+      "&libraries=places";
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+</script>
 
 <script src="./components/create-post.js"></script>
 <script>
