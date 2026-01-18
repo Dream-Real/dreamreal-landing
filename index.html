@@ -2237,6 +2237,23 @@ header * {
 #cp-location-nearby-list .cp-fa-item:last-child {
   margin-bottom: 0;
 }
+/* =====================================
+   CLICKABLE INLINE PILLS (APP-LIKE UX)
+===================================== */
+
+.feed-pill,
+.inline-location {
+  cursor: pointer;
+  user-select: none;
+}
+/* =====================================
+   LOCATION AUTOCOMPLETE — GAP ALIGNMENT
+===================================== */
+
+/* Autocomplete Google Places */
+#cp-location-results {
+  gap: 4px; /* 🔑 EXACTEMENT comme nearby places */
+}
 
   </style>
 </head>

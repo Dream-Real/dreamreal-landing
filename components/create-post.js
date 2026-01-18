@@ -313,6 +313,7 @@ function resetCreatePost() {
   locationInput.value = "";
   locationResults.innerHTML = "";
   closeLocationPanel();
+  renderPreview();
 }
 
   /* ===============================
@@ -588,11 +589,27 @@ function closeLocationPanel() {
   // USERNAME + LOCATION (FEED-LIKE)
   // =========================
   if (usernameEl) {
-    usernameEl.innerHTML = `
-      Dream Real User
-      ${location ? `<span class="inline-location"> in ${location}</span>` : ""}
-    `;
+  usernameEl.innerHTML = `
+    Dream Real User
+    ${
+      location
+        ? `<span class="inline-location" id="cp-inline-location">
+             in ${location}
+           </span>`
+        : ""
+    }
+  `;
+
+  // 🔁 RESET LOCATION ON CLICK (APP-LIKE)
+  const inlineLocation = document.getElementById("cp-inline-location");
+  if (inlineLocation) {
+    inlineLocation.onclick = () => {
+      location = null;
+      renderPreview();
+      updateSubmit();
+    };
   }
+}
 
   // =========================
   // MEDIA (FACEBOOK-LIKE)
@@ -641,7 +658,8 @@ inlineRow.innerHTML = "";
 // =========================
 if (mood) {
   const pill = document.createElement("div");
-pill.className = "feed-pill";
+  pill.className = "feed-pill";
+  pill.id = "cp-inline-mood";
 
   pill.innerHTML = `
     <span>${mood.feeling.title}</span>
@@ -652,6 +670,13 @@ pill.className = "feed-pill";
     }
     <span>${mood.activity.title}</span>
   `;
+
+  // 🔁 RESET MOOD ON CLICK (APP-LIKE)
+  pill.onclick = () => {
+    mood = null;
+    renderPreview();
+    updateSubmit();
+  };
 
   inlineRow.appendChild(pill);
 }
