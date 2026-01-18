@@ -163,13 +163,42 @@ function mountCreatePost() {
           <div class="cp-fa-list" id="cp-fa-list"></div>
         </div>
         <!-- LOCATION PANEL -->
+<!-- LOCATION PANEL -->
 <div class="cp-location-panel hidden" id="cp-location-panel">
-  <div class="cp-fa-header">
-    <button class="cp-fa-back" id="cp-location-back" aria-label="Back">←</button>
-    <div class="cp-fa-title">Choose a location</div>
+
+  <div class="cp-location-sheet">
+
+    <div class="cp-fa-header">
+      <button class="cp-fa-back" id="cp-location-back" aria-label="Back">←</button>
+      <div class="cp-fa-title">Add location</div>
+    </div>
+
+    <input
+      id="cp-location-input"
+      type="text"
+      placeholder="Search a city, place or address"
+      autocomplete="off"
+      style="margin:12px 0;padding:12px;border-radius:10px;border:none"
+    />
+
+    <!-- NEARBY PLACES -->
+<div class="cp-location-nearby hidden" id="cp-location-nearby">
+  <div class="cp-location-section-title">
+    Nearby places
   </div>
 
-  <div class="cp-fa-list" id="cp-location-list"></div>
+  <div class="cp-fa-list" id="cp-location-nearby-list"></div>
+</div>
+
+    <div class="cp-fa-list" id="cp-location-results"></div>
+
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button id="cp-location-cancel" class="btn">Cancel</button>
+      <button id="cp-location-save" class="btn btn-primary">Save</button>
+    </div>
+
+  </div>
+
 </div>
 
       </div>
@@ -240,8 +269,13 @@ mediaInput.addEventListener("change", () => {
 // LOCATION PANEL (WEB)
 // ===============================
 const locationPanel = document.getElementById("cp-location-panel");
-const locationList = document.getElementById("cp-location-list");
 const locationBack = document.getElementById("cp-location-back");
+const locationInput = document.getElementById("cp-location-input");
+const locationResults = document.getElementById("cp-location-results");
+const locationCancel = document.getElementById("cp-location-cancel");
+const locationSave = document.getElementById("cp-location-save");
+const locationNearby = document.getElementById("cp-location-nearby");
+const locationNearbyList = document.getElementById("cp-location-nearby-list");
 
   const trigger = document.querySelector(".btn-create");
 
@@ -276,6 +310,8 @@ function resetCreatePost() {
   preview.innerHTML = "";
   updateSubmit();
   closeMoodPanel();
+  locationInput.value = "";
+  locationResults.innerHTML = "";
   closeLocationPanel();
 }
 
@@ -394,38 +430,145 @@ if (trigger) {
    =============================== */
 
 function openLocationPanel() {
-  locationList.innerHTML = "";
+  locationInput.value = "";
+  locationResults.innerHTML = "";
 
-  const LOCATIONS = [
-    "Paris",
-    "London",
-    "Berlin",
-    "Barcelona",
-    "New York",
-    "Buenos Aires",
-  ];
-
-  LOCATIONS.forEach((city) => {
-    const item = document.createElement("div");
-    item.className = "cp-fa-item";
-    item.textContent = city;
-
-    item.onclick = () => {
-      location = city;
-      closeLocationPanel();
-      renderPreview();
-      updateSubmit();
-    };
-
-    locationList.appendChild(item);
-  });
+  renderNearbyPlaces(); // ✅ AJOUT
 
   locationPanel.classList.remove("hidden");
 }
 
+function renderNearbyPlaces() {
+  locationNearbyList.innerHTML = "";
+
+  const NEARBY = [
+    "Paris, France",
+    "Montmartre",
+    "Le Marais",
+    "Châtelet",
+  ];
+
+  NEARBY.forEach((place) => {
+    const item = document.createElement("div");
+    item.className = "cp-fa-item";
+    item.textContent = place;
+
+    item.onclick = () => {
+      location = place;
+      locationInput.value = place;
+      renderPreview();
+      updateSubmit();
+      closeLocationPanel();
+    };
+
+    locationNearbyList.appendChild(item);
+  });
+
+  locationNearby.classList.remove("hidden");
+}
+
+// ===============================
+// GOOGLE PLACES AUTOCOMPLETE (WEB)
+// ===============================
+
+let placesService = null;
+let sessionToken = null;
+let locationDebounce = null;
+
+locationInput.addEventListener("input", () => {
+  // 🧹 annule l’appel précédent
+  clearTimeout(locationDebounce);
+
+  // ⏳ attend 300 ms après la dernière frappe
+  locationDebounce = setTimeout(() => {
+    // 🔒 sécurité Google
+    if (!window.google || !google.maps || !google.maps.places) {
+      console.warn("⚠️ Google Places not loaded");
+      return;
+    }
+
+    const query = locationInput.value.trim();
+    const currentQuery = query; // 🔒 snapshot anti-race-condition
+    locationResults.innerHTML = "";
+
+    if (!query) {
+  locationResults.innerHTML = "";
+  locationNearby.classList.remove("hidden"); // 🔑 IMPORTANT
+  renderNearbyPlaces();
+  return;
+}
+
+    locationNearby.classList.add("hidden");
+
+    // Init service une seule fois
+    if (!placesService) {
+      placesService = new google.maps.places.AutocompleteService();
+    }
+
+    // Session token = groupement facturation
+    sessionToken =
+      sessionToken ||
+      new google.maps.places.AutocompleteSessionToken();
+
+    placesService.getPlacePredictions(
+      {
+        input: query,
+        sessionToken,
+        types: ["geocode", "establishment"],
+      },
+      (predictions, status) => {
+  // 🔐 Ignore les réponses obsolètes
+  if (locationInput.value.trim() !== currentQuery) {
+    return;
+  }
+
+  if (
+    status !== google.maps.places.PlacesServiceStatus.OK ||
+    !predictions
+  ) {
+    return;
+  }
+
+        locationResults.innerHTML = "";
+
+        predictions.forEach((prediction) => {
+          const item = document.createElement("div");
+          item.className = "cp-fa-item";
+          item.textContent = prediction.description;
+
+          item.onclick = () => {
+            location = prediction.description;
+            locationInput.value = prediction.description;
+
+            renderPreview();
+            updateSubmit();
+            closeLocationPanel();
+
+            sessionToken = null; // 🔑 reset après sélection
+          };
+
+          locationResults.appendChild(item);
+        });
+      }
+    );
+  }, 300); // 🎯 DEBOUNCE = 300ms (APP-LIKE)
+});
+
+locationCancel.onclick = closeLocationPanel;
+
+locationSave.onclick = () => {
+  if (!locationInput.value.trim()) return;
+  location = locationInput.value.trim();
+  renderPreview();
+  updateSubmit();
+  closeLocationPanel();
+};
+
 function closeLocationPanel() {
   locationPanel.classList.add("hidden");
-  locationList.innerHTML = "";
+  locationResults.innerHTML = "";
+  locationNearby.classList.add("hidden"); // ✅ reset
+  sessionToken = null; // 🔑 OBLIGATOIRE
 }
 
   /* ===============================

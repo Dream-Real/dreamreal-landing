@@ -2067,8 +2067,179 @@ header * {
 .cp-location-panel.hidden {
   display: none;
 }
-    </style>
-  </head>
+/* =========================
+   CREATE POST — LOCATION PANEL (APP STYLE)
+========================= */
+
+/* Feuille interne (sheet) */
+.cp-location-sheet {
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px 24px 12px;
+}
+
+/* Champ de recherche — EXACT APP */
+#cp-location-input {
+  width: 100%;
+  height: 46px;
+
+  background-color: #2A2D59;
+  color: #ffffff;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+
+  padding: 0 14px;
+  font-size: 16px;
+
+  outline: none;
+}
+
+#cp-location-input::placeholder {
+  color: rgba(248,250,252,0.6);
+  font-weight: 400;
+}
+
+/* Focus clean (no glow) */
+#cp-location-input:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: rgba(147,197,253,0.45);
+}
+
+/* Résultats (liste) */
+#cp-location-results {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Item résultat — EXACT RN FEEL */
+#cp-location-results .cp-fa-item {
+  display: flex;
+  align-items: center;
+
+  padding: 12px 18px;
+  border-radius: 999px;
+
+  background: rgba(26,30,53,0.88);
+  border: 1px solid rgba(255,255,255,0.06);
+
+  font-size: 17px;
+  font-weight: 600;
+  color: #F8FAFC;
+
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+
+#cp-location-results .cp-fa-item:active {
+  transform: scale(0.98);
+}
+
+/* Actions Cancel / Save */
+.cp-location-actions,
+.cp-location-sheet > div:last-child {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* Bouton Cancel */
+#cp-location-cancel {
+  flex: 1;
+
+  background-color: #2A2D59;
+  color: #ffffff;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+
+  padding: 12px 0;
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+/* Bouton Save */
+#cp-location-save {
+  flex: 1;
+
+  background-color: #2A2D59;
+  color: #93C5FD;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+
+  padding: 12px 0;
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+/* =========================
+   CREATE POST — LOCATION / NEARBY
+========================= */
+
+.cp-location-nearby {
+  margin-top: 18px;
+}
+
+.cp-location-nearby.hidden {
+  display: none;
+}
+
+.cp-location-section-title {
+  margin: 6px 0 10px;
+  padding-left: 4px;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(248,250,252,0.7);
+}
+/* =========================
+   CREATE POST — LOCATION / NEARBY AIR
+========================= */
+
+/* Wrapper Nearby */
+.cp-location-nearby {
+  margin-top: 10px;          /* ⬅️ descend tout le bloc */
+}
+
+/* Titre "Nearby places" */
+.cp-location-section-title {
+  margin-bottom: 14px;       /* ⬅️ respire sous le titre */
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(248,250,252,0.75);
+}
+
+/* Liste des nearby */
+#cp-location-nearby-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;                 /* ⬅️ espace entre les pills */
+}
+
+/* Pills Nearby (même base que app, + aération) */
+#cp-location-nearby-list .cp-fa-item {
+  padding: 14px 18px;        /* ⬅️ plus d’air interne */
+  font-size: 16px;
+  border-radius: 999px;
+
+  /* micro respiration visuelle */
+  line-height: 1.2;
+}
+/* 🔑 Supprime l'espace sous la dernière pill nearby */
+#cp-location-nearby-list .cp-fa-item:last-child {
+  margin-bottom: 0;
+}
+
+  </style>
+</head>
 
   <body>
     <header>
@@ -2181,6 +2352,16 @@ header * {
 <!-- 1️⃣ DONNÉES GLOBALES (OBLIGATOIRE POUR APPROCHE window) -->
 <script src="./components/constants/feelings.js"></script>
 <script src="./components/constants/activities.js"></script>
+
+<!-- 🔐 Google Places API (OBLIGATOIRE) -->
+<script>
+  window.GOOGLE_PLACES_KEY = "AIzaSyCtCZzqDsP1OHMWM7pQn1qz8NC54MBrZA0";
+</script>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtCZzqDsP1OHMWM7pQn1qz8NC54MBrZA0&libraries=places"
+  defer
+></script>
 
 <script src="./components/create-post.js"></script>
 <script>
