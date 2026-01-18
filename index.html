@@ -2254,6 +2254,78 @@ header * {
 #cp-location-results {
   gap: 4px; /* 🔑 EXACTEMENT comme nearby places */
 }
+/* =====================================
+   CREATE POST — MEDIA CAROUSEL (FINAL)
+===================================== */
+
+.cp-carousel {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  /* 🔑 espace scrollbar */
+  padding: 0 24px 18px; /* ⬅️ augmente le padding bas */
+}
+
+.cp-carousel-track {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+}
+
+.cp-carousel-track::before {
+  content: "";
+  flex: 0 0 18px; /* marge gauche principale */
+}
+
+.cp-carousel-track::after {
+  content: "";
+  flex: 0 0 8px; /* marge droite plus discrète */
+}
+
+.cp-carousel-slide {
+  position: relative;
+
+  flex: 0 0 88%;
+  max-width: 88%;
+  height: 520px;
+
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+
+  scroll-snap-align: start;
+  scroll-margin-left: 18px; /* 🔑 */
+}
+
+.cp-carousel-slide img,
+.cp-carousel-slide video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cp-carousel-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  background: rgba(0,0,0,.65);
+  color: white;
+  border: none;
+
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
 
   </style>
 </head>

@@ -48,6 +48,7 @@ function mountCreatePost() {
   type="file"
   id="cp-media-input"
   accept="image/*,video/*"
+  multiple
   hidden
 />
 
@@ -245,17 +246,17 @@ const mediaSlot = document.getElementById("cp-media-slot");
 
 
 mediaInput.addEventListener("change", () => {
-  const file = mediaInput.files[0];
-  if (!file) return;
+  const files = Array.from(mediaInput.files);
+  if (!files.length) return;
 
-  mediaFile = file;
+  files.forEach((file) => {
+    draftMedia.push({
+      file,
+      url: URL.createObjectURL(file),
+    });
+  });
 
-  if (mediaPreviewUrl) {
-    URL.revokeObjectURL(mediaPreviewUrl);
-  }
-
-  mediaPreviewUrl = URL.createObjectURL(file);
-
+  mediaInput.value = ""; // 🔑 permet de re-sélectionner les mêmes fichiers
   renderPreview();
   updateSubmit();
 });
@@ -290,22 +291,22 @@ const locationNearbyList = document.getElementById("cp-location-nearby-list");
   console.log("📦 ACTIVITIES:", ACTIVITIES.length);
 
   let mood = null;
-  let location = null;
-  let mediaFile = null;
-let mediaPreviewUrl = null;
-let mediaRatio = null;
+let location = null;
+
+// 🔑 MEDIA DRAFT (PARITÉ APP)
+let draftMedia = [];           // [{ file, url }]
+let draftCarouselIndex = 0;
+  
 
 function resetCreatePost() {
   overlay.classList.add("hidden");
   message.value = "";
   mood = null;
   location = null;
-  mediaFile = null;
-
-  if (mediaPreviewUrl) {
-    URL.revokeObjectURL(mediaPreviewUrl);
-    mediaPreviewUrl = null;
-  }
+ // 🔑 CLEANUP MEDIA (MULTI SELECT)
+draftMedia.forEach((m) => URL.revokeObjectURL(m.url));
+draftMedia = [];
+draftCarouselIndex = 0;
 
   preview.innerHTML = "";
   updateSubmit();
@@ -611,44 +612,61 @@ function closeLocationPanel() {
   }
 }
 
-  // =========================
-  // MEDIA (FACEBOOK-LIKE)
-  // =========================
-  if (mediaPreviewUrl && mediaFile) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "cp-media-preview";
+ // =========================
+// MEDIA (SINGLE / CAROUSEL)
+// =========================
+if (draftMedia.length === 1) {
+  const m = draftMedia[0];
+  const wrapper = document.createElement("div");
+  wrapper.className = "cp-media-preview";
 
-    if (mediaFile.type.startsWith("video")) {
-      const video = document.createElement("video");
-      video.src = mediaPreviewUrl;
-      video.controls = true;
-      video.playsInline = true;
-      wrapper.appendChild(video);
-    } else {
-      const img = new Image();
-img.src = mediaPreviewUrl;
-
-img.onload = () => {
-  const ratio = img.naturalWidth / img.naturalHeight;
-
-  // reset sécurité
-  wrapper.classList.remove("is-cover", "is-contain");
-
-  // 🎯 LOGIQUE DREAM REAL / FACEBOOK
-  if (ratio > 1.6) {
-    // image trop large OU trop étroite → pas de zoom
-    wrapper.classList.add("is-contain");
+  if (m.file.type.startsWith("video")) {
+    const video = document.createElement("video");
+    video.src = m.url;
+    video.controls = true;
+    wrapper.appendChild(video);
   } else {
-    // image "normale" (portrait / feed)
-    wrapper.classList.add("is-cover");
+    const img = new Image();
+    img.src = m.url;
+    wrapper.appendChild(img);
   }
-};
 
-wrapper.appendChild(img);
-    }
+  mediaSlot.appendChild(wrapper);
+}
 
-    mediaSlot.appendChild(wrapper);
-  }
+if (draftMedia.length > 1) {
+  const carousel = document.createElement("div");
+  carousel.className = "cp-carousel";
+
+  const track = document.createElement("div");
+  track.className = "cp-carousel-track";
+
+  draftMedia.forEach((m, index) => {
+    const slide = document.createElement("div");
+    slide.className = "cp-carousel-slide";
+
+    const img = new Image();
+    img.src = m.url;
+
+    const remove = document.createElement("button");
+    remove.className = "cp-carousel-remove";
+    remove.textContent = "✕";
+    remove.onclick = () => {
+      URL.revokeObjectURL(m.url);
+      draftMedia.splice(index, 1);
+      draftCarouselIndex = Math.max(0, draftCarouselIndex - 1);
+      renderPreview();
+      updateSubmit();
+    };
+
+    slide.appendChild(img);
+    slide.appendChild(remove);
+    track.appendChild(slide);
+  });
+
+  carousel.appendChild(track);
+  mediaSlot.appendChild(carousel);
+}
 
   const inlineRow = document.getElementById("cp-inline-row");
 inlineRow.innerHTML = "";
@@ -684,11 +702,15 @@ if (mood) {
 }
 
   function updateSubmit() {
-    const valid =
-      message.value.trim().length > 0 || mood || location;
+  const hasText = message.value.trim().length > 0;
+  const hasMood = !!mood;
+  const hasLocation = !!location;
+  const hasMedia = draftMedia.length > 0;
 
-    submit.classList.toggle("disabled", !valid);
-  }
+  const valid = hasText || hasMood || hasLocation || hasMedia;
+
+  submit.classList.toggle("disabled", !valid);
+}
 
   submit.onclick = () => {
   if (submit.classList.contains("disabled")) return;
