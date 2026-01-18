@@ -2110,10 +2110,10 @@ header * {
 
 /* Résultats (liste) */
 #cp-location-results {
-  margin-top: 14px;
+  margin-top: 0px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 /* Item résultat — EXACT RN FEEL */
@@ -2121,22 +2121,34 @@ header * {
   display: flex;
   align-items: center;
 
-  padding: 12px 18px;
-  border-radius: 999px;
+  padding: 6px 12px;          /* 🔑 réduit l’air vertical */
+  border-radius: 6px;         /* 🔑 plus de pill */
 
-  background: rgba(26,30,53,0.88);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: transparent;    /* 🔑 look liste */
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.08); /* traits gris */
 
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;           /* 🔑 TEXTE REMONTÉ */
+
   color: #F8FAFC;
 
   cursor: pointer;
-  transition: transform 0.08s ease;
 }
 
 #cp-location-results .cp-fa-item:active {
   transform: scale(0.98);
+}
+
+#cp-location-input {
+  line-height: 1.1;        /* 🔑 empêche l’air vertical */
+  padding-top: 0;          /* 🔑 reset vertical */
+  padding-bottom: 0;
+}
+#cp-location-results .cp-fa-item {
+  padding-top: 5px;
+  padding-bottom: 7px;   /* 🔑 décale la baseline vers le centre */
 }
 
 /* Actions Cancel / Save */
@@ -2325,6 +2337,80 @@ header * {
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
+}
+/* =====================================
+   LOCATION AUTOCOMPLETE — LIST STYLE (NO PILLS)
+===================================== */
+
+#cp-location-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* liste continue */
+}
+
+/* overwrite pill style ONLY for autocomplete results */
+#cp-location-results .cp-fa-item {
+  border-radius: 0;                 /* ❌ plus de pill */
+  background: transparent;          /* ❌ fond pill */
+  border: none;                     /* ❌ contour pill */
+
+  padding: 14px 8px;                /* ✅ spacing lisible */
+  font-size: 16px;
+  font-weight: 500;
+  color: #F8FAFC;
+
+  cursor: pointer;
+}
+
+/* séparateur subtil entre lignes */
+#cp-location-results .cp-fa-item:not(:last-child) {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* feedback tap / hover */
+#cp-location-results .cp-fa-item:hover,
+#cp-location-results .cp-fa-item:active {
+  background: rgba(255,255,255,0.06);
+}
+.cp-location-panel .cp-fa-header {
+  padding-top: 0px;        /* ⬅️ RÉDUCTION MAJEURE */
+  padding-bottom: 4px;
+  min-height: unset;
+  height: auto;
+}
+/* =====================================
+   LOCATION MODAL — HIDE ACTION BUTTONS
+===================================== */
+
+#cp-location-cancel,
+#cp-location-save {
+  display: none !important;
+}
+/* =====================================
+   FEELING / ACTIVITY PANEL — TITLE AIR
+===================================== */
+
+.cp-fa-header {
+  margin-bottom: 18px; /* ⬅️ espace sous le header */
+}
+
+.cp-fa-title {
+  line-height: 1.2;
+}
+/* =====================================
+   FEELING PANEL — REMOVE TOP GAP (FIX)
+===================================== */
+
+.cp-fa-list {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+/* =====================================
+   FEELING PANEL — SPACE ABOVE FIRST ITEM
+===================================== */
+
+.cp-fa-list > .cp-fa-item:first-child {
+  margin-top: 9px; /* ajuste : 12 / 14 / 16 */
 }
 
   </style>

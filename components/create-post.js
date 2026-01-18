@@ -617,20 +617,44 @@ function closeLocationPanel() {
 // =========================
 if (draftMedia.length === 1) {
   const m = draftMedia[0];
-  const wrapper = document.createElement("div");
-  wrapper.className = "cp-media-preview";
 
+  const wrapper = document.createElement("div");
+  wrapper.className = "cp-media-preview is-cover";
+
+  // 🔑 MEDIA
+  let mediaEl;
   if (m.file.type.startsWith("video")) {
-    const video = document.createElement("video");
-    video.src = m.url;
-    video.controls = true;
-    wrapper.appendChild(video);
+    mediaEl = document.createElement("video");
+    mediaEl.src = m.url;
+    mediaEl.controls = true;
   } else {
-    const img = new Image();
-    img.src = m.url;
-    wrapper.appendChild(img);
+    mediaEl = new Image();
+    mediaEl.src = m.url;
+
+    // 🧠 image très panoramique → contain
+    mediaEl.onload = () => {
+      const ratio = mediaEl.naturalWidth / mediaEl.naturalHeight;
+      if (ratio > 1.6) {
+        wrapper.classList.remove("is-cover");
+        wrapper.classList.add("is-contain");
+      }
+    };
   }
 
+  // ❌ BOUTON REMOVE (COMME CAROUSEL)
+  const remove = document.createElement("button");
+  remove.className = "cp-carousel-remove";
+  remove.textContent = "✕";
+  remove.onclick = () => {
+    URL.revokeObjectURL(m.url);
+    draftMedia = [];
+    draftCarouselIndex = 0;
+    renderPreview();
+    updateSubmit();
+  };
+
+  wrapper.appendChild(mediaEl);
+  wrapper.appendChild(remove);
   mediaSlot.appendChild(wrapper);
 }
 
