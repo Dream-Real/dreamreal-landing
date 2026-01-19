@@ -2412,6 +2412,129 @@ header * {
 .cp-fa-list > .cp-fa-item:first-child {
   margin-top: 9px; /* ajuste : 12 / 14 / 16 */
 }
+/* =========================
+   POST — IMAGE CAROUSEL
+========================= */
+
+.post-media.carousel {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  display: flex;
+  gap: 10px;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: 0px; /* espace scroll */
+}
+
+.post-media.carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.post-media.carousel .carousel-slide {
+  flex: 0 0 100%;
+  max-width: 100%;
+
+  scroll-snap-align: start;
+
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent; /* 🔑 SUPPRIME LA BANDE NOIRE */
+}
+
+.post-media.carousel img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* 🔥 FIX — NO BLACK BAND UNDER IMAGE CAROUSEL */
+.post-media.carousel {
+  background-color: transparent; /* ⛔ stop fond noir */
+}
+/* =========================
+   POST — CAROUSEL DOTS (APP-LIKE)
+========================= */
+
+/* Le carrousel devient un bloc vertical */
+.post-media.carousel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  background: transparent; /* sécurité */
+}
+
+/* Track images */
+.post-media.carousel .carousel-track {
+  display: flex;
+  overflow-x: auto;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+    gap: 12px; /* 🔥 ICI — espace entre les images */
+}
+
+.post-media.carousel .carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Slides */
+.post-media.carousel .carousel-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+/* ✅ DOTS — CENTRÉS SOUS LES IMAGES */
+.post-media.carousel .carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 8px;
+  margin-top: -3px; /* EXACT APP */
+}
+
+/* Dot */
+.post-media.carousel .carousel-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+}
+/* Dot */
+.post-media.carousel .carousel-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.4);
+
+  /* 🔑 ANIMATION */
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    opacity 0.25s ease;
+
+  transform: scale(0.9);
+  opacity: 0.6;
+}
+/* Dot actif */
+.post-media.carousel:has(.carousel-slide:nth-child(1):is(:in-view))
+  .carousel-dots span:nth-child(1),
+.post-media.carousel:has(.carousel-slide:nth-child(2):is(:in-view))
+  .carousel-dots span:nth-child(2),
+.post-media.carousel:has(.carousel-slide:nth-child(3):is(:in-view))
+  .carousel-dots span:nth-child(3),
+.post-media.carousel:has(.carousel-slide:nth-child(4):is(:in-view))
+  .carousel-dots span:nth-child(4) {
+
+  background: #EECD79;
+  transform: scale(1.25);   /* 🔥 effet vivant */
+  opacity: 1;
+}
 
   </style>
 </head>
@@ -2617,47 +2740,61 @@ header * {
         </div>
 
        ${
-  message
+  mood || message
     ? `
       <div class="post-text-block">
 
         <div class="post-inline-row">
 
           ${
-  mood
-    ? `
-      <div class="feed-pill">
-        <span>${mood.feeling.title}</span>
-        ${
-          mood.activity?.image
-            ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${mood.activity.image}" alt="" />`
-            : ""
-        }
-        <span>${mood.activity.title}</span>
-      </div>
-    `
-    : ""
-}
-          <button
-            class="post-bio-toggle"
-            data-position="inline"
-          >
-            View more
-          </button>
+            mood
+              ? `
+                <div class="feed-pill">
+                  <span>${mood.feeling.title}</span>
+                  ${
+                    mood.activity?.image
+                      ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${mood.activity.image}" alt="" />`
+                      : ""
+                  }
+                  <span>${mood.activity.title}</span>
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            message
+              ? `
+                <button
+                  class="post-bio-toggle"
+                  data-position="inline"
+                >
+                  View more
+                </button>
+              `
+              : ""
+          }
+
         </div>
 
-        <div class="post-bio collapsed">
-          <span class="post-bio-text">
-            ${message}
-            <button
-              class="post-bio-toggle is-bottom"
-              data-position="bottom"
-              style="display:none"
-            >
-              View less
-            </button>
-          </span>
-        </div>
+        ${
+          message
+            ? `
+              <div class="post-bio collapsed">
+                <span class="post-bio-text">
+                  ${message}
+                  <button
+                    class="post-bio-toggle is-bottom"
+                    data-position="bottom"
+                    style="display:none"
+                  >
+                    View less
+                  </button>
+                </span>
+              </div>
+            `
+            : ""
+        }
 
       </div>
     `
@@ -2680,30 +2817,56 @@ header * {
 }
 
         ${
-          media?.length
-            ? media
-                .map((m) => {
-                  if (m.type === "image") {
-                    return `
-                      <div class="post-media">
-                        <img src="${m.src}" />
-                      </div>
-                    `;
-                  }
+  media?.length
+    ? (() => {
+        const images = media.filter((m) => m.type === "image");
+        const youtube = media.find((m) => m.type === "youtube");
 
-                  if (m.type === "youtube") {
-                    return `
-                      <div class="post-media youtube-preview">
-                        <img src="${m.src}" />
-                      </div>
-                    `;
-                  }
+        let html = "";
 
-                  return "";
-                })
-                .join("")
-            : ""
+        // 🎬 YouTube (priorité visuelle)
+        if (youtube) {
+          html += `
+            <div class="post-media youtube-preview">
+              <img src="${youtube.src}" />
+            </div>
+          `;
         }
+
+        // 🖼️ MULTI-IMAGES → CAROUSEL
+        if (images.length > 1) {
+  html += `
+    <div class="post-media carousel">
+
+      <div class="carousel-track">
+        ${images.map(img => `
+          <div class="carousel-slide">
+            <img src="${img.src}" />
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="carousel-dots">
+        ${images.map(() => `<span></span>`).join("")}
+      </div>
+
+    </div>
+  `;
+}
+
+        // 🖼️ IMAGE UNIQUE → RENDU ACTUEL
+        if (images.length === 1) {
+          html += `
+            <div class="post-media">
+              <img src="${images[0].src}" />
+            </div>
+          `;
+        }
+
+        return html;
+      })()
+    : ""
+}
 
         ${
           linkPreview
@@ -2770,6 +2933,21 @@ header * {
   window.renderFeed = renderFeed;
 </script>
 
+<script>
+  // =========================
+  // STRIP URL FROM TEXT (GLOBAL — UNIQUE)
+  // =========================
+  function stripUrls(text) {
+    if (!text) return text;
+
+    return text
+      .replace(/https?:\/\/[^\s]+/gi, "")
+      .replace(/www\.[^\s]+/gi, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  }
+</script>
+
 <!-- ========================= -->
 <!-- FEED NORMALIZATION (⬅️ ICI EXACTEMENT) -->
 <!-- ========================= -->
@@ -2789,7 +2967,7 @@ header * {
           "https://cdn-icons-png.flaticon.com/512/847/847969.png",
       },
 
-      message: post.message || null,
+      message: stripUrls(post.message || null),
 
       location:
         post.localLocation?.label ||
@@ -2866,22 +3044,6 @@ header * {
     .then((res) => res.json())
     .then((res) => {
       const posts = Array.isArray(res) ? res : res.posts ?? res.data ?? [];
-
-       // =========================
-// STRIP URL FROM TEXT (APP BEHAVIOR)
-// =========================
-function stripUrls(text) {
-  if (!text) return text;
-
-  return text
-    // supprime les URLs http(s)
-    .replace(/https?:\/\/[^\s]+/gi, "")
-    // supprime les www.xxx
-    .replace(/www\.[^\s]+/gi, "")
-    // nettoie les espaces multiples
-    .replace(/\s{2,}/g, " ")
-    .trim();
-}
 
       console.log("📦 POSTS NORMALIZED:", posts);
 
