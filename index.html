@@ -2717,22 +2717,6 @@ margin: 0;
    FILTER MODAL — HEADER BACK (CREATE-LIKE)
 ========================= */
 
-/* Affiche la flèche dans le header UNIQUEMENT pour Activities */
-#filter-step-activity:not(.hidden) ~ .filter-header::before {
-  content: "←";
-
-  position: absolute;
-  left: -4px;
-
-  padding: 4px 10px;
-
-  color: #93C5FD;
-  font-size: 20px;
-  font-weight: 700;
-
-  cursor: pointer;
-  line-height: 1;
-}
 /* =========================
    ACTIVE FILTERS (APP-LIKE)
 ========================= */
@@ -3990,9 +3974,10 @@ window.addEventListener("resize", () => {
     <div class="filter-grabber"></div>
 
     <div class="filter-header">
-      <button class="filter-close">✕</button>
-      <h3>Choose filter</h3>
-    </div>
+  <button class="filter-back hidden">←</button>
+  <h3>Choose filter</h3>
+  <button class="filter-close">✕</button>
+</div>
 
     <!-- STEP 1 — FEELINGS -->
     <div id="filter-step-feeling" class="filter-step">
@@ -4003,7 +3988,6 @@ window.addEventListener("resize", () => {
 
     <!-- STEP 2 — ACTIVITIES -->
     <div id="filter-step-activity" class="filter-step hidden">
-      <button class="filter-back">←</button>
       <div class="filter-grid">
         <!-- activities injected here -->
       </div>
@@ -4026,13 +4010,13 @@ window.addEventListener("resize", () => {
   }
 
   document.addEventListener("click", (e) => {
-    if (
-      e.target.closest(".filter-close") ||
-      e.target === filterOverlay
-    ) {
-      filterOverlay.classList.add("hidden");
-    }
-  });
+  if (
+    e.target.closest(".filter-close") ||
+    e.target === filterOverlay
+  ) {
+    closeFilterModal();
+  }
+});
 </script>
 
 <script>

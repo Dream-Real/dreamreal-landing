@@ -336,7 +336,16 @@ if (trigger) {
 
   closeBtn.onclick = resetCreatePost;
 
-  backBtn.onclick = closeMoodPanel;
+  backBtn.onclick = () => {
+  // 🔁 Si on est dans Activities → retour vers Feelings
+  if (panelTitle.textContent === "Choose an entry") {
+    openMoodPanel();
+    return;
+  }
+
+  // 🔚 Sinon → fermeture du panel mood
+  closeMoodPanel();
+};
 
   locationBack.onclick = closeLocationPanel;
 
