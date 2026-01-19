@@ -739,7 +739,62 @@ if (mood) {
   submit.onclick = () => {
   if (submit.classList.contains("disabled")) return;
 
-  alert("Post created (mock)");
+  // =========================
+  // BUILD LOCAL POST (MOCK)
+  // =========================
+  const now = new Date().toISOString();
+
+  const localPost = {
+    id: `local_${Date.now()}`,
+    user_first_name: "Dream",
+    user_last_name: "Real",
+    user_avatar: "https://i.pravatar.cc/100",
+    message: message.value.trim() || null,
+    created_time: now,
+
+    location: location
+      ? { label: location }
+      : null,
+
+    feeling: mood
+      ? {
+          id: mood.feeling.id,
+          title: mood.feeling.title,
+          slug: mood.feeling.slug,
+        }
+      : null,
+
+    activity: mood
+      ? {
+          id: mood.activity.id,
+          title: mood.activity.title,
+          image: mood.activity.image,
+        }
+      : null,
+
+    images: draftMedia
+      .filter((m) => m.file.type.startsWith("image"))
+      .map((m) => m.url),
+
+    video_url: draftMedia.find((m) =>
+      m.file.type.startsWith("video")
+    )?.url || null,
+
+    reactions_summary: "👍",
+    reactions_count: 1,
+  };
+
+  // =========================
+  // NORMALIZE + INJECT FEED
+  // =========================
+  const normalizedPost = normalizePostFromAPI(localPost);
+
+  window.FEED_POSTS.unshift(normalizedPost);
+  renderFeed();
+
+  // =========================
+  // CLEANUP
+  // =========================
   resetCreatePost();
 };
 }
