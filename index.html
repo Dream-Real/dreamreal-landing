@@ -2536,7 +2536,7 @@ header * {
   opacity: 1;
 }
 /* =========================
-   FILTER MODAL — APP STYLE
+   FILTER MODAL — APP STYLE (CENTERED)
 ========================= */
 
 .filter-overlay {
@@ -2544,9 +2544,10 @@ header * {
   inset: 0;
   background: rgba(0,0,0,.6);
   z-index: 999;
+
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;       /* ✅ centrage vertical */
+  justify-content: center;   /* ✅ centrage horizontal */
 }
 
 .filter-overlay.hidden {
@@ -2554,34 +2555,38 @@ header * {
 }
 
 .filter-modal {
-  width: 100%;
-  height: 65%;
+  width: 465px;              /* ✅ même largeur que .cp-modal */
+  max-width: 96%;
+  max-height: 90vh;
+
   background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
-  border-radius: 18px 18px 0 0;
-  padding: 14px 18px;
+  border-radius: 12px;       /* ✅ même radius que create post */
+
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
+
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 
+/* ❌ grabber inutile en modale centrée */
 .filter-grabber {
-  width: 42px;
-  height: 5px;
-  background: rgba(255,255,255,.35);
-  border-radius: 3px;
-  align-self: center;
-  margin-bottom: 14px;
+  display: none;
 }
 
 .filter-header {
   position: relative;
-  text-align: center;
-  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 32px;
+  margin-bottom: 12px; /* ✅ réduit l’espace sous le titre (22 → 12) */
 }
 
 .filter-header h3 {
-  color: #F8FAFC;
-  font-size: 20px;
-  font-weight: 700;
+  position: relative;
+  top: -20px;
 }
 
 .filter-close {
@@ -2609,7 +2614,7 @@ header * {
 
 .filter-step {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto;          /* ✅ scroll interne comme cp-body */
 }
 
 .filter-step.hidden {
@@ -2650,6 +2655,7 @@ header * {
 .filter-pill.active span {
   color: #1E1E2E;
 }
+
 /* =========================
    FEED — FILTER BUTTON (APP)
 ========================= */
@@ -2675,6 +2681,102 @@ header * {
 
 .feed-filter-btn:hover {
   text-decoration: underline;
+}
+.filter-header h3 {
+  position: relative;
+  top: -20px; /* 🔑 REMONTE VRAIMENT LE TITRE */
+}
+/* =========================
+   FILTER MODAL — FIXED BODY HEIGHT
+========================= */
+
+/* 🔒 hauteur interne identique pour tous les steps */
+.filter-step {
+  flex: 0 0 auto;
+  height: 360px;        /* 🔑 valeur stable (ajuste si besoin : 340–380) */
+  overflow-y: auto;
+}
+/* =========================
+   FILTER MODAL — ACTIVITY HEADER (NO CLOSE)
+========================= */
+
+/* ❌ cache la croix quand on est sur l’étape activity */
+#filter-step-activity:not(.hidden) ~ .filter-header .filter-close {
+  display: none;
+}
+/* ❌ supprime la flèche du bas dans Activities */
+#filter-step-activity .filter-back {
+  display: none;
+}
+/* =========================
+   FILTER MODAL — HEADER BACK (CREATE-LIKE)
+========================= */
+
+/* Affiche la flèche dans le header UNIQUEMENT pour Activities */
+#filter-step-activity:not(.hidden) ~ .filter-header::before {
+  content: "←";
+
+  position: absolute;
+  left: -4px;
+
+  padding: 4px 10px;
+
+  color: #93C5FD;
+  font-size: 20px;
+  font-weight: 700;
+
+  cursor: pointer;
+  line-height: 1;
+}
+/* =========================
+   ACTIVE FILTERS (APP-LIKE)
+========================= */
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  padding: 0 12px;
+  margin: 6px 0 10px;
+}
+
+.active-filters.hidden {
+  display: none;
+}
+
+.active-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Feeling */
+.active-filter-pill.feeling {
+  background: #EECD79;
+  color: #1E1E2E;
+}
+
+/* Activity */
+.active-filter-pill.activity {
+  background: #93C5FD;
+  color: #0B1120;
+}
+
+.active-filter-pill img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
   </style>
@@ -2780,6 +2882,9 @@ header * {
     </button>
   </div>
 
+  <!-- 🔥 ACTIVE FILTERS (APP-LIKE) -->
+  <div id="active-filters" class="active-filters hidden"></div>
+
   <div id="feed"></div>
 </div>
 </div>
@@ -2834,6 +2939,52 @@ header * {
     feeling: null,
     activity: null,
   };
+</script>
+<script>
+  // =========================
+  // ACTIVE FILTERS — RENDER
+  // =========================
+  function renderActiveFilters() {
+    const container = document.getElementById("active-filters");
+    if (!container) return;
+
+    const { feeling, activity } = window.FEED_FILTERS;
+
+    container.innerHTML = "";
+
+    if (!feeling && !activity) {
+      container.classList.add("hidden");
+      return;
+    }
+
+    container.classList.remove("hidden");
+
+    if (feeling) {
+      const pill = document.createElement("div");
+      pill.className = "active-filter-pill feeling";
+      pill.innerHTML = `
+        <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${feeling.image}" />
+        <span>${feeling.title}</span>
+      `;
+      pill.onclick = () => window.clearFilters();
+      container.appendChild(pill);
+    }
+
+    if (activity) {
+      const pill = document.createElement("div");
+      pill.className = "active-filter-pill activity";
+      pill.innerHTML = `
+        <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />
+        <span>${activity.title}</span>
+      `;
+      pill.onclick = () => {
+        window.FEED_FILTERS.activity = null;
+        renderFilteredFeed();
+        renderActiveFilters();
+      };
+      container.appendChild(pill);
+    }
+  }
 </script>
 
 <script>
@@ -3100,9 +3251,7 @@ header * {
 </script>
 
 <script>
-  // =========================
-  // FEED — APPLY FILTERS (APP LOGIC 1:1)
-  // =========================
+
    // =========================
   // FEED — APPLY FILTERS (APP LOGIC 1:1)
   // =========================
@@ -3153,21 +3302,24 @@ header * {
   // FEED — FILTER ACTIONS (PUBLIC API)
   // =========================
   window.setFilterFeeling = function (feeling) {
-    window.FEED_FILTERS.feeling = feeling;
-    window.FEED_FILTERS.activity = null; // 🔑 même règle que l’app
-    renderFilteredFeed();
-  };
+  window.FEED_FILTERS.feeling = feeling;
+  window.FEED_FILTERS.activity = null;
+  renderFilteredFeed();
+  renderActiveFilters(); // ✅ AJOUT
+};
 
-  window.setFilterActivity = function (activity) {
-    window.FEED_FILTERS.activity = activity;
-    renderFilteredFeed();
-  };
+window.setFilterActivity = function (activity) {
+  window.FEED_FILTERS.activity = activity;
+  renderFilteredFeed();
+  renderActiveFilters(); // ✅ AJOUT
+};
 
-  window.clearFilters = function () {
-    window.FEED_FILTERS.feeling = null;
-    window.FEED_FILTERS.activity = null;
-    renderFilteredFeed();
-  };
+window.clearFilters = function () {
+  window.FEED_FILTERS.feeling = null;
+  window.FEED_FILTERS.activity = null;
+  renderFilteredFeed();
+  renderActiveFilters(); // ✅ AJOUT
+};
 </script>
 
 <script>
@@ -3455,6 +3607,7 @@ window.FEED_POSTS = posts
   .map(normalizePostFromAPI);
 
 renderFilteredFeed();
+renderActiveFilters();
 
 // =========================
 // HIDE BIO TOGGLE IF NOT NEEDED
