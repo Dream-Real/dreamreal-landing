@@ -2655,13 +2655,17 @@ header * {
 .filter-pill.active span {
   color: #1E1E2E;
 }
-
 /* =========================
-   FEED — FILTER BUTTON (APP)
+   FEED — FILTER BUTTON (ALIGN WITH POSTS)
 ========================= */
 .feed-filters {
   display: flex;
   justify-content: flex-end;
+
+  /* 🔑 CLÉ ABSOLUE — même padding que les posts */
+  padding-right: 12px;
+  padding-left: 12px;
+
   margin: 4px 0 10px;
 }
 
@@ -2673,14 +2677,15 @@ header * {
   font-size: 16px;
   font-weight: 600;
 
-  padding: 6px 4px;
+  padding: 0;
+margin: 0;
   cursor: pointer;
 
   line-height: 1;
+  transform: translateX(-2px);
 }
-
 .feed-filter-btn:hover {
-  text-decoration: underline;
+  opacity: 0.85;
 }
 .filter-header h3 {
   position: relative;
@@ -2737,7 +2742,10 @@ header * {
   flex-wrap: wrap;
   gap: 10px;
 
-  padding: 0 12px;
+  /* 🔑 CLÉ : même origine que le contenu des posts */
+  padding-left: -8px;
+  padding-right: 14px;
+
   margin: 6px 0 10px;
 }
 
@@ -2777,6 +2785,20 @@ header * {
   width: 18px;
   height: 18px;
   object-fit: contain;
+}
+/* =========================
+   FEED — ALIGNMENT SOURCE
+========================= */
+.feed-inner {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+/* =========================
+   FEED — MICRO ALIGNMENT FIX
+========================= */
+.feed {
+  position: relative;
+  top: -24px; /* ajuste : -8 / -10 / -14 */
 }
 
   </style>
@@ -2867,24 +2889,31 @@ header * {
   </div>
 
   <!-- COLONNE DROITE -->
-  <div class="feed">
-  <div class="feed-heading">
-    <h3>Happening now</h3>
-    <p class="feed-sub">
-      Live posts from around the world
-    </p>
+<div class="feed">
+
+  <!-- 🔑 WRAPPER D’ALIGNEMENT UNIQUE -->
+  <div class="feed-inner">
+
+    <div class="feed-heading">
+      <h3>Happening now</h3>
+      <p class="feed-sub">
+        Live posts from around the world
+      </p>
+    </div>
+
+    <!-- 🟡 FILTER BUTTON -->
+    <div class="feed-filters">
+      <button id="open-filters" class="feed-filter-btn">
+        Filters
+      </button>
+    </div>
+
+    <!-- 🔥 ACTIVE FILTERS -->
+    <div id="active-filters" class="active-filters hidden"></div>
+
   </div>
 
-  <!-- 🟡 FILTER BUTTON (APP-LIKE) -->
-  <div class="feed-filters">
-    <button id="open-filters" class="feed-filter-btn">
-      Filters
-    </button>
-  </div>
-
-  <!-- 🔥 ACTIVE FILTERS (APP-LIKE) -->
-  <div id="active-filters" class="active-filters hidden"></div>
-
+  <!-- 🔽 FEED SCROLLABLE -->
   <div id="feed"></div>
 </div>
 </div>
@@ -3852,10 +3881,14 @@ window.addEventListener("resize", () => {
     const allBtn = document.createElement("div");
     allBtn.className = "filter-pill";
     allBtn.innerHTML = `<span>All</span>`;
-    allBtn.onclick = () => {
-      window.clearFilters();
-      closeFilterModal();
-    };
+   allBtn.onclick = () => {
+  // 🔑 on garde le feeling, on enlève seulement l’activity
+  window.FEED_FILTERS.activity = null;
+
+  renderFilteredFeed();
+  renderActiveFilters();
+  closeFilterModal();
+};
     activityGrid.appendChild(allBtn);
 
     related.forEach((activity) => {
