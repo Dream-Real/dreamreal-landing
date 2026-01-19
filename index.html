@@ -2876,18 +2876,25 @@ margin: 0;
   <button
     id="open-lf-filters"
     style="
-      margin-left: 14px;
+      margin-left: 67px;
       background: none;
       border: none;
       color: #EECD79;
       font-weight: 600;
       font-size: 16px;
+      line-height: 1;   /* ✅ LIGNE CLÉ */
       cursor: pointer;
     "
   >
-    Looking for
+    Filters
   </button>
 </p>
+<!-- 🔥 ACTIVE FILTER — LOOKING FOR -->
+<div
+  id="lf-active-filter"
+  class="active-filters hidden"
+  style="margin-top: 8px;"
+></div>
 
   <!-- MOBILE / TABLETTE : carrousel EXISTANT -->
   <div
@@ -2992,6 +2999,44 @@ margin: 0;
     activity: null,
   };
   
+</script>
+<script>
+  // =========================
+  // LOOKING FOR — ACTIVE FILTER RENDER
+  // =========================
+  function renderLookingForActiveFilter() {
+    const container =
+      document.getElementById("lf-active-filter");
+
+    if (!container) return;
+
+    const { activity } = window.LOOKING_FOR_FILTER;
+
+    container.innerHTML = "";
+
+    if (!activity) {
+      container.classList.add("hidden");
+      return;
+    }
+
+    container.classList.remove("hidden");
+
+    const pill = document.createElement("div");
+    pill.className = "active-filter-pill activity";
+
+    pill.innerHTML = `
+      <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />
+      <span>${activity.title}</span>
+    `;
+
+    pill.onclick = () => {
+      window.LOOKING_FOR_FILTER.activity = null;
+      applyLookingForFilter(null);
+      renderLookingForActiveFilter();
+    };
+
+    container.appendChild(pill);
+  }
 </script>
 
 <script>
@@ -4175,6 +4220,7 @@ window.addEventListener("resize", () => {
     allBtn.innerHTML = `<span>All</span>`;
     allBtn.onclick = () => {
       applyLookingForFilter(null);
+      renderLookingForActiveFilter(); // ✅ ← ICI EXACTEMENT
       lfFilterOverlay.classList.add("hidden");
     };
     lfGrid.appendChild(allBtn);
@@ -4197,6 +4243,7 @@ window.addEventListener("resize", () => {
         btn.classList.add("active");
 
         applyLookingForFilter(activity);
+        renderLookingForActiveFilter(); // ✅ ← ICI EXACTEMENT
         lfFilterOverlay.classList.add("hidden");
       };
 
