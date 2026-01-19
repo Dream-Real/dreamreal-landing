@@ -2871,8 +2871,23 @@ margin: 0;
   <h3>They are looking for</h3>
 
   <p class="looking-for-sub">
-    People nearby open to connect right now
-  </p>
+  People nearby open to connect right now
+
+  <button
+    id="open-lf-filters"
+    style="
+      margin-left: 14px;
+      background: none;
+      border: none;
+      color: #EECD79;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+    "
+  >
+    Looking for
+  </button>
+</p>
 
   <!-- MOBILE / TABLETTE : carrousel EXISTANT -->
   <div
@@ -2969,6 +2984,16 @@ margin: 0;
     activity: null,
   };
 </script>
+<script>
+  // =========================
+  // LOOKING FOR — FILTER STATE (LOCAL)
+  // =========================
+  window.LOOKING_FOR_FILTER = {
+    activity: null,
+  };
+  
+</script>
+
 <script>
   // =========================
   // ACTIVE FILTERS — RENDER
@@ -3366,6 +3391,124 @@ window.clearFilters = function () {
   }
 </script>
 
+<script>
+  // =========================
+  // LOOKING FOR — RENDER HELPERS (GLOBAL)
+  // =========================
+  function renderLookingForPost(post) {
+  const user = post.user?.name || "Dream Real";
+
+  const avatar =
+    post.user?.avatar ||
+    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+  const location = post.location || "";
+
+  const feeling = post.mood?.feeling || null;
+  const activity = post.mood?.activity || null;
+
+  const message = post.message || "";
+
+  return `
+    <div class="lf-post">
+      <div class="lf-post-header">
+        <div class="lf-post-avatar">
+          <img src="${avatar}" />
+        </div>
+
+        <div class="lf-post-meta">
+          <strong>${user}</strong>
+          ${location ? `<span> in ${location}</span>` : ""}
+        </div>
+      </div>
+
+      <div class="lf-post-body">
+
+        ${
+          feeling && activity
+            ? `
+              <div class="feed-pill">
+                <span>${feeling.title}</span>
+                ${
+                  activity.image
+                    ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />`
+                    : ""
+                }
+                <span>${activity.title}</span>
+              </div>
+            `
+            : ""
+        }
+
+        ${
+          message
+            ? `
+              <div class="lf-bio-wrapper">
+                <div class="lf-bio collapsed">
+                  <span class="lf-bio-text">
+                    ${message}
+                    <button class="lf-bio-toggle is-bottom" style="display:none">
+                      View less
+                    </button>
+                  </span>
+                </div>
+
+                <button class="lf-bio-toggle" data-position="inline">
+                  View more
+                </button>
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+    </div>
+  `;
+}
+
+  // =========================
+  // LOOKING FOR — APPLY FILTER (GLOBAL)
+  // =========================
+  function applyLookingForFilter(activity) {
+  window.LOOKING_FOR_FILTER.activity = activity;
+
+  const feed = document.getElementById("looking-for-feed");
+  const carousel = document.getElementById("looking-for-carousel");
+
+  if (!feed && !carousel) return;
+
+  const filtered = window.FEED_POSTS.filter((p) => {
+    // 🔑 filtre STRICTEMENT sur le mood normalisé
+    if (p.mood?.feeling?.slug !== "looking-for") return false;
+
+    // 🔑 activity optionnelle
+    if (!activity) return true;
+
+    return p.mood?.activity?.id === activity.id;
+  });
+
+  if (feed && window.innerWidth >= 1024) {
+    feed.innerHTML = "";
+    filtered.forEach((post) =>
+      feed.insertAdjacentHTML(
+        "beforeend",
+        renderLookingForPost(post)
+      )
+    );
+  }
+
+  if (carousel && window.innerWidth < 1024) {
+    carousel.innerHTML = "";
+    filtered.forEach((post) =>
+      carousel.insertAdjacentHTML(
+        "beforeend",
+        renderLookingForPost(post)
+      )
+    );
+  }
+}
+</script>
+
 <!-- ========================= -->
 <!-- FEED NORMALIZATION (⬅️ ICI EXACTEMENT) -->
 <!-- ========================= -->
@@ -3590,6 +3733,17 @@ const activityIcon =
         </div>
       `;
     })
+    .join("");
+}
+
+// =========================
+// LOOKING FOR — FILTER RENDER (SAFE)
+// =========================
+function rerenderLookingFor(filteredPosts) {
+  if (!feedContainer || window.innerWidth < 1024) return;
+
+  feedContainer.innerHTML = filteredPosts
+    .map((post) => renderLookingForPost(post))
     .join("");
 }
 
@@ -3932,6 +4086,123 @@ window.addEventListener("resize", () => {
     .querySelectorAll(".filter-pill")
     .forEach(p => p.classList.remove("active"));
 }
+</script>
+<!-- =========================
+     LOOKING FOR — FILTER MODAL
+========================= -->
+<div id="lf-filter-overlay" class="filter-overlay hidden">
+  <div class="filter-modal">
+
+    <div class="filter-header">
+      <button class="filter-close">✕</button>
+      <h3>Looking for</h3>
+    </div>
+
+    <div class="filter-step">
+      <div class="filter-grid" id="lf-activity-grid">
+        <!-- activities injected -->
+      </div>
+    </div>
+  </div>
+  <script>
+  // =========================
+  // LOOKING FOR — OPEN / CLOSE (SAFE)
+  // =========================
+  const lfFilterOverlay =
+    document.getElementById("lf-filter-overlay");
+
+  const openLfBtn =
+    document.getElementById("open-lf-filters");
+
+  if (openLfBtn && lfFilterOverlay) {
+    openLfBtn.addEventListener("click", () => {
+      lfFilterOverlay.classList.remove("hidden");
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (
+      e.target.closest("#lf-filter-overlay .filter-close") ||
+      e.target === lfFilterOverlay
+    ) {
+      lfFilterOverlay.classList.add("hidden");
+    }
+  });
+</script>
+</div>
+<script>
+  // =========================
+  // LOOKING FOR — ACTIVITY MODAL (STRICT FEED CLONE)
+  // =========================
+  document.addEventListener("DOMContentLoaded", () => {
+    const lfGrid = document.getElementById("lf-activity-grid");
+    if (!lfGrid) {
+      console.warn("❌ lf-activity-grid introuvable");
+      return;
+    }
+
+    if (!window.FEELINGS || !window.ACTIVITIES) {
+      console.warn("❌ FEELINGS ou ACTIVITIES non chargés");
+      return;
+    }
+
+    // 🔑 Feeling "looking_for"
+    const lookingForFeeling = window.FEELINGS.find(
+      (f) => f.slug === "looking-for"
+    );
+
+    if (!lookingForFeeling) {
+      console.warn("❌ Feeling 'looking_for' introuvable");
+      return;
+    }
+
+    // 🔑 activités associées
+    const relatedActivities = window.ACTIVITIES.filter(
+      (a) => a.feeling_id === lookingForFeeling.id
+    );
+
+    console.log(
+      "✅ Looking for activities:",
+      relatedActivities.map((a) => a.title)
+    );
+
+    // 🧼 reset
+    lfGrid.innerHTML = "";
+
+    // 🔹 ALL
+    const allBtn = document.createElement("div");
+    allBtn.className = "filter-pill active";
+    allBtn.innerHTML = `<span>All</span>`;
+    allBtn.onclick = () => {
+      applyLookingForFilter(null);
+      lfFilterOverlay.classList.add("hidden");
+    };
+    lfGrid.appendChild(allBtn);
+
+    // 🔹 ACTIVITIES
+    relatedActivities.forEach((activity) => {
+      const btn = document.createElement("div");
+      btn.className = "filter-pill";
+
+      btn.innerHTML = `
+        <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />
+        <span>${activity.title}</span>
+      `;
+
+      btn.onclick = () => {
+        lfGrid
+          .querySelectorAll(".filter-pill")
+          .forEach((p) => p.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        applyLookingForFilter(activity);
+        lfFilterOverlay.classList.add("hidden");
+      };
+
+      lfGrid.appendChild(btn);
+    });
+  });
 </script>
   </body>
 </html>
