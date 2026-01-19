@@ -2535,6 +2535,147 @@ header * {
   transform: scale(1.25);   /* 🔥 effet vivant */
   opacity: 1;
 }
+/* =========================
+   FILTER MODAL — APP STYLE
+========================= */
+
+.filter-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 999;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.filter-overlay.hidden {
+  display: none;
+}
+
+.filter-modal {
+  width: 100%;
+  height: 65%;
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  border-radius: 18px 18px 0 0;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-grabber {
+  width: 42px;
+  height: 5px;
+  background: rgba(255,255,255,.35);
+  border-radius: 3px;
+  align-self: center;
+  margin-bottom: 14px;
+}
+
+.filter-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.filter-header h3 {
+  color: #F8FAFC;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.filter-close {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.filter-back {
+  align-self: flex-start;
+  margin-bottom: 12px;
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter-step {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.filter-step.hidden {
+  display: none;
+}
+
+.filter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  cursor: pointer;
+}
+
+.filter-pill.active {
+  background: #EECD79;
+}
+
+.filter-pill img {
+  width: 24px;
+  height: 24px;
+}
+
+.filter-pill span {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.filter-pill.active span {
+  color: #1E1E2E;
+}
+/* =========================
+   FEED — FILTER BUTTON (APP)
+========================= */
+.feed-filters {
+  display: flex;
+  justify-content: flex-end;
+  margin: 4px 0 10px;
+}
+
+.feed-filter-btn {
+  background: none;
+  border: none;
+
+  color: #EECD79; /* 🟡 jaune Dream Real */
+  font-size: 16px;
+  font-weight: 600;
+
+  padding: 6px 4px;
+  cursor: pointer;
+
+  line-height: 1;
+}
+
+.feed-filter-btn:hover {
+  text-decoration: underline;
+}
 
   </style>
 </head>
@@ -2625,14 +2766,22 @@ header * {
 
   <!-- COLONNE DROITE -->
   <div class="feed">
-    <div class="feed-heading">
-  <h3>Happening now</h3>
-  <p class="feed-sub">
-    Live posts from around the world
-  </p>
-</div>
-    <div id="feed"></div>
+  <div class="feed-heading">
+    <h3>Happening now</h3>
+    <p class="feed-sub">
+      Live posts from around the world
+    </p>
   </div>
+
+  <!-- 🟡 FILTER BUTTON (APP-LIKE) -->
+  <div class="feed-filters">
+    <button id="open-filters" class="feed-filter-btn">
+      Filters
+    </button>
+  </div>
+
+  <div id="feed"></div>
+</div>
 </div>
         </div>
       </section>
@@ -2675,6 +2824,16 @@ header * {
   // FEED STORE (SIMULATED)
   // =========================
   window.FEED_POSTS = window.FEED_POSTS || [];
+</script>
+
+<script>
+  // =========================
+  // FEED FILTER STATE (GLOBAL)
+  // =========================
+  window.FEED_FILTERS = {
+    feeling: null,
+    activity: null,
+  };
 </script>
 
 <script>
@@ -2747,20 +2906,27 @@ header * {
         <div class="post-inline-row">
 
           ${
-            mood
-              ? `
-                <div class="feed-pill">
-                  <span>${mood.feeling.title}</span>
-                  ${
-                    mood.activity?.image
-                      ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${mood.activity.image}" alt="" />`
-                      : ""
-                  }
-                  <span>${mood.activity.title}</span>
-                </div>
-              `
-              : ""
-          }
+  mood
+    ? `
+      <div class="feed-pill">
+        <span>${mood.feeling.title}</span>
+
+        ${
+          mood.activity
+            ? `
+              ${
+                mood.activity.image
+                  ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${mood.activity.image}" alt="" />`
+                  : ""
+              }
+              <span>${mood.activity.title}</span>
+            `
+            : ""
+        }
+      </div>
+    `
+    : ""
+}
 
           ${
             message
@@ -2931,6 +3097,77 @@ header * {
 
   // 🔑 accessible depuis create-post.js
   window.renderFeed = renderFeed;
+</script>
+
+<script>
+  // =========================
+  // FEED — APPLY FILTERS (APP LOGIC 1:1)
+  // =========================
+   // =========================
+  // FEED — APPLY FILTERS (APP LOGIC 1:1)
+  // =========================
+  function getFilteredPosts() {
+    const { feeling, activity } = window.FEED_FILTERS;
+
+    return window.FEED_POSTS.filter((post) => {
+      // 🔒 UX safety — si un filtre est actif,
+      // on EXCLUT les posts sans mood
+      if ((feeling || activity) && !post.mood) {
+        return false;
+      }
+
+      const matchFeeling =
+        !feeling ||
+        post.mood?.feeling?.title === feeling.title;
+
+      const matchActivity =
+        !activity ||
+        post.mood?.activity?.title === activity.title;
+
+      return matchFeeling && matchActivity;
+    });
+  }
+
+  function renderFilteredFeed() {
+    const feed = document.getElementById("feed");
+    if (!feed) return;
+
+    feed.innerHTML = "";
+
+    const filtered = getFilteredPosts();
+
+    filtered.forEach((post) => {
+      feed.insertAdjacentHTML(
+        "beforeend",
+        renderPost(post)
+      );
+    });
+  }
+
+  // expose (debug / future usage)
+  window.renderFilteredFeed = renderFilteredFeed;
+</script>
+
+<script>
+  // =========================
+  // FEED — FILTER ACTIONS (PUBLIC API)
+  // =========================
+  window.setFilterFeeling = function (feeling) {
+    window.FEED_FILTERS.feeling = feeling;
+    window.FEED_FILTERS.activity = null; // 🔑 même règle que l’app
+    renderFilteredFeed();
+  };
+
+  window.setFilterActivity = function (activity) {
+    window.FEED_FILTERS.activity = activity;
+    renderFilteredFeed();
+  };
+
+  window.clearFilters = function () {
+    window.FEED_FILTERS.feeling = null;
+    window.FEED_FILTERS.activity = null;
+    renderFilteredFeed();
+  };
 </script>
 
 <script>
@@ -3217,7 +3454,7 @@ window.FEED_POSTS = posts
   )
   .map(normalizePostFromAPI);
 
-renderFeed();
+renderFilteredFeed();
 
 // =========================
 // HIDE BIO TOGGLE IF NOT NEEDED
@@ -3362,6 +3599,153 @@ window.addEventListener("resize", () => {
     location.reload();
   }
 });
+</script>
+
+<!-- =========================
+     FILTER MODAL (APP-LIKE)
+========================= -->
+<div id="filter-overlay" class="filter-overlay hidden">
+  <div id="filter-modal" class="filter-modal">
+    <div class="filter-grabber"></div>
+
+    <div class="filter-header">
+      <button class="filter-close">✕</button>
+      <h3>Choose filter</h3>
+    </div>
+
+    <!-- STEP 1 — FEELINGS -->
+    <div id="filter-step-feeling" class="filter-step">
+      <div class="filter-grid">
+        <!-- feelings injected here -->
+      </div>
+    </div>
+
+    <!-- STEP 2 — ACTIVITIES -->
+    <div id="filter-step-activity" class="filter-step hidden">
+      <button class="filter-back">←</button>
+      <div class="filter-grid">
+        <!-- activities injected here -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 🔽 SCRIPTS DE LA MODALE — ICI UNIQUEMENT 🔽 -->
+
+<script>
+  // =========================
+  // FILTER MODAL — OPEN / CLOSE
+  // =========================
+  const filterOverlay = document.getElementById("filter-overlay");
+  const openFiltersBtn = document.getElementById("open-filters");
+
+  if (openFiltersBtn && filterOverlay) {
+    openFiltersBtn.addEventListener("click", () => {
+      filterOverlay.classList.remove("hidden");
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (
+      e.target.closest(".filter-close") ||
+      e.target === filterOverlay
+    ) {
+      filterOverlay.classList.add("hidden");
+    }
+  });
+</script>
+
+<script>
+  // =========================
+  // FILTER MODAL — CONTENT & ACTIONS
+  // =========================
+
+  const stepFeeling = document.getElementById("filter-step-feeling");
+  const stepActivity = document.getElementById("filter-step-activity");
+
+  const feelingGrid = stepFeeling.querySelector(".filter-grid");
+  const activityGrid = stepActivity.querySelector(".filter-grid");
+
+  window.FEELINGS.forEach((feeling) => {
+    const btn = document.createElement("div");
+    btn.className = "filter-pill";
+    btn.innerHTML = `
+      <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${feeling.image}" />
+      <span>${feeling.title}</span>
+    `;
+
+    btn.onclick = () => {
+  document
+    .querySelectorAll(".filter-pill")
+    .forEach(p => p.classList.remove("active"));
+
+  btn.classList.add("active");
+
+  window.setFilterFeeling(feeling);
+      stepFeeling.classList.add("hidden");
+      stepActivity.classList.remove("hidden");
+      renderActivities(feeling.id);
+    };
+
+    feelingGrid.appendChild(btn);
+  });
+
+  function renderActivities(feelingId) {
+    activityGrid.innerHTML = "";
+
+    const related = window.ACTIVITIES.filter(
+      (a) => a.feeling_id === feelingId
+    );
+
+    const allBtn = document.createElement("div");
+    allBtn.className = "filter-pill";
+    allBtn.innerHTML = `<span>All</span>`;
+    allBtn.onclick = () => {
+      window.clearFilters();
+      closeFilterModal();
+    };
+    activityGrid.appendChild(allBtn);
+
+    related.forEach((activity) => {
+      const btn = document.createElement("div");
+      btn.className = "filter-pill";
+      btn.innerHTML = `
+        <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />
+        <span>${activity.title}</span>
+      `;
+      btn.onclick = () => {
+  // 🔄 reset visuel de TOUTES les pills
+  document
+    .querySelectorAll(".filter-pill")
+    .forEach(p => p.classList.remove("active"));
+
+  // ✅ marque l’activité comme active
+  btn.classList.add("active");
+
+  // 🎯 applique le filtre
+  window.setFilterActivity(activity);
+
+  // 🚪 ferme la modale
+  closeFilterModal();
+};
+      activityGrid.appendChild(btn);
+    });
+  }
+
+  document.querySelector(".filter-back").onclick = () => {
+    stepActivity.classList.add("hidden");
+    stepFeeling.classList.remove("hidden");
+  };
+
+  function closeFilterModal() {
+  filterOverlay.classList.add("hidden");
+  stepActivity.classList.add("hidden");
+  stepFeeling.classList.remove("hidden");
+
+  // 🧼 reset visuel
+  document
+    .querySelectorAll(".filter-pill")
+    .forEach(p => p.classList.remove("active"));
+}
 </script>
   </body>
 </html>
