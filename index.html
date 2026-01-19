@@ -2547,6 +2547,306 @@ header * {
   }
 </script>
 
+<script>
+  // =========================
+  // FEED STORE (SIMULATED)
+  // =========================
+  window.FEED_POSTS = window.FEED_POSTS || [];
+</script>
+
+<script>
+  // =========================
+  // FEED — SINGLE POST RENDER
+  // =========================
+  function renderPost(post) {
+    const {
+      user,
+      message,
+      location,
+      media,
+      video,
+      mood,
+      createdAt,
+      linkPreview,
+      reactions,
+    } = post;
+
+   const date = createdAt
+  ? (() => {
+      const d = new Date(createdAt);
+
+      const datePart = d.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+
+      const timePart = d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      return `${datePart} at ${timePart}`;
+    })()
+  : "";
+
+    return `
+      <div class="post">
+        <div class="post-header">
+          <div class="post-avatar">
+            ${
+              user.avatar
+                ? `<img src="${user.avatar}" alt="${user.name}" />`
+                : `<span>${user.name.charAt(0)}</span>`
+            }
+          </div>
+
+          <div class="post-meta">
+            <strong>
+              ${user.name}
+              ${
+                location
+                  ? `<span class="inline-location"> in ${location}</span>`
+                  : ""
+              }
+            </strong>
+            <div class="post-date">
+              <small>${date}</small>
+            </div>
+          </div>
+        </div>
+
+       ${
+  message
+    ? `
+      <div class="post-text-block">
+
+        <div class="post-inline-row">
+
+          ${
+  mood
+    ? `
+      <div class="feed-pill">
+        <span>${mood.feeling.title}</span>
+        ${
+          mood.activity?.image
+            ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${mood.activity.image}" alt="" />`
+            : ""
+        }
+        <span>${mood.activity.title}</span>
+      </div>
+    `
+    : ""
+}
+          <button
+            class="post-bio-toggle"
+            data-position="inline"
+          >
+            View more
+          </button>
+        </div>
+
+        <div class="post-bio collapsed">
+          <span class="post-bio-text">
+            ${message}
+            <button
+              class="post-bio-toggle is-bottom"
+              data-position="bottom"
+              style="display:none"
+            >
+              View less
+            </button>
+          </span>
+        </div>
+
+      </div>
+    `
+    : ""
+}
+    ${
+  video && !media?.some((m) => m.type === "youtube")
+    ? `
+      <div class="post-media video">
+        <video
+          src="${video}"
+          controls
+          muted
+          playsinline
+          preload="metadata"
+        ></video>
+      </div>
+    `
+    : ""
+}
+
+        ${
+          media?.length
+            ? media
+                .map((m) => {
+                  if (m.type === "image") {
+                    return `
+                      <div class="post-media">
+                        <img src="${m.src}" />
+                      </div>
+                    `;
+                  }
+
+                  if (m.type === "youtube") {
+                    return `
+                      <div class="post-media youtube-preview">
+                        <img src="${m.src}" />
+                      </div>
+                    `;
+                  }
+
+                  return "";
+                })
+                .join("")
+            : ""
+        }
+
+        ${
+          linkPreview
+            ? `
+              <a
+                class="post-media link-preview"
+                href="${linkPreview.url}"
+                target="_blank"
+                rel="noopener"
+              >
+                ${
+                  linkPreview.image
+                    ? `<img src="${linkPreview.image}" />`
+                    : ""
+                }
+                <div class="link-preview-content">
+                  <strong>${linkPreview.title}</strong>
+                  ${
+                    linkPreview.description
+                      ? `<p>${linkPreview.description}</p>`
+                      : ""
+                  }
+                  ${
+                    linkPreview.siteName
+                      ? `<span>${linkPreview.siteName}</span>`
+                      : ""
+                  }
+                </div>
+              </a>
+            `
+            : ""
+        }
+            <div class="post-reactions">
+  ${
+    reactions?.count
+      ? `${reactions.summary} ${reactions.count}`
+      : reactions?.summary || "👍"
+  }
+</div>
+      </div>
+    `;
+  }
+</script>
+
+<script>
+  // =========================
+  // FEED — RENDER (UNIFIED)
+  // =========================
+  function renderFeed() {
+    const feed = document.getElementById("feed");
+    if (!feed) return;
+
+    feed.innerHTML = "";
+
+    window.FEED_POSTS.forEach((post) => {
+      feed.insertAdjacentHTML(
+        "beforeend",
+        renderPost(post)
+      );
+    });
+  }
+
+  // 🔑 accessible depuis create-post.js
+  window.renderFeed = renderFeed;
+</script>
+
+<!-- ========================= -->
+<!-- FEED NORMALIZATION (⬅️ ICI EXACTEMENT) -->
+<!-- ========================= -->
+<script>
+  function normalizePostFromAPI(post) {
+    return {
+      id: post.id || crypto.randomUUID(),
+
+      user: {
+        name:
+          `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
+          "Dream Real",
+        avatar:
+          post.user_avatar ||
+          post.profile_picture ||
+          post.from?.picture?.data?.url ||
+          "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+      },
+
+      message: post.message || null,
+
+      location:
+        post.localLocation?.label ||
+        post.location?.label ||
+        null,
+
+      media: (() => {
+  // 🎬 PRIORITÉ ABSOLUE À YOUTUBE
+  if (post.youtube_url) {
+    const videoId =
+      post.youtube_url.split("v=")[1]?.split("&")[0];
+
+    return videoId
+      ? [
+          {
+            type: "youtube",
+            src: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+          },
+        ]
+      : [];
+  }
+
+  // 🖼 IMAGES CLASSIQUES
+  if (Array.isArray(post.images) && post.images.length) {
+    return post.images.map((src) => ({
+      type: "image",
+      src,
+    }));
+  }
+
+  return [];
+})(),
+
+        video: post.video_url || null, // ✅ 🔑 ICI
+
+      linkPreview: post.linkPreview || null,
+
+      mood:
+        post.feeling && post.activity
+          ? {
+              feeling: post.feeling,
+              activity: post.activity,
+            }
+          : null,
+
+          reactions: {
+  summary: post.reactions_summary || "👍",
+  count: post.reactions_count || null,
+},
+
+      createdAt: post.created_time || new Date().toISOString(),
+
+      source: "api",
+    };
+  }
+</script>
+
 <script src="./components/create-post.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -2744,239 +3044,19 @@ document.querySelectorAll(".lf-bio-wrapper").forEach((wrapper) => {
   }
 });
 
-      if (!posts.length) {
-        feed.innerHTML = "<p>Aucun post pour le moment</p>";
-        return;
-      }
+// =========================
+// FEED PRINCIPAL — TOUS LES POSTS (Y COMPRIS "LOOKING FOR")
+// =========================
+window.FEED_POSTS = posts
+  .sort(
+    (a, b) =>
+      new Date(b.created_time).getTime() -
+      new Date(a.created_time).getTime()
+  )
+  .map(normalizePostFromAPI);
 
-      feed.innerHTML = "";
+renderFeed();
 
-      posts.forEach((post) => {
-  const user =
-    `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
-    "Dream Real";
-
-  const date = post.created_time
-  ? (() => {
-      const d = new Date(post.created_time);
-
-      const datePart = d.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      });
-
-      const timePart = d.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      return `${datePart} at ${timePart}`;
-    })()
-  : "";
-
-  const reactions =
-    post.reactions_summary && post.reactions_count
-      ? `${post.reactions_summary} ${post.reactions_count}`
-      : "👍";
-
-      const avatar =
-    post.user_avatar || // Dream Real user avatar
-    post.profile_picture || // Facebook legacy
-    post.from?.picture?.data?.url || // Facebook Graph API
-    null;
-
-  const initial =
-    (post.user_first_name || post.user_last_name || "D")
-      .charAt(0)
-      .toUpperCase();
-
-        const locationLabel =
-    post.localLocation?.label ||
-    post.location?.label ||
-    null;
-
-    // 🔑 FEELING / ACTIVITY (NORMALISÉ — SOURCE APP)
-const feelingLabel =
-  post.feeling?.label ||
-  post.feeling?.title ||
-  post.feeling?.name ||
-  null;
-
-const activityLabel =
-  post.activity?.label ||
-  post.activity?.title ||
-  post.activity?.name ||
-  null;
-
-const activityIcon =
-  post.activity?.image
-    ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
-    : null;
-
-     const rawBio =
-  post.user_bio ||
-  post.bio ||
-  post.user?.bio ||
-  post.from?.about ||
-  post.message ||
-  null;
-
-const bio = stripUrls(rawBio);
-
-  const imageMedia =
-  (Array.isArray(post.images) && post.images[0]) ||
-  (post.youtube_url
-    ? `https://img.youtube.com/vi/${
-        post.youtube_url.split("v=")[1]?.split("&")[0]
-      }/hqdefault.jpg`
-    : null) ||
-  post.full_picture ||
-  post.linkPreview?.image ||
-  null;
-
-const videoMedia = post.video_url || null;
-
-  /* ✅ AJOUTE CE BLOC ICI */
-  const linkPreview = post.linkPreview || null;
-
-  feed.innerHTML += `
-    <div class="post">
-      <div class="post-header">
-        <div class="post-avatar">
-  ${
-    avatar
-      ? `<img src="${avatar}" alt="${user}" />`
-      : `<span>${initial}</span>`
-  }
-</div>
-        <div class="post-meta">
-  <strong>
-    ${user}
-    ${
-      locationLabel
-        ? `<span class="inline-location"> in ${locationLabel}</span>`
-        : ""
-    }
-  </strong>
-
-  <div class="post-date">
-  <small>${date}</small>
-</div>
-</div>
-      </div>
-
-     ${(feelingLabel && activityLabel && activityIcon) || bio ? `
-  <div class="post-text-block">
-
-    <!-- 🔹 LIGNE 1 : BULLE + VIEW MORE -->
-    <div class="post-inline-row">
-
-      ${
-        feelingLabel && activityLabel && activityIcon
-          ? `
-            <div class="feed-pill">
-              <span>${feelingLabel}</span>
-              <img src="${activityIcon}" alt="" />
-              <span>${activityLabel}</span>
-            </div>
-          `
-          : ""
-      }
-
-      ${
-        bio
-          ? `<button
-  class="post-bio-toggle"
-  data-position="inline"
->
-  View more
-</button>`
-          : ""
-      }
-
-    </div>
-
-    <!-- 🔹 LIGNE 2 : BIO (MASQUÉE PAR DÉFAUT) -->
-    ${
-  bio
-  ? `
-    <div class="post-bio collapsed">
-      <span class="post-bio-text">
-        ${bio}
-        <button
-          class="post-bio-toggle is-bottom"
-          data-position="bottom"
-          style="display:none"
-        >
-          View less
-        </button>
-      </span>
-    </div>
-  `
-  : ""
-}
-
-  </div>
-` : ""}
-
-     ${
-  videoMedia
-    ? `
-      <div class="post-media video">
-        <video
-          src="${videoMedia}"
-          controls
-          muted
-          playsinline
-          preload="metadata"
-        ></video>
-      </div>
-    `
-    : linkPreview && linkPreview.title
-    ? `
-      <a
-        class="post-media link-preview"
-        href="${linkPreview.url || '#'}"
-        target="_blank"
-        rel="noopener"
-      >
-        ${
-          linkPreview.image
-            ? `<img src="${linkPreview.image}" alt="" />`
-            : ""
-        }
-        <div class="link-preview-content">
-          <strong>${linkPreview.title}</strong>
-          ${
-            linkPreview.description
-              ? `<p>${linkPreview.description}</p>`
-              : ""
-          }
-          ${
-            linkPreview.siteName
-              ? `<span>${linkPreview.siteName}</span>`
-              : ""
-          }
-        </div>
-      </a>
-    `
-    : imageMedia
-    ? `
-      <div
-  class="post-media adaptive ${
-    post.youtube_url ? "youtube-preview" : ""
-  }"
-  data-src="${imageMedia}"
-></div>
-    `
-    : `<div class="post-media"></div>`
-}
-
-      <div class="post-reactions">${reactions}</div>
-    </div>
-  `;
-});
 // =========================
 // HIDE BIO TOGGLE IF NOT NEEDED
 // =========================
