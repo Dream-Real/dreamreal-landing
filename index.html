@@ -3307,6 +3307,8 @@ function onUserAuthenticated(user) {
   }
 }
 
+window.onUserAuthenticated = onUserAuthenticated;
+
   /* =========================
      AUTH — OTP LOGIC
   ========================= */
@@ -4909,8 +4911,6 @@ async function loadCompleteProfileMe() {
 
 function closeCompleteProfileModal() {
   document.getElementById("cpf-overlay").classList.add("hidden");
-    // 🔓 FIX — réactive le scroll après complétion
-  document.body.style.overflow = "";
 }
 
 /* Avatar picker */
@@ -4986,7 +4986,7 @@ document.getElementById("cpf-submit").addEventListener("click", async () => {
   localStorage.setItem("user", JSON.stringify(data.user));
 
   closeCompleteProfileModal();
-  onUserAuthenticated(data.user);
+  window.onUserAuthenticated(data.user);
 });
 </script>
   </body>
