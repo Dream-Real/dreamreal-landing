@@ -2858,6 +2858,29 @@ margin: 0;
 .hidden {
   display: none !important;
 }
+/* =========================
+   NAV — USER MINI PROFILE
+========================= */
+
+.nav-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 10px;
+}
+
+.nav-user img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nav-user span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
 
   </style>
 </head>
@@ -2873,12 +2896,19 @@ margin: 0;
   </a>
 
   <div class="nav-actions">
-    <button class="btn btn-create">
-  Create post
-</button>
 
-    <button class="btn btn-primary btn-join">Join</button>
+  <!-- 👤 USER INFO (hidden by default) -->
+  <div id="nav-user" class="nav-user hidden">
+    <img id="nav-user-avatar" alt="avatar" />
+    <span id="nav-user-name"></span>
   </div>
+
+  <button class="btn btn-create" style="display:none">
+    Create post
+  </button>
+
+  <button class="btn btn-primary btn-join">Join</button>
+</div>
 </div>
       </div>
     </header>
@@ -3015,6 +3045,11 @@ margin: 0;
 </script>
 
 <script>
+  // 🔑 SOURCE UNIQUE DE VÉRITÉ API
+  const API_BASE = window.API_URL;
+</script>
+
+<script>
   // =========================
   // AUTH STATE (GLOBAL)
   // =========================
@@ -3048,6 +3083,16 @@ margin: 0;
     document.querySelectorAll(".btn-create").forEach((btn) => {
       btn.style.display = "none";
     });
+      // 👤 hide user info
+  const navUser = document.getElementById("nav-user");
+  if (navUser) navUser.classList.add("hidden");
+     // 🔁 reset filters
+   window.FEED_FILTERS = { feeling: null, activity: null };
+   window.LOOKING_FOR_FILTER = { activity: null };
+
+   renderFilteredFeed?.();
+   renderActiveFilters?.();
+   renderLookingForActiveFilter?.();
   }
 </script>
 
@@ -3059,30 +3104,6 @@ margin: 0;
     alert("🧩 Complete your profile (next step)");
     // 👉 Étape suivante : vraie modale web
   }
-</script>
-
-<script>
-  // =========================
-  // AUTH — USER LOGGED IN (WEB)
-  // =========================
-  function onUserAuthenticated(user) {
-  console.log("✅ Authenticated user:", user);
-
-  window.AUTH.user = user;
-  window.AUTH.isAuthenticated = true;
-
-  document.querySelectorAll(".btn-join").forEach((btn) => {
-    btn.textContent = "Logout";
-    btn.style.display = "inline-flex";
-
-    // 🔁 remplace le comportement
-    btn.onclick = logout;
-  });
-
-  document.querySelectorAll(".btn-create").forEach((btn) => {
-    btn.style.display = "inline-flex";
-  });
-}
 </script>
 
 <script>
@@ -3106,13 +3127,65 @@ if (savedToken) {
   document.querySelectorAll(".btn-create").forEach((btn) => {
     btn.style.display = "inline-flex";
   });
+
+  fetch(`${API_BASE}/api/users/me`, {
+    headers: {
+      Authorization: `Bearer ${savedToken}`,
+    },
+  })
+    .then(res => res.json())
+    .then(user => {
+      if (user?.id) {
+        onUserAuthenticated(user);
+      }
+    })
+    .catch(() => logout());
+}
+
+// =========================
+// AUTH — USER LOGGED IN (WEB)
+// =========================
+function onUserAuthenticated(user) {
+  console.log("✅ Authenticated user:", user);
+
+  // 🔐 état global
+  window.AUTH.user = user;
+  window.AUTH.isAuthenticated = true;
+
+  // ✅ Bouton Join → Logout
+  document.querySelectorAll(".btn-join").forEach((btn) => {
+    btn.textContent = "Logout";
+    btn.style.display = "inline-flex";
+    btn.onclick = logout;
+  });
+
+  // ✅ Create post visible
+  document.querySelectorAll(".btn-create").forEach((btn) => {
+    btn.style.display = "inline-flex";
+  });
+
+  // 👤 USER INFO
+  const navUser = document.getElementById("nav-user");
+  const avatar  = document.getElementById("nav-user-avatar");
+  const name    = document.getElementById("nav-user-name");
+
+  if (navUser && avatar && name) {
+    avatar.src =
+      user.avatar ||
+      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+    name.textContent =
+  `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+  user.name ||
+  "User";
+
+    navUser.classList.remove("hidden");
+  }
 }
 
   /* =========================
      AUTH — OTP LOGIC
   ========================= */
-
-  const API_BASE = window.API_URL || "";
 
   const overlay = document.getElementById("auth-overlay");
   const title   = document.getElementById("auth-title");
@@ -3136,10 +3209,18 @@ if (savedToken) {
     otpInput.value = "";
   };
 
-  /* OPEN — bouton Join */
-  document.querySelectorAll(".btn-join").forEach(btn => {
-    btn.addEventListener("click", openAuthModal);
-  });
+  // =========================
+// AUTH — JOIN / LOGOUT BUTTON (SINGLE SOURCE OF TRUTH)
+// =========================
+document.querySelectorAll(".btn-join").forEach((btn) => {
+  btn.onclick = () => {
+    if (window.AUTH.isAuthenticated) {
+      logout();
+    } else {
+      openAuthModal();
+    }
+  };
+});
 
   /* CLOSE */
   document.getElementById("auth-cancel")
@@ -3890,12 +3971,11 @@ window.clearFilters = function () {
     <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  const API_URL = "https://dreamreal-api.onrender.com/api/posts";
   const feed = document.getElementById("feed");
 
   console.log("🚀 Landing feed script loaded");
 
-  fetch(API_URL)
+  fetch(`${API_BASE}/api/posts`)
     .then((res) => res.json())
     .then((res) => {
       const posts = Array.isArray(res) ? res : res.posts ?? res.data ?? [];
