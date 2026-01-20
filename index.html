@@ -2881,6 +2881,129 @@ margin: 0;
   font-weight: 600;
   color: #ffffff;
 }
+/* =========================
+   COMPLETE PROFILE MODAL
+========================= */
+
+.cpf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0,0,0,.75);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cpf-overlay.hidden {
+  display: none;
+}
+
+.cpf-modal {
+  width: 420px;
+  max-width: 92%;
+  padding: 32px 24px 28px;
+
+  background: linear-gradient(180deg,#0B1120,#2A2D59,#5C3B84);
+  border-radius: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+}
+
+.cpf-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+/* Avatar */
+.cpf-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.cpf-avatar-circle {
+  width: 108px;
+  height: 108px;
+  border-radius: 54px;
+  border: 2px solid #93C5FD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.cpf-avatar-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cpf-avatar-circle span {
+  font-size: 44px;
+  color: #93C5FD;
+}
+
+.cpf-avatar-btn {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Inputs */
+.cpf-modal input[type="text"] {
+  background-color: #2A2D59;
+  color: #fff;
+
+  border-radius: 8px;
+  border: none;
+
+  padding: 12px;
+  font-size: 18px;
+  min-height: 44px;
+}
+
+.cpf-modal input::placeholder {
+  color: #9ca3af;
+}
+
+/* Submit */
+.cpf-submit {
+  margin-top: 8px;
+  background-color: #EECD79;
+  color: #0B1120;
+
+  border: none;
+  border-radius: 999px;
+
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.cpf-submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none !important;
+}
 
   </style>
 </head>
@@ -3094,16 +3217,6 @@ margin: 0;
    renderFilteredFeed?.();
    renderActiveFilters?.();
    renderLookingForActiveFilter?.();
-  }
-</script>
-
-<script>
-  // =========================
-  // AUTH — COMPLETE PROFILE (PLACEHOLDER)
-  // =========================
-  function openCompleteProfileModal() {
-    alert("🧩 Complete your profile (next step)");
-    // 👉 Étape suivante : vraie modale web
   }
 </script>
 
@@ -4694,5 +4807,187 @@ lfFilterOverlay.addEventListener("click", (e) => {
 
   </div>
 </div>
+<!-- =========================
+     COMPLETE PROFILE MODAL
+========================= -->
+<div id="cpf-overlay" class="cpf-overlay hidden">
+  <div class="cpf-modal">
+
+    <h2 class="cpf-title">Complete your profile</h2>
+
+    <div class="cpf-avatar-section">
+      <label class="cpf-avatar-circle">
+        <img id="cpf-avatar-preview" class="hidden" />
+        <span id="cpf-avatar-placeholder">+</span>
+        <input
+          id="cpf-avatar-input"
+          type="file"
+          accept="image/*"
+          hidden
+        />
+      </label>
+
+      <button
+        id="cpf-avatar-btn"
+        class="cpf-avatar-btn"
+      >
+        Add avatar
+      </button>
+    </div>
+
+    <input
+      id="cpf-first-name"
+      type="text"
+      placeholder="First name"
+    />
+
+    <input
+      id="cpf-last-name"
+      type="text"
+      placeholder="Last name"
+    />
+
+    <button
+      id="cpf-submit"
+      class="cpf-submit"
+      disabled
+    >
+      Continue
+    </button>
+
+  </div>
+</div>
+<script>
+/* =========================
+   COMPLETE PROFILE LOGIC
+========================= */
+
+let cpfAvatarBase64 = null;
+let cpfExistingAvatar = null;
+
+function openCompleteProfileModal() {
+  document.getElementById("cpf-overlay").classList.remove("hidden");
+  // 🔒 FIX — bloque le scroll / interactions derrière la modale
+  document.body.style.overflow = "hidden";
+  loadCompleteProfileMe();
+}
+
+async function loadCompleteProfileMe() {
+  const token = localStorage.getItem("token");
+  if (!token) return logout();
+
+  const res = await fetch(`${API_BASE}/api/users/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) return logout();
+
+  const data = await res.json();
+  const user = data.user || data;
+
+  const f = user.first_name || "";
+  const l = user.last_name || "";
+  const a = user.avatar || null;
+
+  // 🔒 Profil déjà complet → on sort
+  if (f.trim() && l.trim() && a) {
+    localStorage.setItem("user", JSON.stringify(user));
+    closeCompleteProfileModal();
+    return;
+  }
+
+  document.getElementById("cpf-first-name").value = f;
+  document.getElementById("cpf-last-name").value = l;
+
+  if (a) {
+    cpfExistingAvatar = a;
+    showAvatarPreview(a);
+  }
+
+  updateCpfSubmitState();
+}
+
+function closeCompleteProfileModal() {
+  document.getElementById("cpf-overlay").classList.add("hidden");
+    // 🔓 FIX — réactive le scroll après complétion
+  document.body.style.overflow = "";
+}
+
+/* Avatar picker */
+document.getElementById("cpf-avatar-input").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    cpfAvatarBase64 = reader.result;
+    showAvatarPreview(reader.result);
+    updateCpfSubmitState();
+  };
+  reader.readAsDataURL(file);
+});
+
+function showAvatarPreview(src) {
+  const img = document.getElementById("cpf-avatar-preview");
+  const plus = document.getElementById("cpf-avatar-placeholder");
+
+  img.src = src;
+  img.classList.remove("hidden");
+  plus.classList.add("hidden");
+
+  document.getElementById("cpf-avatar-btn").textContent = "Change avatar";
+}
+
+/* Form state */
+["cpf-first-name", "cpf-last-name"].forEach(id => {
+  document.getElementById(id).addEventListener("input", updateCpfSubmitState);
+});
+
+function updateCpfSubmitState() {
+  const f = document.getElementById("cpf-first-name").value.trim();
+  const l = document.getElementById("cpf-last-name").value.trim();
+
+  const canSubmit = f && l && (cpfAvatarBase64 || cpfExistingAvatar);
+  document.getElementById("cpf-submit").disabled = !canSubmit;
+}
+
+/* Save */
+document.getElementById("cpf-submit").addEventListener("click", async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return logout();
+
+  const payload = {
+    first_name: document.getElementById("cpf-first-name").value.trim(),
+    last_name: document.getElementById("cpf-last-name").value.trim(),
+    avatar: cpfAvatarBase64 || cpfExistingAvatar,
+  };
+
+  const btn = document.getElementById("cpf-submit");
+  btn.textContent = "Saving…";
+  btn.disabled = true;
+
+  const res = await fetch(`${API_BASE}/api/users/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    btn.textContent = "Continue";
+    btn.disabled = false;
+    alert("Server error");
+    return;
+  }
+
+  const data = await res.json();
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  closeCompleteProfileModal();
+  onUserAuthenticated(data.user);
+});
+</script>
   </body>
 </html>
