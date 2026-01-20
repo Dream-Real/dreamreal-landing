@@ -2784,6 +2784,87 @@ margin: 0;
   position: relative;
   top: -24px; /* ajuste : -8 / -10 / -14 */
 }
+/* =========================
+   AUTH MODAL (OTP)
+========================= */
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-overlay.hidden {
+  display: none;
+}
+
+.auth-modal {
+  width: 100%;
+  max-width: 420px;
+
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 24px;
+
+  border: 1px solid #333;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+
+  text-align: center;
+}
+
+.auth-title {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.auth-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-step.hidden {
+  display: none;
+}
+
+.auth-modal input {
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #555;
+
+  background: #2a2a2a;
+  color: #fff;
+
+  padding: 0 14px;
+  font-size: 17px;
+}
+
+.auth-btn {
+  height: 50px;
+  border-radius: 8px;
+  border: none;
+
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-btn.primary {
+  background: #333;
+  color: #fff;
+}
+
+.auth-btn.ghost {
+  background: none;
+  color: #bbb;
+}
 
   </style>
 </head>
@@ -2803,7 +2884,7 @@ margin: 0;
   Create post
 </button>
 
-    <button class="btn btn-primary">Join</button>
+    <button class="btn btn-primary btn-join">Join</button>
   </div>
 </div>
       </div>
@@ -2935,6 +3016,99 @@ margin: 0;
     </footer>
 
 <div id="create-post-root"></div>
+
+<script>
+  window.API_URL = "https://dreamreal-api.onrender.com";
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* =========================
+     AUTH — OTP LOGIC
+  ========================= */
+
+  const API_BASE = window.API_URL || "";
+
+  const overlay = document.getElementById("auth-overlay");
+  const title   = document.getElementById("auth-title");
+
+  const stepEmail = document.getElementById("auth-step-email");
+  const stepOtp   = document.getElementById("auth-step-otp");
+
+  const emailInput = document.getElementById("auth-email");
+  const otpInput   = document.getElementById("auth-otp");
+
+  const openAuthModal = () => {
+    overlay.classList.remove("hidden");
+    stepEmail.classList.remove("hidden");
+    stepOtp.classList.add("hidden");
+    title.textContent = "Enter your email";
+  };
+
+  const closeAuthModal = () => {
+    overlay.classList.add("hidden");
+    emailInput.value = "";
+    otpInput.value = "";
+  };
+
+  /* OPEN — bouton Join */
+  document.querySelectorAll(".btn-join").forEach(btn => {
+    btn.addEventListener("click", openAuthModal);
+  });
+
+  /* CLOSE */
+  document.getElementById("auth-cancel")
+    .addEventListener("click", closeAuthModal);
+
+  /* REQUEST OTP */
+  document.getElementById("auth-send-otp")
+    .addEventListener("click", async () => {
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email) return;
+
+      await fetch(`${API_BASE}/api/otp/request-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      stepEmail.classList.add("hidden");
+      stepOtp.classList.remove("hidden");
+      title.textContent = "Enter the 6-digit code";
+    });
+
+  /* VERIFY OTP */
+  document.getElementById("auth-verify-otp")
+    .addEventListener("click", async () => {
+      const email = emailInput.value.trim().toLowerCase();
+      const otp   = otpInput.value.trim();
+
+      const res = await fetch(`${API_BASE}/api/otp/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        alert("Invalid code");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      closeAuthModal();
+
+      if (data.needs_profile) {
+        alert("➡️ Complete profile (next step)");
+      } else {
+        location.reload();
+      }
+    });
+
+});
+</script>
 
 <!-- 1️⃣ DONNÉES GLOBALES (OBLIGATOIRE POUR APPROCHE window) -->
 <script src="./components/constants/feelings.js"></script>
@@ -4149,14 +4323,19 @@ window.addEventListener("resize", () => {
     });
   }
 
-  document.addEventListener("click", (e) => {
-    if (
-      e.target.closest("#lf-filter-overlay .filter-close") ||
-      e.target === lfFilterOverlay
-    ) {
-      lfFilterOverlay.classList.add("hidden");
-    }
-  });
+  function closeLfFilterModal() {
+  lfFilterOverlay.classList.add("hidden");
+}
+
+document
+  .querySelector("#lf-filter-overlay .filter-close")
+  ?.addEventListener("click", closeLfFilterModal);
+
+lfFilterOverlay.addEventListener("click", (e) => {
+  if (e.target === lfFilterOverlay) {
+    closeLfFilterModal();
+  }
+});
 </script>
 </div>
 <script>
@@ -4235,5 +4414,50 @@ window.addEventListener("resize", () => {
     });
   });
 </script>
+<!-- =========================
+     AUTH — OTP MODAL
+========================= -->
+<div id="auth-overlay" class="auth-overlay hidden">
+  <div class="auth-modal">
+
+    <h3 class="auth-title" id="auth-title">
+      Enter your email
+    </h3>
+
+    <!-- STEP 1 — EMAIL -->
+    <div class="auth-step" id="auth-step-email">
+      <input
+        id="auth-email"
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+      />
+
+      <button id="auth-send-otp" class="auth-btn primary">
+        Send code
+      </button>
+    </div>
+
+    <!-- STEP 2 — OTP -->
+    <div class="auth-step hidden" id="auth-step-otp">
+      <input
+        id="auth-otp"
+        type="text"
+        inputmode="numeric"
+        maxlength="6"
+        placeholder="123456"
+      />
+
+      <button id="auth-verify-otp" class="auth-btn primary">
+        Verify code
+      </button>
+    </div>
+
+    <button id="auth-cancel" class="auth-btn ghost">
+      Cancel
+    </button>
+
+  </div>
+</div>
   </body>
 </html>
