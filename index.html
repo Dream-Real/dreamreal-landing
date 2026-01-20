@@ -3015,7 +3015,98 @@ margin: 0;
 </script>
 
 <script>
+  // =========================
+  // AUTH STATE (GLOBAL)
+  // =========================
+  window.AUTH = {
+    token: null,
+    isAuthenticated: false,
+  };
+</script>
+
+<script>
+  // =========================
+  // AUTH — LOGOUT
+  // =========================
+  function logout() {
+    console.log("🚪 Logout");
+
+    // 🔐 reset auth
+    window.AUTH.token = null;
+    window.AUTH.user = null;
+    window.AUTH.isAuthenticated = false;
+
+    // 🧹 clear storage
+    localStorage.removeItem("token");
+
+    // 🔄 UI reset
+    document.querySelectorAll(".btn-join").forEach((btn) => {
+      btn.textContent = "Join";
+      btn.style.display = "inline-flex";
+    });
+
+    document.querySelectorAll(".btn-create").forEach((btn) => {
+      btn.style.display = "none";
+    });
+  }
+</script>
+
+<script>
+  // =========================
+  // AUTH — COMPLETE PROFILE (PLACEHOLDER)
+  // =========================
+  function openCompleteProfileModal() {
+    alert("🧩 Complete your profile (next step)");
+    // 👉 Étape suivante : vraie modale web
+  }
+</script>
+
+<script>
+  // =========================
+  // AUTH — USER LOGGED IN (WEB)
+  // =========================
+  function onUserAuthenticated(user) {
+  console.log("✅ Authenticated user:", user);
+
+  window.AUTH.user = user;
+  window.AUTH.isAuthenticated = true;
+
+  document.querySelectorAll(".btn-join").forEach((btn) => {
+    btn.textContent = "Logout";
+    btn.style.display = "inline-flex";
+
+    // 🔁 remplace le comportement
+    btn.onclick = logout;
+  });
+
+  document.querySelectorAll(".btn-create").forEach((btn) => {
+    btn.style.display = "inline-flex";
+  });
+}
+</script>
+
+<script>
 document.addEventListener("DOMContentLoaded", () => {
+
+  // =========================
+// AUTH — RESTORE SESSION
+// =========================
+const savedToken = localStorage.getItem("token");
+
+if (savedToken) {
+  window.AUTH.token = savedToken;
+  window.AUTH.isAuthenticated = true;
+
+  document.querySelectorAll(".btn-join").forEach((btn) => {
+    btn.textContent = "Logout";
+    btn.style.display = "inline-flex";
+    btn.onclick = logout;
+  });
+
+  document.querySelectorAll(".btn-create").forEach((btn) => {
+    btn.style.display = "inline-flex";
+  });
+}
 
   /* =========================
      AUTH — OTP LOGIC
@@ -3090,15 +3181,22 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      closeAuthModal();
+      // =========================
+    // AUTH — SUCCESS
+    // =========================
+    window.AUTH.token = data.token;
+    window.AUTH.isAuthenticated = true;
 
-      if (data.needs_profile) {
-        alert("➡️ Complete profile (next step)");
-      } else {
-        location.reload();
-      }
-    });
+    localStorage.setItem("token", data.token);
+
+    closeAuthModal();
+
+    onUserAuthenticated(data.user);
+
+    if (data.needs_profile) {
+      openCompleteProfileModal();
+    }
+  });
 
 });
 </script>
@@ -3711,7 +3809,7 @@ window.clearFilters = function () {
 <script>
   function normalizePostFromAPI(post) {
     return {
-      id: post.id || crypto.randomUUID(),
+      id: post.id || `${Date.now()}-${Math.random()}`,
 
       user: {
         name:
@@ -4287,12 +4385,25 @@ filterTitle.textContent = feeling.title;
     });
   }
 
-  filterBack.onclick = () => {
-  // 🔁 retour vers FEELINGS
+ filterBack.onclick = () => {
+  // 🧼 RESET TOTAL DU FILTRE (LOGIQUE)
+  window.FEED_FILTERS.feeling = null;
+  window.FEED_FILTERS.activity = null;
+
+  // 🔄 RERENDER FEED + PILLS
+  renderFilteredFeed();
+  renderActiveFilters();
+
+  // 🧼 RESET VISUEL DES PILLS
+  document
+    .querySelectorAll(".filter-pill")
+    .forEach(p => p.classList.remove("active"));
+
+  // 🔁 RETOUR STEP FEELINGS
   stepActivity.classList.add("hidden");
   stepFeeling.classList.remove("hidden");
 
-  // 🔁 reset header (CLÉ ABSOLUE)
+  // 🔁 RESET HEADER
   filterBack.classList.add("hidden");      // ❌ flèche
   filterClose.classList.remove("hidden");  // ✅ croix
   filterTitle.textContent = "Choose filter";
