@@ -3073,6 +3073,7 @@ margin: 0;
 
     // 🧹 clear storage
     localStorage.removeItem("token");
+    localStorage.removeItem("user"); // ⬅️ 🔑 FIX FINAL
 
     // 🔄 UI reset
     document.querySelectorAll(".btn-join").forEach((btn) => {
@@ -3109,35 +3110,45 @@ margin: 0;
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  // =========================
-// AUTH — RESTORE SESSION
+// =========================
+// AUTH — RESTORE SESSION (SOURCE UNIQUE UI)
 // =========================
 const savedToken = localStorage.getItem("token");
+const savedUserRaw = localStorage.getItem("user");
 
 if (savedToken) {
   window.AUTH.token = savedToken;
   window.AUTH.isAuthenticated = true;
 
-  document.querySelectorAll(".btn-join").forEach((btn) => {
-    btn.textContent = "Logout";
-    btn.style.display = "inline-flex";
-    btn.onclick = logout;
-  });
+  // 1️⃣ UI instantanée depuis cache (si dispo)
+  if (savedUserRaw) {
+    try {
+      const cachedUser = JSON.parse(savedUserRaw);
+      if (cachedUser?.id) {
+        onUserAuthenticated(cachedUser);
+      }
+    } catch (e) {
+      console.warn("⚠️ user cache invalide");
+    }
+  }
 
-  document.querySelectorAll(".btn-create").forEach((btn) => {
-    btn.style.display = "inline-flex";
-  });
-
+  // 2️⃣ Source de vérité backend
   fetch(`${API_BASE}/api/users/me`, {
     headers: {
       Authorization: `Bearer ${savedToken}`,
     },
   })
-    .then(res => res.json())
-    .then(user => {
-      if (user?.id) {
-        onUserAuthenticated(user);
-      }
+    .then((res) => {
+      if (!res.ok) throw new Error("Invalid token");
+      return res.json();
+    })
+    .then((data) => {
+      const user = data?.user || data;
+
+      if (!user?.id) throw new Error("Invalid user");
+
+      localStorage.setItem("user", JSON.stringify(user));
+      onUserAuthenticated(user);
     })
     .catch(() => logout());
 }
@@ -3262,21 +3273,28 @@ document.querySelectorAll(".btn-join").forEach((btn) => {
         return;
       }
 
-      // =========================
-    // AUTH — SUCCESS
     // =========================
-    window.AUTH.token = data.token;
-    window.AUTH.isAuthenticated = true;
+// AUTH — SUCCESS
+// =========================
+window.AUTH.token = data.token;
+window.AUTH.isAuthenticated = true;
 
-    localStorage.setItem("token", data.token);
+// 🔐 token
+localStorage.setItem("token", data.token);
 
-    closeAuthModal();
+// 👤 cache user pour refresh instantané (CLÉ ABSOLUE)
+if (data.user) {
+  localStorage.setItem("user", JSON.stringify(data.user));
+}
 
-    onUserAuthenticated(data.user);
+closeAuthModal();
 
-    if (data.needs_profile) {
-      openCompleteProfileModal();
-    }
+// hydrate UI
+onUserAuthenticated(data.user);
+
+if (data.needs_profile) {
+  openCompleteProfileModal();
+}
   });
 
 });
