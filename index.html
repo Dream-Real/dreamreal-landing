@@ -2577,11 +2577,11 @@ header * {
 .filter-header {
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
   min-height: 32px;
-  margin-bottom: 12px; /* ✅ réduit l’espace sous le titre (22 → 12) */
+  margin-bottom: 12px;
 }
 
 .filter-header h3 {
@@ -2602,14 +2602,19 @@ header * {
 }
 
 .filter-back {
-  align-self: flex-start;
-  margin-bottom: 12px;
+  position: absolute;
+  left: -4px;
+  top: -1px; /* 🔑 FIX — aligne avec le titre */
+
   background: none;
   border: none;
+
   color: #93C5FD;
   font-size: 22px;
   font-weight: 700;
+
   cursor: pointer;
+  line-height: 1;
 }
 
 .filter-step {
@@ -2701,21 +2706,6 @@ margin: 0;
   height: 360px;        /* 🔑 valeur stable (ajuste si besoin : 340–380) */
   overflow-y: auto;
 }
-/* =========================
-   FILTER MODAL — ACTIVITY HEADER (NO CLOSE)
-========================= */
-
-/* ❌ cache la croix quand on est sur l’étape activity */
-#filter-step-activity:not(.hidden) ~ .filter-header .filter-close {
-  display: none;
-}
-/* ❌ supprime la flèche du bas dans Activities */
-#filter-step-activity .filter-back {
-  display: none;
-}
-/* =========================
-   FILTER MODAL — HEADER BACK (CREATE-LIKE)
-========================= */
 
 /* =========================
    ACTIVE FILTERS (APP-LIKE)
@@ -2864,6 +2854,9 @@ margin: 0;
 .auth-btn.ghost {
   background: none;
   color: #bbb;
+}
+.hidden {
+  display: none !important;
 }
 
   </style>
@@ -4148,9 +4141,9 @@ window.addEventListener("resize", () => {
     <div class="filter-grabber"></div>
 
     <div class="filter-header">
-  <button class="filter-back hidden">←</button>
-  <h3>Choose filter</h3>
-  <button class="filter-close">✕</button>
+  <button id="filter-back" class="filter-back hidden">←</button>
+  <h3 id="filter-title">Choose filter</h3>
+  <button id="filter-close" class="filter-close">✕</button>
 </div>
 
     <!-- STEP 1 — FEELINGS -->
@@ -4172,25 +4165,28 @@ window.addEventListener("resize", () => {
 
 <script>
   // =========================
-  // FILTER MODAL — OPEN / CLOSE
+  // FILTER MODAL — OPEN / CLOSE (FEED)
   // =========================
+
   const filterOverlay = document.getElementById("filter-overlay");
   const openFiltersBtn = document.getElementById("open-filters");
 
   if (openFiltersBtn && filterOverlay) {
-    openFiltersBtn.addEventListener("click", () => {
-      filterOverlay.classList.remove("hidden");
-    });
-  }
+  openFiltersBtn.addEventListener("click", () => {
 
-  document.addEventListener("click", (e) => {
-  if (
-    e.target.closest(".filter-close") ||
-    e.target === filterOverlay
-  ) {
-    closeFilterModal();
-  }
-});
+    // 🔑 RESET ÉTAT HEADER (OBLIGATOIRE)
+    filterBack.classList.add("hidden");      // ❌ pas de flèche
+    filterClose.classList.remove("hidden");  // ✅ croix visible
+    filterTitle.textContent = "Choose filter";
+
+    // 🔑 RESET STEPS
+    stepActivity.classList.add("hidden");
+    stepFeeling.classList.remove("hidden");
+
+    // 🔑 OUVERTURE
+    filterOverlay.classList.remove("hidden");
+  });
+}
 </script>
 
 <script>
@@ -4200,6 +4196,20 @@ window.addEventListener("resize", () => {
 
   const stepFeeling = document.getElementById("filter-step-feeling");
   const stepActivity = document.getElementById("filter-step-activity");
+
+  const filterBack  = document.getElementById("filter-back");
+const filterClose = document.getElementById("filter-close");
+const filterTitle = document.getElementById("filter-title");
+
+// ❌ CROIX (X)
+filterClose.onclick = closeFilterModal;
+
+// ❌ CLIC SUR OVERLAY
+filterOverlay.addEventListener("click", (e) => {
+  if (e.target === filterOverlay) {
+    closeFilterModal();
+  }
+});
 
   const feelingGrid = stepFeeling.querySelector(".filter-grid");
   const activityGrid = stepActivity.querySelector(".filter-grid");
@@ -4223,6 +4233,9 @@ window.addEventListener("resize", () => {
       stepFeeling.classList.add("hidden");
       stepActivity.classList.remove("hidden");
       renderActivities(feeling.id);
+      filterBack.classList.remove("hidden");
+filterClose.classList.add("hidden");
+filterTitle.textContent = feeling.title;
     };
 
     feelingGrid.appendChild(btn);
@@ -4274,15 +4287,28 @@ window.addEventListener("resize", () => {
     });
   }
 
-  document.querySelector(".filter-back").onclick = () => {
-    stepActivity.classList.add("hidden");
-    stepFeeling.classList.remove("hidden");
-  };
+  filterBack.onclick = () => {
+  // 🔁 retour vers FEELINGS
+  stepActivity.classList.add("hidden");
+  stepFeeling.classList.remove("hidden");
+
+  // 🔁 reset header (CLÉ ABSOLUE)
+  filterBack.classList.add("hidden");      // ❌ flèche
+  filterClose.classList.remove("hidden");  // ✅ croix
+  filterTitle.textContent = "Choose filter";
+};
 
   function closeFilterModal() {
   filterOverlay.classList.add("hidden");
+
+  // 🔁 reset steps
   stepActivity.classList.add("hidden");
   stepFeeling.classList.remove("hidden");
+
+  // 🔁 reset header (CLÉ ABSOLUE)
+  filterBack.classList.add("hidden");
+  filterClose.classList.remove("hidden");
+  filterTitle.textContent = "Choose filter";
 
   // 🧼 reset visuel
   document
