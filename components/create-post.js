@@ -27,8 +27,8 @@ function mountCreatePost() {
         </div>
 
        <div class="cp-user">
-  <img src="https://i.pravatar.cc/100" alt="" />
-  <span id="cp-username">Dream Real User</span>
+  <img id="cp-user-avatar" alt="" />
+  <span id="cp-username"></span>
 </div>
         <div class="post-inline-row cp-inline-row" id="cp-inline-row"></div>
 
@@ -244,6 +244,27 @@ const mediaSlot = document.getElementById("cp-media-slot");
   const mediaInput = document.getElementById("cp-media-input");
   const usernameEl = document.getElementById("cp-username");
 
+  // ===============================
+// AUTH USER (NO MOCK)
+// ===============================
+if (window.AUTH?.user) {
+  const user = window.AUTH.user;
+
+  const avatarEl = document.getElementById("cp-user-avatar");
+
+  if (avatarEl) {
+    avatarEl.src =
+      user.avatar ||
+      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  }
+
+  if (usernameEl) {
+    usernameEl.textContent =
+      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+      user.name ||
+      "User";
+  }
+}
 
 mediaInput.addEventListener("change", () => {
   const files = Array.from(mediaInput.files);
@@ -599,8 +620,15 @@ function closeLocationPanel() {
   // USERNAME + LOCATION (FEED-LIKE)
   // =========================
   if (usernameEl) {
+  const user = window.AUTH?.user || {};
+
+  const fullName =
+    `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+    user.name ||
+    "User";
+
   usernameEl.innerHTML = `
-    Dream Real User
+    ${fullName}
     ${
       location
         ? `<span class="inline-location" id="cp-inline-location">
@@ -753,11 +781,15 @@ if (mood) {
   // =========================
   const now = new Date().toISOString();
 
+  const user = window.AUTH?.user || {};
+
   const localPost = {
     id: `local_${Date.now()}`,
-    user_first_name: "Dream",
-    user_last_name: "Real",
-    user_avatar: "https://i.pravatar.cc/100",
+    user_first_name: user.first_name || "",
+user_last_name: user.last_name || "",
+user_avatar:
+  user.avatar ||
+  "https://cdn-icons-png.flaticon.com/512/847/847969.png",
     message: message.value.trim() || null,
     created_time: now,
 
@@ -800,6 +832,75 @@ if (mood) {
 
   window.FEED_POSTS.unshift(normalizedPost);
   renderFeed();
+
+  // =========================
+// BACKEND PERSISTENCE (WEB)
+// =========================
+(async () => {
+  try {
+    const token = window.AUTH?.token;
+    if (!token) return;
+
+    const payload = {
+      message: message.value.trim() || null,
+
+      feeling: mood
+        ? {
+            id: mood.feeling.id,
+            title: mood.feeling.title,
+            slug: mood.feeling.slug,
+          }
+        : null,
+
+      activity: mood
+        ? {
+            id: mood.activity.id,
+            title: mood.activity.title,
+            image: mood.activity.image,
+          }
+        : null,
+
+      // ⚠️ BACKEND ATTEND "localLocation"
+      localLocation: location
+        ? { label: location }
+        : null,
+
+      images: draftMedia
+        .filter((m) => m.file.type.startsWith("image"))
+        .map((m) => m.url),
+
+      video_url:
+        draftMedia.find((m) =>
+          m.file.type.startsWith("video")
+        )?.url || null,
+
+      youtube_url: null,
+      youtube_thumbnail: null,
+      link_preview: null,
+    };
+
+    const res = await fetch(`${API_BASE}/api/posts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      console.error("❌ createPost WEB failed", res.status);
+      return;
+    }
+
+    const savedPost = await res.json();
+
+    console.log("✅ Post persisted (WEB)", savedPost);
+
+  } catch (err) {
+    console.error("❌ createPost WEB error", err);
+  }
+})();
 
   // =========================
   // CLEANUP
