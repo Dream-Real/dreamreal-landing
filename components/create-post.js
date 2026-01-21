@@ -4,6 +4,18 @@
 
 const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
+function getSafeAvatar(user) {
+  if (
+    user &&
+    typeof user.avatar === "string" &&
+    user.avatar.startsWith("http")
+  ) {
+    return user.avatar;
+  }
+
+  return "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+}
+
 /* =========================================================
    MOUNT
    ========================================================= */
@@ -257,9 +269,7 @@ if (window.AUTH?.user) {
   const avatarEl = document.getElementById("cp-user-avatar");
 
   if (avatarEl) {
-    avatarEl.src =
-      user.avatar ||
-      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+    avatarEl.src = getSafeAvatar(user);
   }
 
   if (usernameEl) {
@@ -792,6 +802,9 @@ if (mood) {
 
   console.log("🟢 SUBMIT AUTORISÉ — ON CONTINUE");
 
+  // ✅ FERMETURE IMMÉDIATE DE LA MODALE (UX)
+overlay.classList.add("hidden");
+
   // =========================
   // BUILD LOCAL POST (MOCK)
   // =========================
@@ -806,9 +819,7 @@ const localPost = {
   client_id: clientId,
     user_first_name: user.first_name || "",
 user_last_name: user.last_name || "",
-user_avatar:
-  user.avatar ||
-  "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+user_avatar: getSafeAvatar(user),
     message: message.value.trim() || null,
     created_time: now,
 
@@ -907,6 +918,11 @@ if (!res.ok) {
 const persistedPost = await res.json();
 
 console.log("✅ POST PERSISTED", persistedPost);
+
+// ✅ STRATÉGIE SAFE — RECHARGEMENT DU FEED
+setTimeout(() => {
+  window.location.reload();
+}, 300);
 
 // 🔒 SOURCE DE VÉRITÉ : LE POST RETOURNÉ
 if (Array.isArray(window.FEED_POSTS)) {
