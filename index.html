@@ -1741,11 +1741,14 @@ header * {
   background: #EECD79;
 }
 
-/* Disabled = JAUNE AUSSI (juste bloqué) */
+/* Disabled = VISUELLEMENT BLOQUÉ, MAIS CLIQUABLE POUR JS */
 .cp-submit.disabled {
   background: #EECD79;
   color: #0B1120;
   cursor: not-allowed;
+
+  /* 🔑 CRITIQUE — NE JAMAIS BLOQUER LES EVENTS */
+  pointer-events: auto;
 }
 /* =========================
    CREATE POST — FOOTER

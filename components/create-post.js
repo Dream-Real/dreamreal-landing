@@ -232,11 +232,15 @@ if (modal) {
    CLOSE ON OVERLAY CLICK
    =============================== */
 
-overlay.addEventListener("click", (e) => {
-  if (e.target === overlay) {
+overlay.onclick = (e) => {
+  if (
+    e.target === overlay &&
+    !overlay.classList.contains("hidden")
+  ) {
     resetCreatePost();
   }
-});
+};
+
   const submit = document.getElementById("cp-submit");
   const message = document.getElementById("cp-message");
  const preview = document.getElementById("cp-preview");
@@ -348,10 +352,12 @@ if (trigger) {
     mood = null;
     location = null;
     preview.innerHTML = "";
-    updateSubmit();
 
     // ✅ ouverture modale
     overlay.classList.remove("hidden");
+
+    // ✅ recalcul état bouton POST (OBLIGATOIRE ICI)
+    updateSubmit();
   };
 }
 
@@ -774,7 +780,17 @@ if (mood) {
 }
 
   submit.onclick = () => {
-  if (submit.classList.contains("disabled")) return;
+  console.log("🟢 CLICK SUR POST BOUTON");
+
+  // 🔥 RECALCUL FORCÉ AVANT TEST
+  updateSubmit();
+
+  if (submit.classList.contains("disabled")) {
+    console.warn("🔴 SUBMIT BLOQUÉ (disabled)");
+    return;
+  }
+
+  console.log("🟢 SUBMIT AUTORISÉ — ON CONTINUE");
 
   // =========================
   // BUILD LOCAL POST (MOCK)
@@ -836,6 +852,8 @@ user_avatar:
     const token = window.AUTH?.token;
     if (!token) return;
 
+        const API_BASE = "https://dreamreal-api.onrender.com";
+
     const payload = {
       client_id: clientId,
       message: message.value.trim() || null,
@@ -872,23 +890,40 @@ user_avatar:
     };
 
     const res = await fetch(`${API_BASE}/api/posts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
+  body: JSON.stringify(payload),
+});
 
-    if (!res.ok) {
-      console.error("❌ createPost WEB failed", res.status);
-      return;
-    }
+if (!res.ok) {
+  const text = await res.text();
+  console.error("❌ createPost failed", res.status, text);
+  return;
+}
 
-    // 🔥 SOURCE UNIQUE — RELOAD FEED FROM BACKEND
-    if (typeof loadFeedFromBackend === "function") {
-      await loadFeedFromBackend();
-    }
+const persistedPost = await res.json();
+
+console.log("✅ POST PERSISTED", persistedPost);
+
+// 🔒 SOURCE DE VÉRITÉ : LE POST RETOURNÉ
+if (Array.isArray(window.FEED_POSTS)) {
+  window.FEED_POSTS = [
+    persistedPost,
+    ...window.FEED_POSTS.filter(
+      (p) => p.client_id !== persistedPost.client_id
+    ),
+  ];
+}
+
+if (typeof renderFeed === "function") {
+  renderFeed();
+}
+
+// ✅ ICI ET SEULEMENT ICI
+    resetCreatePost();
 
     console.log("✅ Post persisted (WEB)");
   } catch (err) {
@@ -899,7 +934,7 @@ user_avatar:
   // =========================
   // CLEANUP
   // =========================
-  resetCreatePost();
+ 
 };
 }
 
