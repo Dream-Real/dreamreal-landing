@@ -7,25 +7,73 @@ const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 async function uploadMediaFile(file) {
   const API_BASE = "https://dreamreal-api.onrender.com";
 
-  const endpoint = file.type.startsWith("video/")
-    ? "/api/upload/video"
-    : "/api/upload/image";
+  /* =========================================================
+     IMAGE → BACKEND CLASSIQUE (INCHANGÉ)
+     ========================================================= */
+  if (file.type.startsWith("image/")) {
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const formData = new FormData();
-  formData.append("file", file);
+    const res = await fetch(`${API_BASE}/api/upload/image`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${window.AUTH.token}`,
+      },
+      body: formData,
+    });
 
-  // ⚠️ TEST : PAS DE HEADER Authorization
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    method: "POST",
-    body: formData,
-  });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error("Image upload failed: " + text);
+    }
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error("Upload failed: " + text);
+    return res.json(); // { url }
   }
 
-  return res.json();
+  /* =========================================================
+     VIDEO (WEB) → PRESIGN + PUT DIRECT S3
+     ========================================================= */
+  if (file.type.startsWith("video/")) {
+    // 1️⃣ demander une URL signée
+    const presignRes = await fetch(
+      `${API_BASE}/api/upload/presign-video`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${window.AUTH.token}`,
+        },
+        body: JSON.stringify({
+          mimeType: file.type,
+        }),
+      }
+    );
+
+    if (!presignRes.ok) {
+      const text = await presignRes.text();
+      throw new Error("Presign failed: " + text);
+    }
+
+    const { uploadUrl, publicUrl } = await presignRes.json();
+
+    // 2️⃣ upload direct vers S3 (sans backend)
+    const uploadRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error("S3 video upload failed");
+    }
+
+    // 3️⃣ retour cohérent avec images
+    return { url: publicUrl };
+  }
+
+  throw new Error("Unsupported media type");
 }
 
 function getSafeAvatar(user) {
@@ -894,11 +942,17 @@ video_url: null,
 // 🔼 UPLOAD MEDIA AVANT POST
 // =========================
 const uploadedImages = [];
+let uploadedVideo = null;
 
 for (const m of draftMedia) {
-  if (m.file.type.startsWith("image")) {
+  if (m.file.type.startsWith("image/")) {
     const { url } = await uploadMediaFile(m.file);
     uploadedImages.push(url);
+  }
+
+  if (m.file.type.startsWith("video/")) {
+    const { url } = await uploadMediaFile(m.file);
+    uploadedVideo = url;
   }
 }
 
@@ -925,7 +979,7 @@ for (const m of draftMedia) {
       localLocation: location ? { label: location } : null,
 
       images: uploadedImages,
-video_url: null,
+video_url: uploadedVideo,
 
       youtube_url: null,
       youtube_thumbnail: null,
@@ -948,6 +1002,13 @@ if (!res.ok) {
 }
 
 const persistedPost = await res.json();
+
+// 🔥 NORMALISATION VIDÉO (OBLIGATOIRE POUR FEED IMMÉDIAT)
+persistedPost.video_url =
+  typeof persistedPost.video_url === "string" &&
+  persistedPost.video_url.startsWith("http")
+    ? persistedPost.video_url
+    : null;
 
 console.log("🧪 persistedPost.images =", persistedPost.images);
 
