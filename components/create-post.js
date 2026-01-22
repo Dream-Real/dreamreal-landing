@@ -4,6 +4,8 @@
 
 const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
+let localLinkPreview = null;
+
 async function uploadMediaFile(file) {
   const API_BASE = "https://dreamreal-api.onrender.com";
 
@@ -86,6 +88,12 @@ function getSafeAvatar(user) {
   }
 
   return "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+}
+
+// 🔗 LINK DETECTION (WEB — APP PARITY)
+function extractFirstUrl(text) {
+  const match = text.match(/https?:\/\/[^\s]+/i);
+  return match ? match[0] : null;
 }
 
 /* =========================================================
@@ -693,14 +701,108 @@ function closeLocationPanel() {
      PREVIEW / SUBMIT
      =============================== */
 
-  message.oninput = updateSubmit;
+  message.oninput = () => {
+  const text = message.value || "";
+
+  // 🔗 détection lien
+  const url = extractFirstUrl(text);
+
+  if (url) {
+    // ⚠️ on ne refetch PAS si déjà détecté
+    if (!localLinkPreview || localLinkPreview.url !== url) {
+      localLinkPreview = {
+        url,
+        status: "detected", // pas encore fetché
+      };
+      console.log("🔗 Link detected:", url);
+    }
+    // 🔎 fetch preview (une seule fois)
+if (localLinkPreview.status === "detected") {
+  localLinkPreview.status = "loading";
+
+   renderPreview(); // ✅ AFFICHE LE LOADING IMMÉDIATEMENT
+
+  fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${window.AUTH.token}`,
+    },
+    body: JSON.stringify({ url }),
+  })
+    .then((res) => res.ok ? res.json() : null)
+    .then((data) => {
+      if (!data) return;
+
+      localLinkPreview = {
+        ...data,
+        url,
+        status: "ready",
+      };
+
+      console.log("🔗 Link preview ready", localLinkPreview);
+      renderPreview(); // 🔥 IMPORTANT
+    })
+    .catch((err) => {
+      console.warn("❌ link preview failed", err);
+      localLinkPreview = null;
+    });
+}
+  } else {
+  // 🧹 aucun lien → reset
+  if (localLinkPreview) {
+    console.log("🧹 Link removed");
+    localLinkPreview = null;
+    renderPreview(); // 🔥 OBLIGATOIRE
+  }
+}
+
+  updateSubmit();
+};
 
  function renderPreview() {
   const mediaSlot = document.getElementById("cp-media-slot");
 
-  // RESET
-  mediaSlot.innerHTML = "";
+  // RESET MEDIA SEULEMENT
+mediaSlot.innerHTML = "";
+
+// ⚠️ NE PAS EFFACER LA PREVIEW SI LINK EN COURS
+if (!localLinkPreview) {
   preview.innerHTML = "";
+}
+
+// =========================
+// LINK PREVIEW — LOADING
+// =========================
+if (localLinkPreview && localLinkPreview.status === "loading") {
+  preview.innerHTML = `
+    <div class="cp-link-preview loading">
+      <div style="opacity:.6;font-size:14px">
+        Loading link preview…
+      </div>
+    </div>
+  `;
+  return; // ⛔️ CRITIQUE : on stoppe renderPreview ici
+}
+
+  // =========================
+// LINK PREVIEW (WEB)
+// =========================
+if (localLinkPreview && localLinkPreview.status === "ready") {
+  const card = document.createElement("div");
+  card.className = "cp-link-preview";
+
+  card.innerHTML = `
+    ${localLinkPreview.image ? `<img src="${localLinkPreview.image}" />` : ""}
+    <div class="cp-link-meta">
+      <div class="cp-link-title">${localLinkPreview.title || ""}</div>
+      <div class="cp-link-desc">${localLinkPreview.description || ""}</div>
+      <div class="cp-link-url">${localLinkPreview.url}</div>
+    </div>
+  `;
+
+  preview.appendChild(card);
+}
 
     // =========================
   // USERNAME + LOCATION (FEED-LIKE)
@@ -983,7 +1085,16 @@ video_url: uploadedVideo,
 
       youtube_url: null,
       youtube_thumbnail: null,
-      link_preview: null,
+      link_preview:
+  localLinkPreview && localLinkPreview.status === "ready"
+    ? {
+        title: localLinkPreview.title || null,
+        description: localLinkPreview.description || null,
+        image: localLinkPreview.image || null,
+        url: localLinkPreview.url,
+        siteName: localLinkPreview.siteName || null,
+      }
+    : null,
     };
 
     const res = await fetch(`${API_BASE}/api/posts`, {
