@@ -4,6 +4,30 @@
 
 const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
+async function uploadMediaFile(file) {
+  const API_BASE = "https://dreamreal-api.onrender.com";
+
+  const endpoint = file.type.startsWith("video/")
+    ? "/api/upload/video"
+    : "/api/upload/image";
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  // ⚠️ TEST : PAS DE HEADER Authorization
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error("Upload failed: " + text);
+  }
+
+  return res.json();
+}
+
 function getSafeAvatar(user) {
   if (
     user &&
@@ -286,12 +310,11 @@ mediaInput.addEventListener("change", () => {
 
   files.forEach((file) => {
     draftMedia.push({
-      file,
-      url: URL.createObjectURL(file),
+      file, // ✅ on garde seulement le file
     });
   });
 
-  mediaInput.value = ""; // 🔑 permet de re-sélectionner les mêmes fichiers
+  mediaInput.value = "";
   renderPreview();
   updateSubmit();
 });
@@ -339,7 +362,6 @@ function resetCreatePost() {
   mood = null;
   location = null;
  // 🔑 CLEANUP MEDIA (MULTI SELECT)
-draftMedia.forEach((m) => URL.revokeObjectURL(m.url));
 draftMedia = [];
 draftCarouselIndex = 0;
 
@@ -677,12 +699,16 @@ if (draftMedia.length === 1) {
   // 🔑 MEDIA
   let mediaEl;
   if (m.file.type.startsWith("video")) {
-    mediaEl = document.createElement("video");
-    mediaEl.src = m.url;
-    mediaEl.controls = true;
-  } else {
+  mediaEl = document.createElement("video");
+  const objectUrl = URL.createObjectURL(m.file);
+  mediaEl.src = objectUrl;
+  mediaEl.dataset.objectUrl = objectUrl;
+  mediaEl.controls = true;
+}else {
     mediaEl = new Image();
-    mediaEl.src = m.url;
+    const objectUrl = URL.createObjectURL(m.file);
+mediaEl.src = objectUrl;
+mediaEl.dataset.objectUrl = objectUrl;
 
     // 🧠 image très panoramique → contain
     mediaEl.onload = () => {
@@ -699,12 +725,14 @@ if (draftMedia.length === 1) {
   remove.className = "cp-carousel-remove";
   remove.textContent = "✕";
   remove.onclick = () => {
-    URL.revokeObjectURL(m.url);
-    draftMedia = [];
-    draftCarouselIndex = 0;
-    renderPreview();
-    updateSubmit();
-  };
+  if (mediaEl.dataset.objectUrl) {
+    URL.revokeObjectURL(mediaEl.dataset.objectUrl);
+  }
+  draftMedia = [];
+  draftCarouselIndex = 0;
+  renderPreview();
+  updateSubmit();
+};
 
   wrapper.appendChild(mediaEl);
   wrapper.appendChild(remove);
@@ -723,13 +751,15 @@ if (draftMedia.length > 1) {
     slide.className = "cp-carousel-slide";
 
     const img = new Image();
-    img.src = m.url;
+    const objectUrl = URL.createObjectURL(m.file);
+img.src = objectUrl;
+img.dataset.objectUrl = objectUrl;
 
     const remove = document.createElement("button");
     remove.className = "cp-carousel-remove";
     remove.textContent = "✕";
     remove.onclick = () => {
-      URL.revokeObjectURL(m.url);
+      URL.revokeObjectURL(img.dataset.objectUrl);
       draftMedia.splice(index, 1);
       draftCarouselIndex = Math.max(0, draftCarouselIndex - 1);
       renderPreview();
@@ -843,13 +873,8 @@ user_avatar: getSafeAvatar(user),
         }
       : null,
 
-    images: draftMedia
-      .filter((m) => m.file.type.startsWith("image"))
-      .map((m) => m.url),
-
-    video_url: draftMedia.find((m) =>
-      m.file.type.startsWith("video")
-    )?.url || null,
+    images: [],
+video_url: null,
 
     reactions_summary: "👍",
     reactions_count: 1,
@@ -864,6 +889,18 @@ user_avatar: getSafeAvatar(user),
     if (!token) return;
 
         const API_BASE = "https://dreamreal-api.onrender.com";
+
+        // =========================
+// 🔼 UPLOAD MEDIA AVANT POST
+// =========================
+const uploadedImages = [];
+
+for (const m of draftMedia) {
+  if (m.file.type.startsWith("image")) {
+    const { url } = await uploadMediaFile(m.file);
+    uploadedImages.push(url);
+  }
+}
 
     const payload = {
       client_id: clientId,
@@ -887,13 +924,8 @@ user_avatar: getSafeAvatar(user),
 
       localLocation: location ? { label: location } : null,
 
-      images: draftMedia
-        .filter((m) => m.file.type.startsWith("image"))
-        .map((m) => m.url),
-
-      video_url:
-        draftMedia.find((m) => m.file.type.startsWith("video"))
-          ?.url || null,
+      images: uploadedImages,
+video_url: null,
 
       youtube_url: null,
       youtube_thumbnail: null,
@@ -917,7 +949,20 @@ if (!res.ok) {
 
 const persistedPost = await res.json();
 
+console.log("🧪 persistedPost.images =", persistedPost.images);
+
 console.log("✅ POST PERSISTED", persistedPost);
+
+// 🧩 NORMALISATION IMAGES POUR LE FEED (ALIGNÉE SUR GET /api/posts)
+if (Array.isArray(persistedPost.images)) {
+  if (persistedPost.images.length === 1) {
+    persistedPost.full_picture = persistedPost.images[0];
+    persistedPost.multiple_images = null;
+  } else if (persistedPost.images.length > 1) {
+    persistedPost.full_picture = null;
+    persistedPost.multiple_images = persistedPost.images;
+  }
+}
 
 // ✅ STRATÉGIE SAFE — RECHARGEMENT DU FEED
 setTimeout(() => {

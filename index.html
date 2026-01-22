@@ -3561,7 +3561,6 @@ if (data.needs_profile) {
       user,
       message,
       location,
-      media,
       video,
       mood,
       createdAt,
@@ -3643,7 +3642,6 @@ if (data.needs_profile) {
     `
     : ""
 }
-
           ${
             message
               ? `
@@ -3682,73 +3680,45 @@ if (data.needs_profile) {
     `
     : ""
 }
-    ${
-  video && !media?.some((m) => m.type === "youtube")
-    ? `
-      <div class="post-media video">
-        <video
-          src="${video}"
-          controls
-          muted
-          playsinline
-          preload="metadata"
-        ></video>
-      </div>
-    `
-    : ""
-}
+   
+        ${post.youtube_url ? `
+  <div class="post-media youtube-preview">
+    <img src="https://img.youtube.com/vi/${post.youtube_url.split("v=")[1]?.split("&")[0]}/hqdefault.jpg" />
+  </div>
+` : ""}
 
-        ${
-  media?.length
-    ? (() => {
-        const images = media.filter((m) => m.type === "image");
-        const youtube = media.find((m) => m.type === "youtube");
+${video ? `
+  <div class="post-media video">
+    <video
+      src="${video}"
+      controls
+      muted
+      playsinline
+      preload="metadata"
+    ></video>
+  </div>
+` : ""}
 
-        let html = "";
+${Array.isArray(post.images) && post.images.length === 1 ? `
+  <div class="post-media">
+    <img src="${post.images[0]}" />
+  </div>
+` : ""}
 
-        // 🎬 YouTube (priorité visuelle)
-        if (youtube) {
-          html += `
-            <div class="post-media youtube-preview">
-              <img src="${youtube.src}" />
-            </div>
-          `;
-        }
-
-        // 🖼️ MULTI-IMAGES → CAROUSEL
-        if (images.length > 1) {
-  html += `
-    <div class="post-media carousel">
-
-      <div class="carousel-track">
-        ${images.map(img => `
-          <div class="carousel-slide">
-            <img src="${img.src}" />
-          </div>
-        `).join("")}
-      </div>
-
-      <div class="carousel-dots">
-        ${images.map(() => `<span></span>`).join("")}
-      </div>
-
+${Array.isArray(post.images) && post.images.length > 1 ? `
+  <div class="post-media carousel">
+    <div class="carousel-track">
+      ${post.images.map(src => `
+        <div class="carousel-slide">
+          <img src="${src}" />
+        </div>
+      `).join("")}
     </div>
-  `;
-}
-
-        // 🖼️ IMAGE UNIQUE → RENDU ACTUEL
-        if (images.length === 1) {
-          html += `
-            <div class="post-media">
-              <img src="${images[0].src}" />
-            </div>
-          `;
-        }
-
-        return html;
-      })()
-    : ""
-}
+    <div class="carousel-dots">
+      ${post.images.map(() => `<span></span>`).join("")}
+    </div>
+  </div>
+` : ""}
 
         ${
           linkPreview
@@ -4025,76 +3995,66 @@ window.clearFilters = function () {
 <!-- ========================= -->
 <script>
   function normalizePostFromAPI(post) {
-    return {
-      id: post.id || `${Date.now()}-${Math.random()}`,
+      // 🔑 FIX ABSOLU N°2 — NORMALISATION DÉTERMINISTE DES IMAGES
+  const images =
+  Array.isArray(post.images) && post.images.length
+    ? post.images
+    : Array.isArray(post.multiple_images) && post.multiple_images.length
+      ? post.multiple_images
+      : post.full_picture
+        ? [post.full_picture]
+        : [];
+  return {
+    id: post.id || `${Date.now()}-${Math.random()}`,
 
-      user: {
-        name:
-          `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
-          "Dream Real",
-        avatar:
-          post.user_avatar ||
-          post.profile_picture ||
-          post.from?.picture?.data?.url ||
-          "https://cdn-icons-png.flaticon.com/512/847/847969.png",
-      },
+    user: {
+      name:
+        `${post.user_first_name ?? ""} ${post.user_last_name ?? ""}`.trim() ||
+        "Dream Real",
+      avatar:
+        post.user_avatar ||
+        post.profile_picture ||
+        post.from?.picture?.data?.url ||
+        "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+    },
 
-      message: stripUrls(post.message || null),
+    message: stripUrls(post.message || ""),
 
-      location:
-        post.localLocation?.label ||
-        post.location?.label ||
-        null,
+    location:
+      post.localLocation?.label ||
+      post.location?.label ||
+      null,
 
-      media: (() => {
-  // 🎬 PRIORITÉ ABSOLUE À YOUTUBE
-  if (post.youtube_url) {
-    const videoId =
-      post.youtube_url.split("v=")[1]?.split("&")[0];
+    // 🔑 MÉDIAS — EXACTEMENT COMME L’APP
+    youtube_url: post.youtube_url || null,
+    video: post.video_url || null,
+    
+    images, // 🔑 SOURCE UNIQUE ET DÉTERMINISTE
 
-    return videoId
-      ? [
-          {
-            type: "youtube",
-            src: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-          },
-        ]
-      : [];
-  }
+// ⛔ legacy neutralisés (sécurité)
+full_picture: null,
+multiple_images: null,
 
-  // 🖼 IMAGES CLASSIQUES
-  if (Array.isArray(post.images) && post.images.length) {
-    return post.images.map((src) => ({
-      type: "image",
-      src,
-    }));
-  }
+    linkPreview: post.linkPreview || null,
 
-  return [];
-})(),
+    mood:
+      post.feeling && post.activity
+        ? {
+            feeling: post.feeling,
+            activity: post.activity,
+          }
+        : null,
 
-        video: post.video_url || null, // ✅ 🔑 ICI
+    reactions: {
+      summary: post.reactions_summary || "👍",
+      count: post.reactions_count || null,
+    },
 
-      linkPreview: post.linkPreview || null,
+    createdAt: post.created_time || new Date().toISOString(),
 
-      mood:
-        post.feeling && post.activity
-          ? {
-              feeling: post.feeling,
-              activity: post.activity,
-            }
-          : null,
-
-          reactions: {
-  summary: post.reactions_summary || "👍",
-  count: post.reactions_count || null,
-},
-
-      createdAt: post.created_time || new Date().toISOString(),
-
-      source: "api",
-    };
-  }
+    source: "api",
+  };
+}
 </script>
 
 <script src="./components/create-post.js"></script>
@@ -4321,46 +4281,7 @@ document.querySelectorAll(".post-bio-wrapper").forEach((wrapper) => {
     bio.classList.remove("collapsed");
   }
 });
-// 🎥 Adaptive media height (Dream Real logic)
-document.querySelectorAll(".post-media.adaptive").forEach((container) => {
-  const src = container.dataset.src;
-  if (!src) return;
 
-  // 🎬 CAS SPÉCIAL — PREVIEW YOUTUBE (anti bandes noires)
-  if (container.classList.contains("youtube-preview")) {
-    const img = new Image();
-    img.src = src;
-
-    img.onload = () => {
-      container.innerHTML = "";
-      container.appendChild(img);
-    };
-
-    return; // ⛔ ne PAS recalculer la hauteur
-  }
-
-  const img = new Image();
-  img.src = src;
-
-  img.onload = () => {
-    const ratio = img.naturalWidth / img.naturalHeight;
-    const containerWidth = container.offsetWidth;
-    const MAX_HEIGHT = 520;
-
-    const computedHeight = Math.min(
-      containerWidth / ratio,
-      MAX_HEIGHT
-    );
-
-    container.style.height = `${computedHeight}px`;
-    container.innerHTML = "";
-    container.appendChild(img);
-  };
-
-  img.onerror = () => {
-    container.style.height = "260px";
-  };
-});
     })
     .catch((err) => {
       console.error("❌ Feed fetch error:", err);
