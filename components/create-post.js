@@ -771,37 +771,42 @@ if (!localLinkPreview) {
   preview.innerHTML = "";
 }
 
-// =========================
-// LINK PREVIEW — LOADING
-// =========================
-if (localLinkPreview && localLinkPreview.status === "loading") {
-  preview.innerHTML = `
-    <div class="cp-link-preview loading">
-      <div style="opacity:.6;font-size:14px">
-        Loading link preview…
-      </div>
-    </div>
-  `;
-  return; // ⛔️ CRITIQUE : on stoppe renderPreview ici
-}
-
   // =========================
-// LINK PREVIEW (WEB)
+// LINK PREVIEW — FEED PARITY
 // =========================
 if (localLinkPreview && localLinkPreview.status === "ready") {
-  const card = document.createElement("div");
-  card.className = "cp-link-preview";
+  const wrapper = document.createElement("div");
+  wrapper.className = "post-media link-preview cp-link-preview-draft";
 
-  card.innerHTML = `
-    ${localLinkPreview.image ? `<img src="${localLinkPreview.image}" />` : ""}
-    <div class="cp-link-meta">
-      <div class="cp-link-title">${localLinkPreview.title || ""}</div>
-      <div class="cp-link-desc">${localLinkPreview.description || ""}</div>
-      <div class="cp-link-url">${localLinkPreview.url}</div>
-    </div>
+  wrapper.innerHTML = `
+    ${
+      localLinkPreview.image
+        ? `<img src="${localLinkPreview.image}" alt="" />`
+        : ""
+    }
+
+    <div class="link-preview-text">
+  ${
+    localLinkPreview.siteName
+      ? `<div class="link-preview-site">${localLinkPreview.siteName}</div>`
+      : ""
+  }
+
+  ${
+    localLinkPreview.title
+      ? `<div class="link-preview-title">${localLinkPreview.title}</div>`
+      : ""
+  }
+
+  ${
+    localLinkPreview.description
+      ? `<div class="link-preview-description">${localLinkPreview.description}</div>`
+      : ""
+  }
+</div>
   `;
 
-  preview.appendChild(card);
+  preview.appendChild(wrapper);
 }
 
     // =========================

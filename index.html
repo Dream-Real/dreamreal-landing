@@ -3007,6 +3007,55 @@ margin: 0;
 .hidden {
   display: none !important;
 }
+/* =========================================================
+   LINK PREVIEW — CREATE POST (APP PARITY)
+   ========================================================= */
+
+.cp-preview .post-media.link-preview {
+  margin-top: 6px;
+  border-radius: 12px;
+}
+
+/* image */
+.cp-preview .post-media.link-preview img {
+  width: 100%;
+  display: block;
+}
+
+/* 🔑 BLOC TEXTE AVEC CADRE */
+.cp-preview .link-preview-text {
+  border: 1px solid rgba(255,255,255,0.18);
+  border-top: none;
+  padding: 12px;
+
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* site */
+.cp-preview .link-preview-site {
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+/* titre */
+.cp-preview .link-preview-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+/* description */
+.cp-preview .link-preview-description {
+  font-size: 14px;
+  line-height: 1.35;
+  color: #d1d5db;
+}
 
   </style>
 </head>
@@ -3699,26 +3748,41 @@ ${video ? `
   </div>
 ` : ""}
 
-${Array.isArray(post.images) && post.images.length === 1 ? `
-  <div class="post-media">
-    <img src="${post.images[0]}" />
-  </div>
-` : ""}
+${Array.isArray(post.images) &&
+  post.images.length === 1 &&
+  sanitizeMediaUrl(post.images[0])
+  ? `
+    <div class="post-media">
+      <img src="${sanitizeMediaUrl(post.images[0])}" />
+    </div>
+  `
+  : ""
+}
 
-${Array.isArray(post.images) && post.images.length > 1 ? `
-  <div class="post-media carousel">
-    <div class="carousel-track">
-      ${post.images.map(src => `
-        <div class="carousel-slide">
-          <img src="${src}" />
-        </div>
-      `).join("")}
+${Array.isArray(post.images) &&
+  post.images.filter(sanitizeMediaUrl).length > 1
+  ? `
+    <div class="post-media carousel">
+      <div class="carousel-track">
+        ${post.images
+          .map(sanitizeMediaUrl)
+          .filter(Boolean)
+          .map(src => `
+            <div class="carousel-slide">
+              <img src="${src}" />
+            </div>
+          `).join("")}
+      </div>
+      <div class="carousel-dots">
+        ${post.images
+          .filter(sanitizeMediaUrl)
+          .map(() => `<span></span>`)
+          .join("")}
+      </div>
     </div>
-    <div class="carousel-dots">
-      ${post.images.map(() => `<span></span>`).join("")}
-    </div>
-  </div>
-` : ""}
+  `
+  : ""
+}
 
         ${
           linkPreview
@@ -3988,6 +4052,15 @@ window.clearFilters = function () {
     );
   }
 }
+</script>
+
+<script>
+  // 🔒 GUARD GLOBAL — ANTI BLOB (WEB ONLY)
+  function sanitizeMediaUrl(url) {
+    if (typeof url !== "string") return null;
+    if (url.startsWith("blob:")) return null;
+    return url;
+  }
 </script>
 
 <!-- ========================= -->
