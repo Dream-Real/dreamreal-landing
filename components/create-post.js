@@ -96,6 +96,39 @@ function extractFirstUrl(text) {
   return match ? match[0] : null;
 }
 
+// 🎥 YOUTUBE DETECTION (WEB — APP PARITY)
+function extractYouTubeId(url) {
+  if (!url) return null;
+
+  try {
+    const u = new URL(url);
+
+    // 🎬 youtu.be/VIDEOID
+    if (u.hostname === "youtu.be") {
+      return u.pathname.slice(1) || null;
+    }
+
+    // 🎬 youtube.com
+    if (
+      u.hostname.includes("youtube.com") ||
+      u.hostname.includes("m.youtube.com")
+    ) {
+      // watch?v=VIDEOID
+      const v = u.searchParams.get("v");
+      if (v) return v;
+
+      // shorts/VIDEOID
+      if (u.pathname.startsWith("/shorts/")) {
+        return u.pathname.split("/")[2] || null;
+      }
+    }
+  } catch (e) {
+    return null;
+  }
+
+  return null;
+}
+
 /* =========================================================
    MOUNT
    ========================================================= */
@@ -706,6 +739,30 @@ function closeLocationPanel() {
 
   // 🔗 détection lien
   const url = extractFirstUrl(text);
+  const youtubeId = extractYouTubeId(url);
+
+    // 🔁 même lien déjà prêt → ne rien refaire
+  if (
+    url &&
+    localLinkPreview?.url === url &&
+    localLinkPreview.status === "ready"
+  ) {
+    updateSubmit();
+    return;
+  }
+
+  // 🎥 YOUTUBE → traitement dédié (AVANT preview classique)
+  if (youtubeId) {
+    localLinkPreview = {
+      url,
+      youtubeId,
+      status: "youtube",
+    };
+
+    renderPreview();
+    updateSubmit();
+    return; // ⛔️ CRITIQUE : on stoppe ici
+  }
 
   if (url) {
     // ⚠️ on ne refetch PAS si déjà détecté
@@ -771,10 +828,32 @@ if (!localLinkPreview) {
   preview.innerHTML = "";
 }
 
+// =========================
+// YOUTUBE PREVIEW — DRAFT (APP PARITY)
+// =========================
+if (localLinkPreview?.status === "youtube") {
+  const youtubeId = localLinkPreview.youtubeId;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "post-media youtube-preview";
+
+  const thumbnail = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+
+  wrapper.innerHTML = `
+    <div class="yt-thumb">
+      <img src="${thumbnail}" alt="" />
+      <div class="yt-play-overlay">▶</div>
+    </div>
+  `;
+
+  preview.appendChild(wrapper);
+  return; // 🔒 EXCLUSIF — pas de link preview après
+}
+
   // =========================
 // LINK PREVIEW — FEED PARITY
 // =========================
-if (localLinkPreview && localLinkPreview.status === "ready") {
+if (localLinkPreview && localLinkPreview.status === "ready" && !localLinkPreview.youtubeId) {
   const wrapper = document.createElement("div");
   wrapper.className = "post-media link-preview cp-link-preview-draft";
 
