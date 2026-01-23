@@ -439,6 +439,7 @@ const locationNearbyList = document.getElementById("cp-location-nearby-list");
 
   let mood = null;
 let location = null;
+localLinkPreview = null; // ✅ ICI ET SEULEMENT ICI
 
 // 🔑 MEDIA DRAFT (PARITÉ APP)
 let draftMedia = [];           // [{ file, url }]
@@ -799,6 +800,7 @@ if (localLinkPreview.status === "detected") {
 
       console.log("🔗 Link preview ready", localLinkPreview);
       renderPreview(); // 🔥 IMPORTANT
+      updateSubmit();
     })
     .catch((err) => {
       console.warn("❌ link preview failed", err);
@@ -823,10 +825,8 @@ if (localLinkPreview.status === "detected") {
   // RESET MEDIA SEULEMENT
 mediaSlot.innerHTML = "";
 
-// ⚠️ NE PAS EFFACER LA PREVIEW SI LINK EN COURS
-if (!localLinkPreview) {
-  preview.innerHTML = "";
-}
+// 🔥 RESET PREVIEW (OBLIGATOIRE — évite les doublons)
+preview.innerHTML = "";
 
 // =========================
 // YOUTUBE PREVIEW — DRAFT (APP PARITY)
@@ -847,7 +847,6 @@ if (localLinkPreview?.status === "youtube") {
   `;
 
   preview.appendChild(wrapper);
-  return; // 🔒 EXCLUSIF — pas de link preview après
 }
 
   // =========================
@@ -1047,13 +1046,28 @@ if (mood) {
   const hasMood = !!mood;
   const hasLocation = !!location;
   const hasMedia = draftMedia.length > 0;
+  const hasLink =
+  localLinkPreview &&
+  (localLinkPreview.status === "ready" ||
+   localLinkPreview.status === "youtube");
 
-  const valid = hasText || hasMood || hasLocation || hasMedia;
+  const valid =
+    hasText ||
+    hasMood ||
+    hasLocation ||
+    hasMedia ||
+    hasLink;
 
   submit.classList.toggle("disabled", !valid);
 }
 
   submit.onclick = () => {
+
+  // 🔒 SNAPSHOT LINK PREVIEW (CRITIQUE)
+  const linkPreviewSnapshot = localLinkPreview
+    ? JSON.parse(JSON.stringify(localLinkPreview))
+    : null;
+console.log("🧪 SNAPSHOT LINK PREVIEW (SUBMIT)", linkPreviewSnapshot);
   console.log("🟢 CLICK SUR POST BOUTON");
 
   // 🔥 RECALCUL FORCÉ AVANT TEST
@@ -1077,6 +1091,28 @@ overlay.classList.add("hidden");
   const user = window.AUTH?.user || {};
 
   const clientId = `client_${Date.now()}`;
+
+  let youtube_url = null;
+let youtube_thumbnail = null;
+let link_preview = null;
+
+if (linkPreviewSnapshot) {
+  if (linkPreviewSnapshot.status === "youtube") {
+    youtube_url = linkPreviewSnapshot.url;
+    youtube_thumbnail =
+      `https://img.youtube.com/vi/${linkPreviewSnapshot.youtubeId}/hqdefault.jpg`;
+  }
+
+  if (linkPreviewSnapshot.status === "ready") {
+    link_preview = {
+      title: linkPreviewSnapshot.title,
+      description: linkPreviewSnapshot.description,
+      image: linkPreviewSnapshot.image,
+      url: linkPreviewSnapshot.url,
+      siteName: linkPreviewSnapshot.siteName,
+    };
+  }
+}
 
 const localPost = {
   id: `local_${clientId}`,
@@ -1110,6 +1146,11 @@ user_avatar: getSafeAvatar(user),
     images: [],
 video_url: null,
 
+ // 🔥 AJOUTS CRITIQUES
+  youtube_url,
+  youtube_thumbnail,
+  link_preview,
+
     reactions_summary: "👍",
     reactions_count: 1,
   };
@@ -1142,6 +1183,31 @@ for (const m of draftMedia) {
   }
 }
 
+// =========================
+// LINK / YOUTUBE NORMALISATION
+// =========================
+let youtube_url = null;
+let youtube_thumbnail = null;
+let link_preview = null;
+
+if (linkPreviewSnapshot) {
+  if (linkPreviewSnapshot.status === "youtube") {
+    youtube_url = linkPreviewSnapshot.url;
+    youtube_thumbnail =
+      `https://img.youtube.com/vi/${linkPreviewSnapshot.youtubeId}/hqdefault.jpg`;
+  }
+
+  if (linkPreviewSnapshot.status === "ready") {
+    link_preview = {
+      title: linkPreviewSnapshot.title || null,
+      description: linkPreviewSnapshot.description || null,
+      image: linkPreviewSnapshot.image || null,
+      url: linkPreviewSnapshot.url,
+      siteName: linkPreviewSnapshot.siteName || null,
+    };
+  }
+}
+
     const payload = {
       client_id: clientId,
       message: message.value.trim() || null,
@@ -1167,18 +1233,9 @@ for (const m of draftMedia) {
       images: uploadedImages,
 video_url: uploadedVideo,
 
-      youtube_url: null,
-      youtube_thumbnail: null,
-      link_preview:
-  localLinkPreview && localLinkPreview.status === "ready"
-    ? {
-        title: localLinkPreview.title || null,
-        description: localLinkPreview.description || null,
-        image: localLinkPreview.image || null,
-        url: localLinkPreview.url,
-        siteName: localLinkPreview.siteName || null,
-      }
-    : null,
+youtube_url,
+  youtube_thumbnail,
+  link_preview,
     };
 
     const res = await fetch(`${API_BASE}/api/posts`, {

@@ -4146,6 +4146,23 @@ window.clearFilters = function () {
       : post.full_picture
         ? [post.full_picture]
         : [];
+        // 🔗 LINK PREVIEW — NORMALISATION WEB (CRITIQUE)
+let normalizedLinkPreview = null;
+
+const rawLinkPreview = post.linkPreview ?? post.link_preview ?? null;
+
+if (rawLinkPreview) {
+  if (typeof rawLinkPreview === "string") {
+    try {
+      normalizedLinkPreview = JSON.parse(rawLinkPreview);
+    } catch (e) {
+      console.warn("❌ Invalid link_preview JSON", rawLinkPreview);
+      normalizedLinkPreview = null;
+    }
+  } else if (typeof rawLinkPreview === "object") {
+    normalizedLinkPreview = rawLinkPreview;
+  }
+}
   return {
     id: post.id || `${Date.now()}-${Math.random()}`,
 
@@ -4177,7 +4194,7 @@ window.clearFilters = function () {
 full_picture: null,
 multiple_images: null,
 
-    linkPreview: post.linkPreview || null,
+    linkPreview: normalizedLinkPreview,
 
     mood:
       post.feeling && post.activity
@@ -4217,8 +4234,31 @@ multiple_images: null,
     .then((res) => res.json())
     .then((res) => {
       const posts = Array.isArray(res) ? res : res.posts ?? res.data ?? [];
+      console.log(
+  "🧪 RAW API POST (link_preview)",
+  posts.map(p => ({
+    id: p.id,
+    link_preview: p.link_preview,
+    type: typeof p.link_preview
+  }))
+);
 
       console.log("📦 POSTS NORMALIZED:", posts);
+
+      // ===============================
+// FEED — SOURCE DE VÉRITÉ
+// ===============================
+window.FEED_POSTS = posts
+  .sort(
+    (a, b) =>
+      new Date(b.created_time).getTime() -
+      new Date(a.created_time).getTime()
+  )
+  .map(normalizePostFromAPI);
+
+// 🔥 RENDU GLOBAL (OBLIGATOIRE)
+renderFeed();
+renderFilteredFeed?.();
 
       const carouselContainer = document.getElementById("looking-for-carousel");
 const feedContainer = document.getElementById("looking-for-feed");
