@@ -2416,115 +2416,75 @@ header * {
   margin-top: 9px; /* ajuste : 12 / 14 / 16 */
 }
 /* =========================
-   POST — IMAGE CAROUSEL
+   POST — IMAGE CAROUSEL (LOCKED)
 ========================= */
 
+/* Conteneur */
 .post-media.carousel {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  min-height: 0;
+}
+
+/* TRACK */
+.post-media.carousel .carousel-track {
+  display: flex;
+  width: 100%;
+  height: 480px;
+
+  gap: 14px; /* ✅ SEULE SOURCE DU GAP */
+
   overflow-x: auto;
   overflow-y: hidden;
 
-  display: flex;
-  gap: 10px;
-
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-
-  padding-bottom: 0px; /* espace scroll */
-}
-
-.post-media.carousel::-webkit-scrollbar {
-  display: none;
-}
-
-.post-media.carousel .carousel-slide {
-  flex: 0 0 100%;
-  max-width: 100%;
-
-  scroll-snap-align: start;
-
-  border-radius: 12px;
-  overflow: hidden;
-  background: transparent; /* 🔑 SUPPRIME LA BANDE NOIRE */
-}
-
-.post-media.carousel img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-/* 🔥 FIX — NO BLACK BAND UNDER IMAGE CAROUSEL */
-.post-media.carousel {
-  background-color: transparent; /* ⛔ stop fond noir */
-}
-/* =========================
-   POST — CAROUSEL DOTS (APP-LIKE)
-========================= */
-
-/* Le carrousel devient un bloc vertical */
-.post-media.carousel {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-
-  background: transparent; /* sécurité */
-}
-
-/* Track images */
-.post-media.carousel .carousel-track {
-  display: flex;
-  overflow-x: auto;
-
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-    gap: 12px; /* 🔥 ICI — espace entre les images */
 }
 
 .post-media.carousel .carousel-track::-webkit-scrollbar {
   display: none;
 }
 
-/* Slides */
+/* SLIDE — 100% RÉEL */
 .post-media.carousel .carousel-slide {
   flex: 0 0 100%;
+  height: 100%;
+
   scroll-snap-align: start;
+
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-/* ✅ DOTS — CENTRÉS SOUS LES IMAGES */
+/* IMAGE */
+.post-media.carousel .carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* DOTS */
 .post-media.carousel .carousel-dots {
   display: flex;
   justify-content: center;
   align-items: center;
-
   gap: 8px;
-  margin-top: -3px; /* EXACT APP */
+  margin-top: 8px;
 }
 
-/* Dot */
 .post-media.carousel .carousel-dots span {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: rgba(255,255,255,0.4);
-}
-/* Dot */
-.post-media.carousel .carousel-dots span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-
-  background: rgba(255,255,255,0.4);
-
-  /* 🔑 ANIMATION */
-  transition:
-    background-color 0.25s ease,
-    transform 0.25s ease,
-    opacity 0.25s ease;
-
-  transform: scale(0.9);
   opacity: 0.6;
+  transform: scale(0.9);
+  transition: background-color .25s, transform .25s, opacity .25s;
 }
-/* Dot actif */
+
 .post-media.carousel:has(.carousel-slide:nth-child(1):is(:in-view))
   .carousel-dots span:nth-child(1),
 .post-media.carousel:has(.carousel-slide:nth-child(2):is(:in-view))
@@ -2533,11 +2493,11 @@ header * {
   .carousel-dots span:nth-child(3),
 .post-media.carousel:has(.carousel-slide:nth-child(4):is(:in-view))
   .carousel-dots span:nth-child(4) {
-
   background: #EECD79;
-  transform: scale(1.25);   /* 🔥 effet vivant */
+  transform: scale(1.25);
   opacity: 1;
 }
+
 /* =========================
    FILTER MODAL — APP STYLE (CENTERED)
 ========================= */
