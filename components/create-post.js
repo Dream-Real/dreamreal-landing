@@ -532,6 +532,9 @@ if (trigger) {
     panelTitle.textContent = "Choose a category";
     panelList.innerHTML = "";
 
+    // 🔑 AJOUT ICI
+  modal.classList.add("is-feeling-open");
+
     if (!FEELINGS.length) {
       panelList.innerHTML = `
         <div style="opacity:.6;text-align:center;padding:20px">
@@ -583,6 +586,8 @@ if (trigger) {
     moodPanel.classList.add("hidden");
     panelList.innerHTML = "";
     panelTitle.textContent = "Choose a category";
+    // 🔑 AJOUT ICI
+  modal.classList.remove("is-feeling-open");
   }
 
   /* ===============================
