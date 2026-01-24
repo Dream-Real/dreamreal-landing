@@ -475,10 +475,27 @@ if (trigger) {
     location = null;
     preview.innerHTML = "";
 
+    // ✅ RÉ-INJECTION SAFE DE L’USER (CRITIQUE)
+    const user = window.AUTH?.user;
+    const avatarEl = document.getElementById("cp-user-avatar");
+    const usernameEl = document.getElementById("cp-username");
+
+    if (user && avatarEl) {
+      avatarEl.src = getSafeAvatar(user);
+      avatarEl.style.display = "block";
+    }
+
+    if (user && usernameEl) {
+      usernameEl.textContent =
+        `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+        user.name ||
+        "User";
+    }
+
     // ✅ ouverture modale
     overlay.classList.remove("hidden");
 
-    // ✅ recalcul état bouton POST (OBLIGATOIRE ICI)
+    // ✅ recalcul état bouton POST
     updateSubmit();
   };
 }
@@ -533,7 +550,7 @@ if (trigger) {
     panelList.innerHTML = "";
 
     // 🔑 AJOUT ICI
-  modal.classList.add("is-feeling-open");
+  overlay.classList.add("is-feeling-open");
 
     if (!FEELINGS.length) {
       panelList.innerHTML = `
@@ -587,7 +604,7 @@ if (trigger) {
     panelList.innerHTML = "";
     panelTitle.textContent = "Choose a category";
     // 🔑 AJOUT ICI
-  modal.classList.remove("is-feeling-open");
+  overlay.classList.remove("is-feeling-open");
   }
 
   /* ===============================
