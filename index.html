@@ -3786,6 +3786,7 @@ if (data.needs_profile) {
       window.LOOKING_FOR_FILTER.activity = null;
       applyLookingForFilter(null);
       renderLookingForActiveFilter();
+      resetLookingForFilterModalUI();
     };
 
     container.appendChild(pill);
@@ -4179,6 +4180,26 @@ window.clearFilters = function () {
   // LOOKING FOR — RENDER HELPERS (GLOBAL)
   // =========================
   function renderLookingForPost(post) {
+      const createdAt = post.createdAt || post.created_time;
+
+  const date = createdAt
+    ? (() => {
+        const d = new Date(createdAt);
+
+        const datePart = d.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+
+        const timePart = d.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `${datePart} at ${timePart}`;
+      })()
+    : "";
   const user = post.user?.name || "Dream Real";
 
   const avatar =
@@ -4200,9 +4221,18 @@ window.clearFilters = function () {
         </div>
 
         <div class="lf-post-meta">
-          <strong>${user}</strong>
-          ${location ? `<span> in ${location}</span>` : ""}
+  <strong>${user}</strong>
+  ${location ? `<span> in ${location}</span>` : ""}
+  ${
+    date
+      ? `
+        <div class="lf-post-date">
+          <small>${date}</small>
         </div>
+      `
+      : ""
+  }
+</div>
       </div>
 
       <div class="lf-post-body">
@@ -4944,6 +4974,7 @@ filterTitle.textContent = feeling.title;
 
   if (openLfBtn && lfFilterOverlay) {
     openLfBtn.addEventListener("click", () => {
+      resetLookingForFilterModalUI(); // ✅ AJOUT ICI
       lfFilterOverlay.classList.remove("hidden");
     });
   }
@@ -4964,6 +4995,20 @@ lfFilterOverlay.addEventListener("click", (e) => {
 </script>
 </div>
 <script>
+
+  function resetLookingForFilterModalUI() {
+  const overlay = document.getElementById("lf-filter-overlay");
+  if (!overlay) return;
+
+  overlay
+    .querySelectorAll(".filter-pill.active")
+    .forEach(p => p.classList.remove("active"));
+
+  // Remet "All" actif par défaut (optionnel mais cohérent UX)
+  const allBtn = overlay.querySelector(".filter-pill");
+  if (allBtn) allBtn.classList.add("active");
+}
+
   // =========================
   // LOOKING FOR — ACTIVITY MODAL (STRICT FEED CLONE)
   // =========================
