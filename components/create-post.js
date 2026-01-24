@@ -286,6 +286,16 @@ function mountCreatePost() {
             </div>
           </div>
 
+          <!-- 🔍 ACTIVITY SEARCH (AJOUT) -->
+  <div class="cp-fa-search">
+    <input
+      id="cp-activity-search"
+      type="text"
+      placeholder="Search…"
+      autocomplete="off"
+    />
+  </div>
+
           <div class="cp-fa-list" id="cp-fa-list"></div>
         </div>
         <!-- LOCATION PANEL -->
@@ -549,6 +559,10 @@ if (trigger) {
     panelTitle.textContent = "Choose a category";
     panelList.innerHTML = "";
 
+    // 🔒 CACHER LA SEARCH
+  const searchInput = document.getElementById("cp-activity-search");
+  if (searchInput) searchInput.style.display = "none";
+
     // 🔑 AJOUT ICI
   overlay.classList.add("is-feeling-open");
 
@@ -597,15 +611,41 @@ if (trigger) {
         };
         panelList.appendChild(item);
       });
+        // 🔍 ACTIVITY SEARCH LOGIC (ICI)
+  const searchInput = document.getElementById("cp-activity-search");
+
+  if (searchInput) {
+    searchInput.style.display = "block"; // ✅ OBLIGATOIRE
+    searchInput.value = "";
+    searchInput.placeholder = "Search…"; // ✅ FIX DÉFINITIF
+
+    searchInput.oninput = () => {
+      const q = searchInput.value.trim().toLowerCase();
+
+      panelList.querySelectorAll(".cp-fa-item").forEach(item => {
+        const label =
+          item.querySelector("span")?.textContent.toLowerCase() || "";
+
+        item.style.display = label.includes(q) ? "flex" : "none";
+      });
+    };
+  }
   }
 
   function closeMoodPanel() {
-    moodPanel.classList.add("hidden");
-    panelList.innerHTML = "";
-    panelTitle.textContent = "Choose a category";
-    // 🔑 AJOUT ICI
+  moodPanel.classList.add("hidden");
+  panelList.innerHTML = "";
+  panelTitle.textContent = "Choose a category";
+
   overlay.classList.remove("is-feeling-open");
+
+  const searchInput = document.getElementById("cp-activity-search");
+  if (searchInput) {
+    searchInput.value = "";
+    searchInput.oninput = null;        // ✅ sécurité : détache le handler
+    searchInput.style.display = "none"; // ✅ UX : cache la search
   }
+}
 
   /* ===============================
    LOCATION PANEL

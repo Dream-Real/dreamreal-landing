@@ -2427,9 +2427,11 @@ header * {
    FEELING PANEL — SPACE ABOVE FIRST ITEM
 ===================================== */
 
-.cp-fa-list > .cp-fa-item:first-child {
-  margin-top: 9px; /* ajuste : 12 / 14 / 16 */
+/* ✅ STABLE — NE BOUGE JAMAIS AU FILTRAGE */
+.cp-fa-list {
+  padding-top: 9px;   /* ajuste si besoin : 8 / 10 / 12 */
 }
+
 /* =========================
    POST — IMAGE CAROUSEL (LOCKED)
 ========================= */
@@ -2511,6 +2513,14 @@ header * {
   background: #EECD79;
   transform: scale(1.25);
   opacity: 1;
+}
+/* 🔒 EMOJI ANIMATION — NEVER BLOCK UI */
+.header-live-emotes,
+.live-emotes,
+.live-emote-container,
+.live-emote,
+.live-emote img {
+  pointer-events: none !important;
 }
 
 /* =========================
@@ -3288,6 +3298,60 @@ margin: 0;
 .live-emote-container:nth-child(8) .live-emote {
   animation-duration: 19s;
   animation-timing-function: cubic-bezier(0.7, 0.21, 0.4, 0.78);
+}
+/* =========================
+   CREATE POST — ACTIVITY SEARCH
+   (MATCH LOCATION SEARCH 1:1)
+========================= */
+
+.cp-fa-search {
+  /* 🔑 sort du padding de la modale */
+  width: calc(100% + 48px);
+  margin-left: -24px;
+  margin-right: -24px;
+
+  padding: 0 24px 20px;
+  margin-top: 10px;
+}
+
+#cp-activity-search {
+  width: 100%;
+  height: 42px;           /* ✅ EXACT Location */
+  line-height: 1.1;
+
+  background-color: #2A2D59;
+  color: #ffffff;
+
+  border-radius: 10px;    /* ❌ plus de pill */
+  border: 1px solid rgba(255,255,255,0.12);
+
+  padding: 0 14px;
+  font-size: 16px;
+
+  outline: none;
+}
+
+#cp-activity-search::placeholder {
+  color: rgba(248,250,252,0.6);
+  font-weight: 400;
+}
+
+#cp-activity-search:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: rgba(147,197,253,0.45);
+}
+/* 🔑 ACTIVITIES — remonte les pills sous la search */
+.cp-feeling-panel .cp-fa-search + .cp-fa-list {
+  margin-top: -4px;
+}
+/* =========================
+   CREATE POST — ACTIVITY LIST STABILITY FIX
+========================= */
+
+.cp-fa-list {
+  min-height: 320px;      /* 🔑 empêche la remontée visuelle */
+  overflow-y: auto;
 }
 
   </style>
