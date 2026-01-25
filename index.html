@@ -2699,16 +2699,23 @@ margin: 0;
    ACTIVE FILTERS (APP-LIKE)
 ========================= */
 
+/* Base neutre commune */
 .active-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 
-  /* 🔑 CLÉ : même origine que le contenu des posts */
-  padding-left: -8px;
-  padding-right: 14px;
-
+  padding: 0;
   margin: 6px 0 10px;
+}
+
+/* =========================
+   FEED — ACTIVE FILTERS
+   Alignés sous "Filters"
+========================= */
+.feed #active-filters {
+  justify-content: flex-end; /* 🔑 à droite */
+  width: 100%;
 }
 
 .active-filters.hidden {
@@ -3378,6 +3385,7 @@ margin: 0;
   padding-right: 12px;
 
   margin: 4px 0 10px;
+  transform: translateY(-4px); /* ajuste : -2 / -3 / -4 */
 }
 
 .feed-action {
@@ -3415,6 +3423,13 @@ margin: 0;
 .feed-action.create:hover {
   opacity: 0.85;
 }
+/* =========================
+   FEED — CREATE MICRO ALIGN FIX
+========================= */
+
+.feed-action.create {
+  transform: translateX(-18px); /* ajuste : -8 / -10 / -12 */
+}
 
   </style>
 </head>
@@ -3442,9 +3457,11 @@ margin: 0;
     <span id="nav-user-name"></span>
   </div>
 
-  <button class="btn btn-create" style="display:none">
-    Create post
-  </button>
+  <!--
+<button class="btn btn-create">
+  Create post
+</button>
+-->
 
   <button class="btn btn-primary btn-join">Join</button>
 </div>
