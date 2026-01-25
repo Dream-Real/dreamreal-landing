@@ -1399,6 +1399,23 @@ window.openCreatePost = function () {
     return;
   }
 
+    // ✅ HYDRATATION USER (CRITIQUE — FIX AVATAR)
+  const user = window.AUTH?.user;
+  const avatarEl = document.getElementById("cp-user-avatar");
+  const usernameEl = document.getElementById("cp-username");
+
+  if (user && avatarEl) {
+    avatarEl.src = getSafeAvatar(user);
+    avatarEl.style.display = "block";
+  }
+
+  if (user && usernameEl) {
+    usernameEl.textContent =
+      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+      user.name ||
+      "User";
+  }
+
   overlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 };
