@@ -419,7 +419,7 @@ const locationSave = document.getElementById("cp-location-save");
 const locationNearby = document.getElementById("cp-location-nearby");
 const locationNearbyList = document.getElementById("cp-location-nearby-list");
 
-  const trigger = document.querySelector(".btn-create");
+const triggers = document.querySelectorAll(".btn-create");
 
   /* ===============================
      SAFE DATA ACCESS
@@ -466,19 +466,19 @@ draftCarouselIndex = 0;
    OPEN / CLOSE MODAL
    =============================== */
 
-if (trigger) {
+triggers.forEach((trigger) => {
   trigger.onclick = () => {
     // 🔄 reset état Create Post
     mood = null;
     location = null;
     preview.innerHTML = "";
 
-    // ✅ RÉ-INJECTION SAFE DE L’USER (CRITIQUE)
+    // ✅ RÉ-INJECTION SAFE DE L’USER
     const user = window.AUTH?.user;
     const avatarEl = document.getElementById("cp-user-avatar");
     const usernameEl = document.getElementById("cp-username");
 
-    if (user && avatarEl) {
+    if (avatarEl) {
       avatarEl.src = getSafeAvatar(user);
       avatarEl.style.display = "block";
     }
@@ -492,12 +492,12 @@ if (trigger) {
 
     // ✅ ouverture modale
     overlay.classList.remove("hidden");
-    document.body.style.overflow = "hidden"; // 🔒 LOCK SCROLL (ICI EXACTEMENT)
+    document.body.style.overflow = "hidden";
 
     // ✅ recalcul état bouton POST
     updateSubmit();
   };
-}
+});
 
   closeBtn.onclick = resetCreatePost;
 
@@ -1241,9 +1241,6 @@ for (const m of draftMedia) {
 // =========================
 // LINK / YOUTUBE NORMALISATION
 // =========================
-let youtube_url = null;
-let youtube_thumbnail = null;
-let link_preview = null;
 
 if (linkPreviewSnapshot) {
   if (linkPreviewSnapshot.status === "youtube") {

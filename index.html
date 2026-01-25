@@ -4271,8 +4271,15 @@ if (data.needs_profile) {
 }
    
         ${post.youtube_url ? `
-  <div class="post-media youtube-preview">
-    <img src="https://img.youtube.com/vi/${post.youtube_url.split("v=")[1]?.split("&")[0]}/hqdefault.jpg" />
+  <div
+    class="post-media youtube-preview"
+    style="cursor:pointer"
+    onclick="window.open('${post.youtube_url}', '_blank', 'noopener,noreferrer')"
+  >
+    <img
+      src="https://img.youtube.com/vi/${post.youtube_url.split("v=")[1]?.split("&")[0]}/hqdefault.jpg"
+      alt="YouTube preview"
+    />
   </div>
 ` : ""}
 
