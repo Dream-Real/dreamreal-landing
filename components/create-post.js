@@ -556,6 +556,8 @@ if (trigger) {
      =============================== */
 
   function openMoodPanel() {
+    moodPanel.classList.add("is-feelings");
+  moodPanel.classList.remove("is-activities");
     panelTitle.textContent = "Choose a category";
     panelList.innerHTML = "";
 
@@ -591,6 +593,8 @@ if (trigger) {
   }
 
   function openActivities(feeling) {
+     moodPanel.classList.remove("is-feelings");
+  moodPanel.classList.add("is-activities");
     panelTitle.textContent = "Choose an entry"
     panelList.innerHTML = "";
 
@@ -633,6 +637,7 @@ if (trigger) {
   }
 
   function closeMoodPanel() {
+    moodPanel.classList.remove("is-feelings", "is-activities");
   moodPanel.classList.add("hidden");
   panelList.innerHTML = "";
   panelTitle.textContent = "Choose a category";
