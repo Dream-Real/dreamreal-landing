@@ -3430,6 +3430,57 @@ margin: 0;
 .feed-action.create {
   transform: translateX(-18px); /* ajuste : -8 / -10 / -12 */
 }
+/* =========================
+   NAV — USER DROPDOWN MENU
+========================= */
+
+.nav-user-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-user {
+  cursor: pointer;
+}
+
+/* menu */
+.nav-user-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+
+  min-width: 160px;
+  padding: 8px;
+
+  background: rgba(11, 17, 32, 0.95);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+
+  z-index: 100;
+}
+
+/* bouton menu */
+.nav-user-menu button {
+  width: 100%;
+  background: none;
+  border: none;
+
+  padding: 10px 12px;
+  text-align: left;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.nav-user-menu button:hover {
+  background: rgba(255,255,255,0.08);
+}
 
   </style>
 </head>
@@ -3452,10 +3503,17 @@ margin: 0;
   <div class="nav-actions">
 
   <!-- 👤 USER INFO (hidden by default) -->
-  <div id="nav-user" class="nav-user hidden">
+  <div class="nav-user-wrapper hidden" id="nav-user-wrapper">
+  <div id="nav-user" class="nav-user">
     <img id="nav-user-avatar" alt="avatar" />
     <span id="nav-user-name"></span>
   </div>
+
+  <!-- MENU DÉROULANT -->
+  <div id="nav-user-menu" class="nav-user-menu hidden">
+    <button id="nav-logout-btn">Logout</button>
+  </div>
+</div>
 
   <!--
 <button class="btn btn-create">
@@ -3631,22 +3689,26 @@ margin: 0;
     window.AUTH.user = null;
     window.AUTH.isAuthenticated = false;
 
+    // 🔒 force la fermeture du menu user (sécurité UX)
+const navUserMenu = document.getElementById("nav-user-menu");
+if (navUserMenu) navUserMenu.classList.add("hidden");
+
+// 🔓 sécurité UX — restore scroll si une modale était ouverte
+document.body.style.overflow = "";
+
     // 🧹 clear storage
     localStorage.removeItem("token");
     localStorage.removeItem("user"); // ⬅️ 🔑 FIX FINAL
 
-    // 🔄 UI reset
-    document.querySelectorAll(".btn-join").forEach((btn) => {
-      btn.textContent = "Join";
-      btn.style.display = "inline-flex";
-    });
+    // 🔁 Join réapparaît
+document.querySelectorAll(".btn-join").forEach((btn) => {
+  btn.style.display = "inline-flex";
+});
 
-    document.querySelectorAll(".btn-create").forEach((btn) => {
-      btn.style.display = "none";
-    });
-      // 👤 hide user info
-  const navUser = document.getElementById("nav-user");
-  if (navUser) navUser.classList.add("hidden");
+// 👤 cache menu user
+const navUserWrapper = document.getElementById("nav-user-wrapper");
+if (navUserWrapper) navUserWrapper.classList.add("hidden");
+
      // 🔁 reset filters
    window.FEED_FILTERS = { feeling: null, activity: null };
    window.LOOKING_FOR_FILTER = { activity: null };
@@ -3704,13 +3766,21 @@ if (savedToken) {
 }
 
   // =========================
-  // CREATE POST — OPEN BUTTON
-  // =========================
-  document
-    .getElementById("open-create")
-    ?.addEventListener("click", () => {
-      window.openCreatePost?.();
-    });
+// CREATE POST — OPEN BUTTON (AUTH GUARD)
+// =========================
+document
+  .getElementById("open-create")
+  ?.addEventListener("click", () => {
+
+    // 🔐 UTILISATEUR LOGOUT → LOGIN
+    if (!window.AUTH.isAuthenticated) {
+      openAuthModal();
+      return;
+    }
+
+    // ✅ UTILISATEUR LOGGÉ → CREATE POST
+    window.openCreatePost?.();
+  });
 
 // =========================
 // AUTH — USER LOGGED IN (WEB)
@@ -3722,12 +3792,10 @@ function onUserAuthenticated(user) {
   window.AUTH.user = user;
   window.AUTH.isAuthenticated = true;
 
-  // ✅ Bouton Join → Logout
-  document.querySelectorAll(".btn-join").forEach((btn) => {
-    btn.textContent = "Logout";
-    btn.style.display = "inline-flex";
-    btn.onclick = logout;
-  });
+  // ✅ Join disparaît quand l'utilisateur est connecté
+document.querySelectorAll(".btn-join").forEach((btn) => {
+  btn.style.display = "none";
+});
 
   // ✅ Create post visible
   document.querySelectorAll(".btn-create").forEach((btn) => {
@@ -3735,25 +3803,54 @@ function onUserAuthenticated(user) {
   });
 
   // 👤 USER INFO
-  const navUser = document.getElementById("nav-user");
-  const avatar  = document.getElementById("nav-user-avatar");
-  const name    = document.getElementById("nav-user-name");
+  const navUserWrapper = document.getElementById("nav-user-wrapper");
+const avatar = document.getElementById("nav-user-avatar");
+const name   = document.getElementById("nav-user-name");
 
-  if (navUser && avatar && name) {
-    avatar.src =
-      user.avatar ||
-      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+if (navUserWrapper && avatar && name) {
+  avatar.src =
+    user.avatar ||
+    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
-    name.textContent =
-  `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-  user.name ||
-  "User";
+  name.textContent =
+    `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+    user.name ||
+    "User";
 
-    navUser.classList.remove("hidden");
-  }
+  navUserWrapper.classList.remove("hidden"); // ✅ SOURCE UNIQUE
+}
 }
 
 window.onUserAuthenticated = onUserAuthenticated;
+
+// =========================
+// NAV — USER MENU (HEADER)
+// =========================
+
+const navUser        = document.getElementById("nav-user");
+const navUserMenu    = document.getElementById("nav-user-menu");
+const navLogoutBtn   = document.getElementById("nav-logout-btn");
+
+// Sécurité : si le menu n’existe pas (non connecté), on sort
+if (navUser && navUserMenu && navLogoutBtn) {
+
+  // Toggle menu au clic avatar + nom
+  navUser.addEventListener("click", (e) => {
+    e.stopPropagation();
+    navUserMenu.classList.toggle("hidden");
+  });
+
+  // Click global → ferme le menu
+  document.addEventListener("click", () => {
+    navUserMenu.classList.add("hidden");
+  });
+
+  // Action logout
+  navLogoutBtn.addEventListener("click", () => {
+    navUserMenu.classList.add("hidden");
+    logout();
+  });
+}
 
   /* =========================
      AUTH — OTP LOGIC
