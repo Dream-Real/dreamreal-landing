@@ -285,7 +285,7 @@ main {
   flex-direction: column;
 
   /* 🔑 zone beaucoup plus haute */
-  height: min(350vh, 1218px);
+  height: min(350vh, 1200px);
 
   /* 🔑 indispensable pour le scroll interne */
   min-height: 0;
@@ -3357,6 +3357,64 @@ margin: 0;
 .cp-feeling-panel.is-feelings .cp-fa-header {
   margin-bottom: -2px;
 }
+@media (min-width: 1024px) {
+  .looking-for-feed {
+    max-height: 88vh;
+    overflow-y: auto;
+    padding-right: 12px;
+  }
+}
+/* =========================
+   FEED — ACTIONS (CREATE + FILTERS)
+========================= */
+
+.feed-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  /* 🔑 ALIGNEMENT SOURCE — IDENTIQUE AUX POSTS */
+  padding-left: 12px;
+  padding-right: 12px;
+
+  margin: 4px 0 10px;
+}
+
+.feed-action {
+  background: none;
+  border: none;
+
+  padding: 0;
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+
+  color: #EECD79;
+  cursor: pointer;
+}
+
+.feed-action:hover {
+  opacity: 0.85;
+}
+
+/* Create = légèrement distinct, mais discret */
+.feed-action.create {
+  font-weight: 600;
+}
+/* =========================
+   FEED — CREATE BUTTON (BLUE ONLY)
+========================= */
+
+.feed-action.create {
+  color: var(--blue); /* #93c5fd */
+}
+
+/* hover discret, app-like */
+.feed-action.create:hover {
+  opacity: 0.85;
+}
 
   </style>
 </head>
@@ -3492,12 +3550,16 @@ margin: 0;
       </p>
     </div>
 
-    <!-- 🟡 FILTER BUTTON -->
-    <div class="feed-filters">
-      <button id="open-filters" class="feed-filter-btn">
-        Filters
-      </button>
-    </div>
+    <!-- 🟡 FEED ACTIONS -->
+<div class="feed-actions">
+  <button id="open-create" class="feed-action create">
+    Create
+  </button>
+
+  <button id="open-filters" class="feed-action">
+    Filters
+  </button>
+</div>
 
     <!-- 🔥 ACTIVE FILTERS -->
     <div id="active-filters" class="active-filters hidden"></div>
@@ -3623,6 +3685,15 @@ if (savedToken) {
     })
     .catch(() => logout());
 }
+
+  // =========================
+  // CREATE POST — OPEN BUTTON
+  // =========================
+  document
+    .getElementById("open-create")
+    ?.addEventListener("click", () => {
+      window.openCreatePost?.();
+    });
 
 // =========================
 // AUTH — USER LOGGED IN (WEB)

@@ -450,6 +450,7 @@ const locationNearbyList = document.getElementById("cp-location-nearby-list");
   let mood = null;
 let location = null;
 localLinkPreview = null; // ✅ ICI ET SEULEMENT ICI
+let isSubmitting = false; // 🔒 sécurité anti double submit
 
 // 🔑 MEDIA DRAFT (PARITÉ APP)
 let draftMedia = [];           // [{ file, url }]
@@ -457,7 +458,10 @@ let draftCarouselIndex = 0;
   
 
 function resetCreatePost() {
+  isSubmitting = false; // 🔓 reset sécurité submit (ICI EXACTEMENT)
   overlay.classList.add("hidden");
+  // ✅ RESTORE BODY SCROLL (CRITIQUE)
+  document.body.style.overflow = "";
   message.value = "";
   mood = null;
   location = null;
@@ -504,6 +508,7 @@ if (trigger) {
 
     // ✅ ouverture modale
     overlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden"; // 🔒 LOCK SCROLL (ICI EXACTEMENT)
 
     // ✅ recalcul état bouton POST
     updateSubmit();
@@ -1129,6 +1134,8 @@ if (mood) {
 }
 
   submit.onclick = () => {
+    if (isSubmitting) return;
+isSubmitting = true;
 
   // 🔒 SNAPSHOT LINK PREVIEW (CRITIQUE)
   const linkPreviewSnapshot = localLinkPreview
@@ -1146,9 +1153,6 @@ console.log("🧪 SNAPSHOT LINK PREVIEW (SUBMIT)", linkPreviewSnapshot);
   }
 
   console.log("🟢 SUBMIT AUTORISÉ — ON CONTINUE");
-
-  // ✅ FERMETURE IMMÉDIATE DE LA MODALE (UX)
-overlay.classList.add("hidden");
 
   // =========================
   // BUILD LOCAL POST (MOCK)
@@ -1384,4 +1388,18 @@ if (typeof renderFeed === "function") {
    ========================================================= */
 
 window.mountCreatePost = mountCreatePost;
+// =========================
+// GLOBAL OPEN CREATE POST
+// =========================
+window.openCreatePost = function () {
+  const overlay = document.getElementById("cp-overlay");
+
+  if (!overlay) {
+    console.warn("❌ cp-overlay introuvable — mountCreatePost non exécuté ?");
+    return;
+  }
+
+  overlay.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+};
 console.log("🚀 create-post.js loaded");
