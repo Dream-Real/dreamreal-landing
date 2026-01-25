@@ -386,22 +386,6 @@ const mediaSlot = document.getElementById("cp-media-slot");
   // ===============================
 // AUTH USER (NO MOCK)
 // ===============================
-if (window.AUTH?.user) {
-  const user = window.AUTH.user;
-
-  const avatarEl = document.getElementById("cp-user-avatar");
-
-  if (avatarEl) {
-    avatarEl.src = getSafeAvatar(user);
-  }
-
-  if (usernameEl) {
-    usernameEl.textContent =
-      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-      user.name ||
-      "User";
-  }
-}
 
 mediaInput.addEventListener("change", () => {
   const files = Array.from(mediaInput.files);
@@ -1404,10 +1388,14 @@ window.openCreatePost = function () {
   const avatarEl = document.getElementById("cp-user-avatar");
   const usernameEl = document.getElementById("cp-username");
 
-  if (user && avatarEl) {
-    avatarEl.src = getSafeAvatar(user);
-    avatarEl.style.display = "block";
-  }
+  if (avatarEl) {
+  avatarEl.src =
+    user?.avatar && user.avatar.startsWith("http")
+      ? user.avatar
+      : "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+  avatarEl.style.display = "block";
+}
 
   if (user && usernameEl) {
     usernameEl.textContent =

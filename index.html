@@ -3481,11 +3481,39 @@ margin: 0;
 .nav-user-menu button:hover {
   background: rgba(255,255,255,0.08);
 }
-/* =========================
-   AUTH — PREVENT HEADER FLASH
-========================= */
-.btn-join {
-  display: none;
+/* 🔒 AUTH — block UI until JS hydration */
+body:not(.auth-ready) .btn-join {
+  display: none !important;
+}
+.nav-user span {
+  font-size: 16px;   /* ⬆️ agrandit le nom dans le header */
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1;    /* 🔑 évite toute variation de hauteur */
+}
+/* ===============================
+   CREATE POST — USER HEADER
+   =============================== */
+
+.cp-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#cp-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block; /* 🔑 CRITIQUE */
+  background: #111; /* fallback visuel */
+}
+
+#cp-username {
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
 }
 
   </style>
@@ -3771,6 +3799,11 @@ if (savedToken) {
     .catch(() => logout());
 }
 
+// 🔓 auth state known (logged out, no token)
+if (!savedToken) {
+  document.body.classList.add("auth-ready");
+}
+
   // =========================
 // CREATE POST — OPEN BUTTON (AUTH GUARD)
 // =========================
@@ -3794,9 +3827,14 @@ document
 function onUserAuthenticated(user) {
   console.log("✅ Authenticated user:", user);
 
+  // 🔓 auth state known (logged)
+  document.body.classList.add("auth-ready");
+
   // 🔐 état global
   window.AUTH.user = user;
   window.AUTH.isAuthenticated = true;
+
+  document.dispatchEvent(new Event("auth:ready"));
 
   // ✅ Join disparaît quand l'utilisateur est connecté
 document.querySelectorAll(".btn-join").forEach((btn) => {
@@ -3814,9 +3852,13 @@ const avatar = document.getElementById("nav-user-avatar");
 const name   = document.getElementById("nav-user-name");
 
 if (navUserWrapper && avatar && name) {
-  avatar.src =
-    user.avatar ||
-    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  const fallbackAvatar =
+  "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+avatar.src =
+  typeof user.avatar === "string" && user.avatar.trim().length > 0
+    ? user.avatar
+    : fallbackAvatar;
 
   name.textContent =
     `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
