@@ -3642,6 +3642,204 @@ body:not(.auth-ready) .btn-join {
   margin-bottom: 14px; /* EXACT feed rhythm */
 }
 
+/* =========================
+   LEADERBOARD — WEB (APP PARITY)
+========================= */
+
+/* =========================
+   LEADERBOARD — VERTICAL OFFSET (AUTHORITATIVE)
+========================= */
+.leaderboard {
+  margin-top: 120px; /* ⬅️ DESCEND TOUT : titre + contenu */
+  padding-bottom: 40px;
+}
+
+/* Header */
+.leaderboard-header h3 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+
+.leaderboard-sub {
+  font-size: 21px;
+  line-height: 1.65;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+/* Podium */
+.leaderboard-podium {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+
+.podium-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 92px;
+}
+
+.podium-card strong {
+  margin-top: 10px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.podium-card small {
+  font-size: 16px;
+  color: #9ca3af;
+}
+
+/* Avatar ring */
+.avatar-ring {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #EECD79;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-ring.winner {
+  width: 120px;
+  height: 120px;
+  border: 5px solid #EECD79;
+}
+
+/* Crown */
+.crown {
+  position: absolute;
+  top: -44px;
+  width: 52px;
+  height: 52px;
+  z-index: 10;
+}
+
+/* Rank badge */
+.rank-badge {
+  position: absolute;
+  top: -12px;
+  width: 28px;
+  height: 28px;
+  background: #EECD79;
+  color: #0B1120;
+  font-weight: 800;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Divider */
+.leaderboard-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 18px 0;
+}
+
+/* List */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.rank {
+  width: 26px;
+  text-align: center;
+  color: #93c5fd;
+  font-weight: 700;
+}
+
+.row-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  object-fit: cover;
+}
+
+.row-name {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.row-xp {
+  font-size: 17px;
+  color: #9ca3af;
+}
+
+/* CTA */
+.leaderboard-cta {
+  margin-top: 22px;
+  background: none;
+  border: none;
+  color: #93c5fd;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+/* =========================
+   LEADERBOARD — ALIGNÉ FEED
+========================= */
+
+.leaderboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* gauche = looking for | droite = feed */
+  gap: 40px;
+  align-items: end;
+}
+
+/* TITRE SOUS LE FEED */
+.leaderboard-heading h3 {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+  color: #ffffff;
+}
+
+.leaderboard-sub {
+  font-size: 21px;
+  line-height: 1.65;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+/* PODIUM + LISTE */
+.leaderboard-content {
+  margin-top: 32px;
+}
+/* =========================
+   LEADERBOARD — RIGHT COLUMN OFFSET
+========================= */
+.leaderboard-heading {
+  margin-top: 54px; /* ⬅️ DESCEND titre + sous-titre */
+}
+
   </style>
 </head>
 
@@ -3762,6 +3960,62 @@ body:not(.auth-ready) .btn-join {
       </div>
 
     </section>
+    <section class="leaderboard">
+
+  <!-- PODIUM -->
+  <div class="leaderboard-podium">
+
+    <div class="podium-card second">
+      <span class="rank-badge">2</span>
+      <div class="avatar-ring">
+        <img src="https://i.pravatar.cc/150?img=12" />
+      </div>
+      <strong>Liam Miller</strong>
+      <small>4520 Views</small>
+    </div>
+
+    <div class="podium-card first">
+      <img class="crown" src="/assets/icons/crownemoji.png" />
+      <div class="avatar-ring winner">
+        <img src="https://i.pravatar.cc/150?img=11" />
+      </div>
+      <strong>Ava Reyes</strong>
+      <small>4820 Views</small>
+    </div>
+
+    <div class="podium-card third">
+      <span class="rank-badge">3</span>
+      <div class="avatar-ring">
+        <img src="https://i.pravatar.cc/150?img=13" />
+      </div>
+      <strong>Zoe Nguyen</strong>
+      <small>4310 Views</small>
+    </div>
+
+  </div>
+
+  <div class="leaderboard-divider"></div>
+
+  <!-- LIST -->
+  <div class="leaderboard-list">
+
+    <div class="leaderboard-row">
+      <span class="rank">4</span>
+      <img class="row-avatar" src="https://i.pravatar.cc/150?img=14" />
+      <span class="row-name">Noah Martin</span>
+      <span class="row-xp">3900 Views</span>
+    </div>
+
+    <div class="leaderboard-row">
+      <span class="rank">5</span>
+      <img class="row-avatar" src="https://i.pravatar.cc/150?img=15" />
+      <span class="row-name">Maya Lopez</span>
+      <span class="row-xp">3650 Views</span>
+    </div>
+
+  </div>
+
+</section>
   </div>
 
   <!-- COLONNE DROITE -->
@@ -3799,6 +4053,16 @@ body:not(.auth-ready) .btn-join {
       <div id="feed"></div>
     </div>
   </div>
+
+  <!-- =========================
+     LEADERBOARD — HEADING (RIGHT COLUMN)
+========================= -->
+<div class="leaderboard-heading">
+  <h3>Leaderboard</h3>
+  <p class="leaderboard-sub">
+    Most active members right now
+  </p>
+</div>
 
 </div>
 </div>
