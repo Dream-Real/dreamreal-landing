@@ -279,18 +279,6 @@ main {
   margin-top: 28px; /* ⬆️ espace plus généreux au-dessus des badges */
 }
 
-      /* FEED (colonne droite) */
-.feed {
-  display: flex;
-  flex-direction: column;
-
-  /* 🔑 zone beaucoup plus haute */
-  height: min(350vh, 1200px);
-
-  /* 🔑 indispensable pour le scroll interne */
-  min-height: 0;
-}
-
 /* Zone scrollable interne (seulement les posts) */
 #feed {
   margin-top: 10px;
@@ -2744,10 +2732,7 @@ margin: 0;
 /* =========================
    FEED — MICRO ALIGNMENT FIX
 ========================= */
-.feed {
-  position: relative;
-  top: -24px; /* ajuste : -8 / -10 / -14 */
-}
+
 /* =========================
    AUTH MODAL (OTP)
 ========================= */
@@ -3523,19 +3508,8 @@ body:not(.auth-ready) .btn-join {
   display: none;                /* Chrome / Safari */
 }
 
-/* le feed lui-même ne scrolle pas */
-#feed {
-  min-height: 100%;
-  overflow: visible;
-}
 .feed-actions {
   margin-bottom: 12px; /* ← AJUSTE ICI : 10 / 12 / 14 */
-}
-.feed {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
 }
 
 /* 🔒 zone totalement fixe */
@@ -3545,7 +3519,7 @@ body:not(.auth-ready) .btn-join {
 
 /* 🔽 seule zone qui scrolle */
 .feed-clip {
-  flex: 1;
+  height: min(145vh, 1115px); /* ⬅️ AJUSTE ICI POUR LE FEED */
   min-height: 0;
   overflow: hidden;
 }
@@ -3555,10 +3529,6 @@ body:not(.auth-ready) .btn-join {
   overflow-y: auto;
 }
 
-/* le feed interne ne scrolle PAS */
-#feed {
-  overflow: visible;
-}
 /* =========================
    FEED — FILTERS MICRO OFFSET
 ========================= */
@@ -3571,7 +3541,7 @@ body:not(.auth-ready) .btn-join {
   flex-direction:column;
 
   /* hauteur FIXE */
-  height: min(94vh, 1040px);  /* ajuste si besoin */
+  height: min(88vh, 1100px); /* ⬅️ +1vh, +20px — micro confort */
   min-height:0;
 
   margin-top:64px;
@@ -3607,6 +3577,7 @@ body:not(.auth-ready) .btn-join {
   flex:1;
   min-height:0;
   overflow:hidden;
+  margin-top: 14px; /* ⬅️ ICI */
 }
 
 /* Desktop mini feed scroll vertical */
