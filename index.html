@@ -1318,9 +1318,25 @@ main {
   padding-left: 0;         /* ⬅️ sécurité */
 }
 
-/* 🔒 état par défaut : 3 lignes MAX */
+/* =========================
+   LOOKING FOR — BIO HEIGHT LOCK (SAFE)
+========================= */
+
+/* état repos : HAUTEUR NORMALISÉE */
 .lf-bio.collapsed {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+
+  /* 🔑 CLÉ : hauteur VISUELLE identique */
+  max-height: calc(2 * 21px); /* 2 lignes × line-height */
+  overflow: hidden;
+}
+
+/* état déplié : LIBERTÉ TOTALE */
+.lf-bio:not(.collapsed) {
+  max-height: none;
+  overflow: visible;
 }
 /* 🔑 View more fait partie du clamp */
 .lf-bio-text {
@@ -1367,22 +1383,12 @@ main {
   color: #fff;
 }
 
-.lf-post {
-  transform: scaleY(0.94);
-  transform-origin: center;
-}
-
 /* Message */
 .lf-post-message {
   font-size: 17px;        /* ⬅️ IDENTIQUE AU FEED */
   line-height: 21px;      /* ⬅️ IDENTIQUE AU FEED */
   font-weight: 400;       /* ⬅️ IDENTIQUE AU FEED */
   color: #e5e7eb;         /* ⬅️ IDENTIQUE AU FEED */
-
-  display: -webkit-box;
-  -webkit-line-clamp: 2;  /* ⬅️ on garde la contrainte mini-feed */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 /* =========================
    LOOKING FOR — DESKTOP SCROLL (CLEAN)
@@ -3617,6 +3623,54 @@ body:not(.auth-ready) .btn-join {
   }
 }
 
+/* =========================
+   LOOKING FOR — BIO (HEIGHT SOURCE)
+========================= */
+
+.lf-bio {
+  font-size: 17px;
+  line-height: 21px;
+  color: #e5e7eb;
+}
+
+/* ÉTAT REPOS — hauteur NORMALISÉE */
+.lf-bio.collapsed {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  max-height: calc(2 * 21px); /* 🔑 SOURCE UNIQUE DE HAUTEUR */
+  overflow: hidden;
+}
+
+/* ÉTAT OUVERT — LIBERTÉ TOTALE */
+.lf-bio:not(.collapsed) {
+  max-height: none;
+  overflow: visible;
+}
+/* =========================
+   LOOKING FOR — CARD HEIGHT (AUTHORITATIVE)
+========================= */
+
+/* état repos : cartes strictement identiques */
+.lf-post {
+  height: 230px;              /* 🔑 AJUSTE ICI : 340 / 360 / 380 */
+  overflow: hidden;
+}
+
+/* état déplié : liberté totale */
+.lf-post.is-expanded {
+  height: auto;
+  overflow: visible;
+}
+/* =========================
+   LOOKING FOR — CARD SPACING (SAFE)
+========================= */
+
+.looking-for-feed > .lf-post:not(:last-child) {
+  margin-bottom: 14px; /* EXACT feed rhythm */
+}
+
   </style>
 </head>
 
@@ -5154,6 +5208,8 @@ document.addEventListener("click", (e) => {
   const wrapper = btn.closest(".lf-bio-wrapper");
   if (!wrapper) return;
 
+  const post = btn.closest(".lf-post"); // 🔑 LA CARTE
+
   const bio = wrapper.querySelector(".lf-bio");
   const inlineBtn = wrapper.querySelector(
     '.lf-bio-toggle[data-position="inline"]'
@@ -5164,10 +5220,12 @@ document.addEventListener("click", (e) => {
 
   if (!isExpanded) {
     bio.classList.remove("collapsed");
+    post?.classList.add("is-expanded")
     inlineBtn.style.display = "none";
     bottomBtn.style.display = "inline";
   } else {
     bio.classList.add("collapsed");
+    post?.classList.remove("is-expanded"); // ✅ ICI
     inlineBtn.style.display = "inline";
     bottomBtn.style.display = "none";
   }
