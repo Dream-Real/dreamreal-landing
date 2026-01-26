@@ -608,14 +608,6 @@ main {
   display: none;
 }
 
-.looking-for-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.looking-for-scroll::-webkit-scrollbar {
-  display: none;
-}
-
 .looking-for-item {
   flex: 0 0 auto;
   width: 86px;
@@ -772,9 +764,7 @@ main {
           grid-template-columns: 1fr;
         }
       }
-      /* =========================
-   MOBILE ADJUSTMENTS
-========================= */
+      
 /* =========================
    MOBILE — HERO SPACING FIX
 ========================= */
@@ -1214,13 +1204,6 @@ main {
    LOOKING FOR — DESKTOP / MOBILE GATING
 ========================= */
 
-/* 🔹 Par défaut (desktop) */
-.looking-for-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 2px; /* ✅ EXACTEMENT comme le feed */
-}
-
 /* 🔹 Mobile / tablette */
 @media (max-width: 900px) {
   .looking-for-scroll {
@@ -1402,32 +1385,23 @@ main {
   overflow: hidden;
 }
 /* =========================
-   LOOKING FOR — DESKTOP SCROLL (FEED-LIKE)
+   LOOKING FOR — DESKTOP SCROLL (CLEAN)
 ========================= */
 
-.looking-for {
-  display: flex;
-  flex-direction: column;
-}
-
 .looking-for-feed {
-  /* 🔑 même logique que #feed */
-  /* 🔑 PLUS DE HAUTEUR SCROLLABLE — COMME LE FEED */
-  max-height: min(94vh, 1040px);
-
+  height: 100%;
   overflow-y: auto;
   padding-right: 12px;
 }
+
 /* Scroll discret — Looking For */
 .looking-for-feed::-webkit-scrollbar {
   width: 6px;
 }
 .looking-for-feed::-webkit-scrollbar-track {
   background: transparent;
-
-  /* 🎯 ALIGNEMENT SCROLLBAR AVEC LA 1ʳᵉ CARTE */
-  margin-top: 8px;     /* ← valeur clé (10–14 si micro-ajustement) */
-  margin-bottom: 2px;   /* optionnel mais propre */
+  margin-top: 8px;
+  margin-bottom: 2px;
 }
 .looking-for-feed::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.25);
@@ -3586,6 +3560,62 @@ body:not(.auth-ready) .btn-join {
 .feed-action:not(.create) {
   transform: translateX(6px); /* ajuste : 4 / 6 / 8 */
 }
+.looking-for{
+  display:flex;
+  flex-direction:column;
+
+  /* hauteur FIXE */
+  height: min(94vh, 1040px);  /* ajuste si besoin */
+  min-height:0;
+
+  margin-top:64px;
+  padding:0;
+  background:none;
+  border:none;
+}
+
+.looking-for-header{
+  flex-shrink:0;
+}
+
+.looking-for-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.lf-filter-btn{
+  background:none;
+  border:none;
+  color:#EECD79;
+  font-weight:600;
+  font-size:16px;
+  line-height:1;
+  cursor:pointer;
+  padding:0;
+  margin:0;
+}
+
+.looking-for-clip{
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+}
+
+/* Desktop mini feed scroll vertical */
+.looking-for-feed{
+  height:100%;
+  overflow-y:auto;
+  padding-right:12px;
+}
+
+/* Mobile carousel reste horizontal */
+@media (max-width: 900px){
+  .looking-for-clip{
+    overflow:visible; /* carrousel horizontal gère son propre overflow */
+  }
+}
 
   </style>
 </head>
@@ -3674,51 +3704,43 @@ body:not(.auth-ready) .btn-join {
 </div>
     </div>
 
+    <!-- ✅ LOOKING FOR (FIXED HEADER + SCROLL BODY) -->
     <section class="looking-for">
-  <h3>They are looking for</h3>
 
-  <p class="looking-for-sub">
-  People nearby open to connect right now
+      <!-- 🔒 ZONE FIXE (NE SCROLLE JAMAIS) -->
+      <div class="looking-for-header">
+        <div class="looking-for-title-row">
+          <h3>They are looking for</h3>
 
-  <button
-    id="open-lf-filters"
-    style="
-      margin-left: 67px;
-      background: none;
-      border: none;
-      color: #EECD79;
-      font-weight: 600;
-      font-size: 16px;
-      line-height: 1;   /* ✅ LIGNE CLÉ */
-      cursor: pointer;
-    "
-  >
-    Filters
-  </button>
-</p>
-<!-- 🔥 ACTIVE FILTER — LOOKING FOR -->
-<div
-  id="lf-active-filter"
-  class="active-filters hidden"
-  style="margin-top: 8px;"
-></div>
+          <button id="open-lf-filters" class="lf-filter-btn">
+            Filters
+          </button>
+        </div>
 
-  <!-- MOBILE / TABLETTE : carrousel EXISTANT -->
-  <div
-    class="looking-for-scroll"
-    id="looking-for-carousel"
-  ></div>
+        <p class="looking-for-sub">
+          People nearby open to connect right now
+        </p>
 
-  <!-- DESKTOP : mini feed -->
-  <div
-    class="looking-for-feed"
-    id="looking-for-feed"
-  ></div>
-</section>
+        <!-- 🔥 ACTIVE FILTER — LOOKING FOR -->
+        <div id="lf-active-filter" class="active-filters hidden"></div>
+      </div>
+
+      <!-- 🔽 SEULE ZONE SCROLLABLE -->
+      <div class="looking-for-clip">
+
+        <!-- MOBILE / TABLETTE : carrousel -->
+        <div class="looking-for-scroll" id="looking-for-carousel"></div>
+
+        <!-- DESKTOP : mini feed -->
+        <div class="looking-for-feed" id="looking-for-feed"></div>
+
+      </div>
+
+    </section>
   </div>
 
- <!-- COLONNE DROITE -->
-<div class="feed">
+  <!-- COLONNE DROITE -->
+  <div class="feed">
 
   <!-- 🔒 ZONE FIXE (NE SCROLLE JAMAIS) -->
   <div class="feed-header">
@@ -4663,6 +4685,36 @@ window.clearFilters = function () {
   `;
 }
 
+// =========================
+  // LOOKING FOR — BIO TOGGLE UTILS (GLOBAL)
+  // =========================
+  function updateLookingForBioToggles(root = document) {
+    root.querySelectorAll(".lf-bio-wrapper").forEach((wrapper) => {
+      const bio = wrapper.querySelector(".lf-bio");
+      const inlineBtn = wrapper.querySelector(
+        '.lf-bio-toggle[data-position="inline"]'
+      );
+      const bottomBtn = wrapper.querySelector(".lf-bio-toggle.is-bottom");
+
+      if (!bio || !inlineBtn) return;
+
+      // force collapsed pour mesurer
+      bio.classList.add("collapsed");
+
+      const needsToggle =
+        bio.scrollHeight > bio.clientHeight + 1;
+
+      if (!needsToggle) {
+        inlineBtn.remove();
+        if (bottomBtn) bottomBtn.remove();
+        bio.classList.remove("collapsed");
+      } else {
+        inlineBtn.style.display = "inline";
+        if (bottomBtn) bottomBtn.style.display = "none";
+      }
+    });
+  }
+
   // =========================
   // LOOKING FOR — APPLY FILTER (GLOBAL)
   // =========================
@@ -4692,6 +4744,7 @@ window.clearFilters = function () {
         renderLookingForPost(post)
       )
     );
+    updateLookingForBioToggles(feed); // 🔑 AJOUT
   }
 
   if (carousel && window.innerWidth < 1024) {
@@ -4969,6 +5022,8 @@ const activityIcon =
       `;
     })
     .join("");
+    // 🔑 OBLIGATOIRE — APRÈS insertion DOM
+  updateLookingForBioToggles(feedContainer);
 }
 
 // =========================
@@ -4980,6 +5035,7 @@ function rerenderLookingFor(filteredPosts) {
   feedContainer.innerHTML = filteredPosts
     .map((post) => renderLookingForPost(post))
     .join("");
+    updateLookingForBioToggles(feedContainer); // ✅ OBLIGATOIRE
 }
 
 // =========================
