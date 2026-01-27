@@ -3922,6 +3922,65 @@ body:not(.auth-ready) .btn-join {
   color: #9ca3af;
   white-space: nowrap;
 }
+/* =========================
+   RIGHT COLUMN — LEADERBOARD USER CARDS
+   (MATCH LOOKING FOR CARD STYLE)
+========================= */
+
+.lb-users-grid {
+  margin-top: 18px;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* ✅ 2 par ligne */
+  gap: 14px; /* même rythme que leaderboard-cards */
+}
+
+/* carte = même ADN que .looking-for-card */
+.lb-user-card {
+  padding: 18px;               /* un peu plus compact que 24 */
+  border-radius: 16px;         /* ✅ EXACT looking-for-card */
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  display: flex;
+  align-items: center;
+
+  min-height: 76px;            /* ✅ rectangulaire équilibré */
+}
+
+/* contenu avatar + nom */
+.lb-user-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lb-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.lb-user-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive : si colonne trop étroite → 1 colonne */
+@media (max-width: 420px) {
+  .lb-users-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
   </style>
 </head>
@@ -4191,6 +4250,9 @@ body:not(.auth-ready) .btn-join {
   </p>
 </div>
 
+<!-- 👇 CARTES UTILISATEURS (RIGHT COLUMN) -->
+<div class="lb-users-grid" id="lb-users-grid"></div>
+
 </div>
 </div>
         </div>
@@ -4213,6 +4275,62 @@ body:not(.auth-ready) .btn-join {
 <script>
   // 🔑 SOURCE UNIQUE DE VÉRITÉ API
   const API_BASE = window.API_URL;
+</script>
+
+<script>
+async function loadLeaderboardUsers() {
+  const grid = document.getElementById("lb-users-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users`);
+    if (!res.ok) throw new Error("Leaderboard fetch failed");
+
+    const data = await res.json();
+    const users = Array.isArray(data) ? data : data.users || [];
+
+    users.forEach((user) => {
+      const card = document.createElement("div");
+      card.className = "lb-user-card";
+
+      card.innerHTML = `
+        <div class="lb-user-left">
+          <img
+            class="lb-user-avatar"
+            src="${user.avatar || "/assets/avatar-placeholder.png"}"
+            alt="${user.name || "User"}"
+          />
+          <span class="lb-user-name">${user.name || "User"}</span>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        if (typeof openUserProfile === "function") {
+          openUserProfile(user.id);
+        }
+      });
+
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Leaderboard error:", err);
+  }
+}
+</script>
+
+<script>
+  // =========================
+  // USER PROFILE — OPEN (GLOBAL)
+  // =========================
+  window.openUserProfile = function (userId) {
+    console.log("👤 Open user profile:", userId);
+
+    // TODO (plus tard) :
+    // - ouvrir une modale profil public
+    // - ou naviguer vers /user/:id
+  };
 </script>
 
 <script>
@@ -4318,6 +4436,8 @@ if (!savedToken) {
   document.body.classList.add("auth-ready");
 }
 
+loadLeaderboardUsers();
+
   // =========================
 // CREATE POST — OPEN BUTTON (AUTH GUARD)
 // =========================
@@ -4343,6 +4463,8 @@ function onUserAuthenticated(user) {
 
   // 🔓 auth state known (logged)
   document.body.classList.add("auth-ready");
+
+  loadLeaderboardUsers();
 
   // 🔐 état global
   window.AUTH.user = user;
