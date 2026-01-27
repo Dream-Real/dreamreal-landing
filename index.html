@@ -3944,6 +3944,7 @@ body:not(.auth-ready) .btn-join {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 cartes par ligne */
   gap: 14px;
+  padding-bottom: 16px; /* ⬅️ FIX : empêche la coupe des dernières cartes */
 }
 
 /* =========================
@@ -3952,7 +3953,7 @@ body:not(.auth-ready) .btn-join {
 
 .lb-user-card {
   padding: 32px 28px;
-  border-radius: 20px;
+  border-radius: 16px;
 
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -3960,7 +3961,7 @@ body:not(.auth-ready) .btn-join {
   display: flex;
   flex-direction: column;
 
-  min-height: 420px; /* 🔥 hauteur assumée (x2) */
+  min-height: 380px; /* ✅ hauteur réduite, toujours confortable */
 }
 
 /* =========================
@@ -3968,28 +3969,39 @@ body:not(.auth-ready) .btn-join {
    (FIXÉ EN HAUT)
 ========================= */
 
+/* =========================
+   HEADER — AVATAR + USERNAME
+   (CENTRÉ VERTICALEMENT)
+========================= */
+
 .lb-user-header {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;   /* ⬅️ avatar AU-DESSUS */
+  align-items: center;      /* ⬅️ centrage horizontal */
+  text-align: center;
 
-  flex-shrink: 0; /* 🔑 NE BOUGE JAMAIS */
+  gap: 12px;
+  flex-shrink: 0;
+  margin-top: -8px; /* ⬅️ remonte légèrement avatar + nom */
 }
 
 .lb-user-avatar {
-  width: 44px;
-  height: 44px;
+  width: 72px;              /* 🔥 plus présent */
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
 }
 
 .lb-user-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   color: #ffffff;
-  line-height: 1.1;
+  line-height: 1.2;
 
+  text-align: center;
+
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -4049,9 +4061,9 @@ body:not(.auth-ready) .btn-join {
   justify-content: center;
   gap: 10px;                 /* 🔑 icône + texte */
 
-  border-radius: 6px;
+  border-radius: 999px; /* ✅ même forme que Messenger */
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
 
   color: #ffffff;
   text-decoration: none;
@@ -4067,10 +4079,10 @@ body:not(.auth-ready) .btn-join {
   line-height: 1;
 }
 
-/* Hover feedback (identique app) */
+/* Hover feedback — NO MOVE */
 .lb-social:hover {
-  transform: translateY(-1px);
-  opacity: 0.92;
+  transform: none;     /* ⛔ aucun mouvement */
+  opacity: 0.95;       /* léger feedback visuel */
 }
 
 /* Instagram */
@@ -4083,8 +4095,26 @@ body:not(.auth-ready) .btn-join {
   background-color: #1877f2;
 }
 
-/* Messenger — gradient exact */
+/* =========================================
+   Messenger — gradient exact (FIXED EDGES)
+   ========================================= */
+
+/* Bouton Messenger — structure */
 .lb-social.ms {
+  position: relative;
+  overflow: hidden;                 /* 🔑 empêche les bavures */
+  background: transparent;          /* ⛔ PAS de gradient ici */
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+/* Gradient interne (comme LinearGradient RN) */
+.lb-social.ms::before {
+  content: "";
+  position: absolute;
+  inset: 0;                         /* top/right/bottom/left = 0 */
+  border-radius: inherit;
+
   background: linear-gradient(
     135deg,
     #00b2ff 0%,
@@ -4092,7 +4122,47 @@ body:not(.auth-ready) .btn-join {
     #a033ff 100%
   );
 
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  z-index: 0;
+}
+
+/* Contenu AU-DESSUS du gradient */
+.lb-social.ms > * {
+  position: relative;
+  z-index: 1;
+}
+/* 🔥 Instagram icon — accent visuel */
+.lb-social.ig i {
+  font-size: 21px;      /* ⬅️ augmente l’icône uniquement */
+}
+.lb-social.fb i {
+  font-size: 20px;      /* ← augmente ici (22–24px selon goût) */
+}
+/* 💬 Messenger — agrandie uniquement */
+.lb-social.ms i {
+  font-size: 19px;          /* ajuste à 23–24px si besoin */
+}
+.lb-social span {
+  transform: translateX(-3px); /* micro décalage vers la gauche */
+}
+/* =========================
+   LEADERBOARD USERS — SCROLL ONLY
+   (SAFE, ISOLATED)
+========================= */
+
+.lb-users-grid {
+  max-height: 108vh;
+  overflow-y: auto;
+
+  padding-bottom: 16px; /* 🔑 évite que les dernières cartes soient coupées */
+
+  /* 🔒 Masquage scrollbar — scroll toujours actif */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge legacy */
+}
+
+/* Chrome / Safari */
+.lb-users-grid::-webkit-scrollbar {
+  display: none;
 }
 
   </style>
@@ -4442,7 +4512,7 @@ ${
                 onclick="event.stopPropagation()"
               >
                 <i class="fa-brands fa-instagram"></i>
-                <span>Instagram</span>
+                <span>View Profile</span>
               </a>
             `
             : ""
@@ -4459,7 +4529,7 @@ ${
                 onclick="event.stopPropagation()"
               >
                 <i class="fa-brands fa-facebook-square"></i>
-                <span>Facebook</span>
+                <span>View Profile</span>
               </a>
             `
             : ""
@@ -4476,7 +4546,7 @@ ${
                 onclick="event.stopPropagation()"
               >
                 <i class="fa-brands fa-facebook-messenger"></i>
-                <span>Messenger</span>
+                <span>Message</span>
               </a>
             `
             : ""
