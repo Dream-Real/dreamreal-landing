@@ -19,6 +19,12 @@
       rel="stylesheet"
     />
 
+    <!-- ICONS — Font Awesome (social icons, app parity) -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+/>
+
     <style>
       :root {
         --bg1: #0b1120;
@@ -3927,33 +3933,47 @@ body:not(.auth-ready) .btn-join {
    (MATCH LOOKING FOR CARD STYLE)
 ========================= */
 
+/* =========================
+   RIGHT COLUMN — LEADERBOARD USER CARDS
+   (APP PARITY STRUCTURE)
+========================= */
+
 .lb-users-grid {
   margin-top: 18px;
 
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* ✅ 2 par ligne */
-  gap: 14px; /* même rythme que leaderboard-cards */
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 cartes par ligne */
+  gap: 14px;
 }
 
-/* carte = même ADN que .looking-for-card */
+/* =========================
+   USER CARD — CONTAINER
+========================= */
+
 .lb-user-card {
-  padding: 18px;               /* un peu plus compact que 24 */
-  border-radius: 16px;         /* ✅ EXACT looking-for-card */
+  padding: 32px 28px;
+  border-radius: 20px;
+
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.14);
 
   display: flex;
-  align-items: center;
+  flex-direction: column;
 
-  min-height: 76px;            /* ✅ rectangulaire équilibré */
+  min-height: 420px; /* 🔥 hauteur assumée (x2) */
 }
 
-/* contenu avatar + nom */
-.lb-user-left {
+/* =========================
+   HEADER — AVATAR + USERNAME
+   (FIXÉ EN HAUT)
+========================= */
+
+.lb-user-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-width: 0;
+
+  flex-shrink: 0; /* 🔑 NE BOUGE JAMAIS */
 }
 
 .lb-user-avatar {
@@ -3967,7 +3987,7 @@ body:not(.auth-ready) .btn-join {
 .lb-user-name {
   font-size: 16px;
   font-weight: 700;
-  color: #fff;
+  color: #ffffff;
   line-height: 1.1;
 
   overflow: hidden;
@@ -3975,11 +3995,104 @@ body:not(.auth-ready) .btn-join {
   white-space: nowrap;
 }
 
-/* Responsive : si colonne trop étroite → 1 colonne */
+/* =========================
+   SPACER — FLEXIBLE
+   (POUSSE LES BOUTONS EN BAS)
+========================= */
+
+.lb-user-spacer {
+  flex: 1;
+}
+
+/* =========================
+   SOCIAL BUTTONS — BAS FIXE
+========================= */
+
+.lb-user-socials {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media (max-width: 420px) {
   .lb-users-grid {
     grid-template-columns: 1fr;
   }
+}
+/* =========================================
+   Dream Real — Social buttons (web mirror)
+   Match exact app design
+   ========================================= */
+
+.lb-user-socials {
+  display: flex;
+  flex-direction: column;   /* ✅ STACK VERTICAL */
+  gap: 10px;                /* ✅ même rythme que l’app */
+  margin-top: 10px;
+}
+
+/* Base button (same geometry as app) */
+.lb-social {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;                 /* 🔑 icône + texte */
+
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #ffffff;
+  text-decoration: none;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* Icônes */
+.lb-social i {
+  font-size: 18px;           /* 🔑 proche du size={20} RN */
+  line-height: 1;
+}
+
+/* Hover feedback (identique app) */
+.lb-social:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+/* Instagram */
+.lb-social.ig {
+  background-color: #c13584;
+}
+
+/* Facebook */
+.lb-social.fb {
+  background-color: #1877f2;
+}
+
+/* Messenger — gradient exact */
+.lb-social.ms {
+  background: linear-gradient(
+    135deg,
+    #00b2ff 0%,
+    #006aff 45%,
+    #a033ff 100%
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
   </style>
@@ -4296,15 +4409,84 @@ async function loadLeaderboardUsers() {
       card.className = "lb-user-card";
 
       card.innerHTML = `
-        <div class="lb-user-left">
-          <img
-            class="lb-user-avatar"
-            src="${user.avatar || "/assets/avatar-placeholder.png"}"
-            alt="${user.name || "User"}"
-          />
-          <span class="lb-user-name">${user.name || "User"}</span>
-        </div>
-      `;
+  <!-- ZONE HAUTE — FIXE -->
+  <div class="lb-user-header">
+    <img
+      class="lb-user-avatar"
+      src="${user.avatar || "/assets/avatar-placeholder.png"}"
+      alt="${user.display_name || "User"}"
+    />
+
+    <span class="lb-user-name">
+      ${user.display_name || "User"}
+    </span>
+  </div>
+
+  <!-- ZONE FLEXIBLE (VIDE, POUR L'ÉQUILIBRE VISUEL) -->
+  <div class="lb-user-spacer"></div>
+
+  <!-- ZONE BASSE — FIXE -->
+${
+  user.instagram_username || user.facebook_url || user.messenger_url
+    ? `
+      <div class="lb-user-socials">
+
+        ${
+          user.instagram_username
+            ? `
+              <a
+                href="https://www.instagram.com/${user.instagram_username}"
+                target="_blank"
+                rel="noopener"
+                class="lb-social ig"
+                onclick="event.stopPropagation()"
+              >
+                <i class="fa-brands fa-instagram"></i>
+                <span>Instagram</span>
+              </a>
+            `
+            : ""
+        }
+
+        ${
+          user.facebook_url
+            ? `
+              <a
+                href="${user.facebook_url}"
+                target="_blank"
+                rel="noopener"
+                class="lb-social fb"
+                onclick="event.stopPropagation()"
+              >
+                <i class="fa-brands fa-facebook-square"></i>
+                <span>Facebook</span>
+              </a>
+            `
+            : ""
+        }
+
+        ${
+          user.messenger_url
+            ? `
+              <a
+                href="${user.messenger_url}"
+                target="_blank"
+                rel="noopener"
+                class="lb-social ms"
+                onclick="event.stopPropagation()"
+              >
+                <i class="fa-brands fa-facebook-messenger"></i>
+                <span>Messenger</span>
+              </a>
+            `
+            : ""
+        }
+
+      </div>
+    `
+    : ""
+}
+`;
 
       card.addEventListener("click", () => {
         if (typeof openUserProfile === "function") {
