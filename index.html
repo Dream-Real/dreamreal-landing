@@ -3789,6 +3789,9 @@ body:not(.auth-ready) .btn-join {
 .row-xp {
   font-size: 17px;
   color: #9ca3af;
+
+  padding-left: 12px;   /* ⬅️ DÉCALE LES VIEWS À DROITE */
+  white-space: nowrap;  /* stabilité visuelle */
 }
 
 /* CTA */
@@ -3838,6 +3841,72 @@ body:not(.auth-ready) .btn-join {
 ========================= */
 .leaderboard-heading {
   margin-top: 54px; /* ⬅️ DESCEND titre + sous-titre */
+}
+/* =========================
+   LEADERBOARD — CARDS (4–10)
+========================= */
+
+.leaderboard-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* même rythme que looking-for-feed */
+}
+
+/* Rank badge */
+.leaderboard-card .lb-rank {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+  background: #EECD79;
+  color: #0B1120;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 800;
+  font-size: 14px;
+}
+/* =========================
+   LEADERBOARD — CARDS (4–10)
+========================= */
+
+.leaderboard-card {
+  position: relative;
+  padding: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  display: grid;
+  grid-template-columns:
+    26px   /* rank */
+    52px   /* avatar */
+    1fr    /* nom */
+    auto;  /* views */
+  align-items: center;
+  gap: 14px;
+}
+
+.row-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.row-xp {
+  justify-self: end;      /* ⬅️ colle à droite */
+  text-align: right;
+
+  font-size: 17px;
+  color: #9ca3af;
+  white-space: nowrap;
 }
 
   </style>
@@ -3996,63 +4065,66 @@ body:not(.auth-ready) .btn-join {
 
   <div class="leaderboard-divider"></div>
 
-<div class="leaderboard-list">
+<div class="leaderboard-list leaderboard-cards">
 
   <!-- 4 -->
-  <div class="leaderboard-row">
-    <span class="rank">4</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=14" />
-    <span class="row-name">Noah Martin</span>
-    <span class="row-xp">3900 Views</span>
-  </div>
+ <div class="leaderboard-card">
+  <span class="rank">4</span>
+
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=14" />
+
+  <span class="row-name">Noah Martin</span>
+
+  <span class="row-xp">3900 Views</span>
+</div>
 
   <!-- 5 -->
-  <div class="leaderboard-row">
-    <span class="rank">5</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=15" />
-    <span class="row-name">Maya Lopez</span>
-    <span class="row-xp">3650 Views</span>
-  </div>
+<div class="leaderboard-card">
+  <span class="rank">5</span>
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=15" />
+  <span class="row-name">Maya Lopez</span>
+  <span class="row-xp">3650 Views</span>
+</div>
 
-  <!-- 6 -->
-  <div class="leaderboard-row">
-    <span class="rank">6</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=21" />
-    <span class="row-name">Julien Petit</span>
-    <span class="row-xp">2480 Views</span>
-  </div>
+<!-- 6 -->
+<div class="leaderboard-card">
+  <span class="rank">6</span>
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=21" />
+  <span class="row-name">Julien Petit</span>
+  <span class="row-xp">2480 Views</span>
+</div>
 
-  <!-- 7 -->
-  <div class="leaderboard-row">
-    <span class="rank">7</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=22" />
-    <span class="row-name">Emma Laurent</span>
-    <span class="row-xp">2360 Views</span>
-  </div>
+<!-- 7 -->
+<div class="leaderboard-card">
+  <span class="rank">7</span>
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=22" />
+  <span class="row-name">Emma Laurent</span>
+  <span class="row-xp">2360 Views</span>
+</div>
 
-  <!-- 8 -->
-  <div class="leaderboard-row">
-    <span class="rank">8</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=23" />
-    <span class="row-name">Lucas Girard</span>
-    <span class="row-xp">2210 Views</span>
-  </div>
+<!-- 8 -->
+<div class="leaderboard-card">
+  <span class="rank">8</span>
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=23" />
+  <span class="row-name">Lucas Girard</span>
+  <span class="row-xp">2210 Views</span>
+</div>
 
-  <!-- 9 -->
-  <div class="leaderboard-row">
-    <span class="rank">9</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=24" />
-    <span class="row-name">Sofia Almeida</span>
-    <span class="row-xp">2090 Views</span>
-  </div>
+<!-- 9 -->
+<div class="leaderboard-card">
+  <span class="rank">9</span>
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=24" />
+  <span class="row-name">Sofia Almeida</span>
+  <span class="row-xp">2090 Views</span>
+</div>
 
-  <!-- 10 -->
-  <div class="leaderboard-row">
-    <span class="rank">10</span>
-    <img class="row-avatar" src="https://i.pravatar.cc/300?img=25" />
-    <span class="row-name">Tom Schneider</span>
-    <span class="row-xp">1980 Views</span>
-  </div>
+<!-- 10 -->
+<div class="leaderboard-card">
+  <span class="rank">10</span>
+  <img class="row-avatar" src="https://i.pravatar.cc/300?img=25" />
+  <span class="row-name">Tom Schneider</span>
+  <span class="row-xp">1980 Views</span>
+</div>
 
 </div>
 
