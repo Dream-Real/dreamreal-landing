@@ -3715,19 +3715,33 @@ body:not(.auth-ready) .btn-join {
   object-fit: cover;
 }
 
+/* 🥇 WINNER — PLUS GRAND, MAIS MÊME RING */
 .avatar-ring.winner {
   width: 120px;
   height: 120px;
-  border: 5px solid #EECD79;
+}
+
+/* 🥈🥉 */
+.avatar-ring:not(.winner) {
+  width: 96px;
+  height: 96px;
 }
 
 /* Crown */
 .crown {
   position: absolute;
-  top: -44px;
+
+  /* 🔑 ancrage au ring */
+  top: -45px;                 /* ⬅️ remonte légèrement */
+  left: 44%;                  /* centre horizontalement */
+  transform: translateX(-50%) translateX(-4px) rotate(3deg);
+  /* ⬅️ micro décalage gauche */
+
   width: 52px;
   height: 52px;
+
   z-index: 10;
+  pointer-events: none;       /* sécurité */
 }
 
 /* Rank badge */
