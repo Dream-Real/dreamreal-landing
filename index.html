@@ -3951,6 +3951,10 @@ body:not(.auth-ready) .btn-join {
    USER CARD — CONTAINER
 ========================= */
 
+/* =========================
+   USER CARD — HEIGHT LOGIC
+========================= */
+
 .lb-user-card {
   padding: 32px 28px;
   border-radius: 16px;
@@ -3961,7 +3965,15 @@ body:not(.auth-ready) .btn-join {
   display: flex;
   flex-direction: column;
 
-  min-height: 380px; /* ✅ hauteur réduite, toujours confortable */
+  height: 260px;          /* 🔑 HAUTEUR FIXE AU REPOS */
+  overflow: hidden;       /* 🔒 cache socials */
+  transition: height 0.25s ease;
+}
+
+/* état ouvert */
+.lb-user-card.is-expanded {
+  height: auto;
+  overflow: visible;
 }
 
 /* =========================
@@ -4104,7 +4116,6 @@ body:not(.auth-ready) .btn-join {
   position: relative;
   overflow: hidden;                 /* 🔑 empêche les bavures */
   background: transparent;          /* ⛔ PAS de gradient ici */
-  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
 }
 
@@ -4163,6 +4174,95 @@ body:not(.auth-ready) .btn-join {
 /* Chrome / Safari */
 .lb-users-grid::-webkit-scrollbar {
   display: none;
+}
+/* =========================
+   USER CARD — TODAY MOOD
+========================= */
+
+.lb-user-mood {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+  margin-top: 6px;
+
+  text-align: center;
+}
+
+.lb-user-mood-text {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.lb-user-mood-emoji {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+.lb-user-spacer {
+  flex: 1;
+}
+.lb-user-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+/* =========================
+   USER CARD — VIEW MORE
+========================= */
+
+.lb-user-toggle {
+  background: none;
+  border: none;
+
+  padding: 0;
+  margin: 6px 0 0;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #93C5FD;
+
+  cursor: pointer;
+  align-self: center;
+}
+
+.lb-user-toggle:hover {
+  opacity: 0.85;
+}
+/* =========================
+   LEADERBOARD — CARD EXPAND
+========================= */
+
+/* Par défaut : contenu caché */
+.lb-user-details {
+  display: none;
+}
+
+/* Carte ouverte */
+.lb-user-card.is-expanded .lb-user-details {
+  display: block;
+}
+
+/* Bouton View more */
+.lb-user-toggle {
+  margin-top: 12px;
+  align-self: center;
+
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lb-user-toggle:hover {
+  color: #ffffff;
 }
 
   </style>
@@ -4486,77 +4586,119 @@ async function loadLeaderboardUsers() {
       src="${user.avatar || "/assets/avatar-placeholder.png"}"
       alt="${user.display_name || "User"}"
     />
-
     <span class="lb-user-name">
       ${user.display_name || "User"}
     </span>
   </div>
 
-  <!-- ZONE FLEXIBLE (VIDE, POUR L'ÉQUILIBRE VISUEL) -->
-  <div class="lb-user-spacer"></div>
+  <!-- CONTENU OPTIONNEL — DÉPLIANT -->
+  <div class="lb-user-details">
 
-  <!-- ZONE BASSE — FIXE -->
-${
-  user.instagram_username || user.facebook_url || user.messenger_url
-    ? `
-      <div class="lb-user-socials">
+    ${
+      user.today_feeling
+        ? `
+          <div class="lb-user-mood">
+            <span class="lb-user-mood-text">feeling</span>
 
-        ${
-          user.instagram_username
-            ? `
-              <a
-                href="https://www.instagram.com/${user.instagram_username}"
-                target="_blank"
-                rel="noopener"
-                class="lb-social ig"
-                onclick="event.stopPropagation()"
-              >
-                <i class="fa-brands fa-instagram"></i>
-                <span>View Profile</span>
-              </a>
-            `
-            : ""
-        }
+            <img
+              class="lb-user-mood-emoji"
+              src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${user.today_feeling.image}"
+              alt="${user.today_feeling.title}"
+            />
 
-        ${
-          user.facebook_url
-            ? `
-              <a
-                href="${user.facebook_url}"
-                target="_blank"
-                rel="noopener"
-                class="lb-social fb"
-                onclick="event.stopPropagation()"
-              >
-                <i class="fa-brands fa-facebook-square"></i>
-                <span>View Profile</span>
-              </a>
-            `
-            : ""
-        }
+            <span class="lb-user-mood-text">
+              ${user.today_feeling.title}
+            </span>
+          </div>
+        `
+        : ""
+    }
 
-        ${
-          user.messenger_url
-            ? `
-              <a
-                href="${user.messenger_url}"
-                target="_blank"
-                rel="noopener"
-                class="lb-social ms"
-                onclick="event.stopPropagation()"
-              >
-                <i class="fa-brands fa-facebook-messenger"></i>
-                <span>Message</span>
-              </a>
-            `
-            : ""
-        }
+    ${
+      user.instagram_username || user.facebook_url || user.messenger_url
+        ? `
+          <div class="lb-user-socials">
 
-      </div>
-    `
-    : ""
-}
+            ${
+              user.instagram_username
+                ? `
+                  <a
+                    href="https://www.instagram.com/${user.instagram_username}"
+                    target="_blank"
+                    rel="noopener"
+                    class="lb-social ig"
+                    onclick="event.stopPropagation()"
+                  >
+                    <i class="fa-brands fa-instagram"></i>
+                    <span>View Profile</span>
+                  </a>
+                `
+                : ""
+            }
+
+            ${
+              user.facebook_url
+                ? `
+                  <a
+                    href="${user.facebook_url}"
+                    target="_blank"
+                    rel="noopener"
+                    class="lb-social fb"
+                    onclick="event.stopPropagation()"
+                  >
+                    <i class="fa-brands fa-facebook-square"></i>
+                    <span>View Profile</span>
+                  </a>
+                `
+                : ""
+            }
+
+            ${
+              user.messenger_url
+                ? `
+                  <a
+                    href="${user.messenger_url}"
+                    target="_blank"
+                    rel="noopener"
+                    class="lb-social ms"
+                    onclick="event.stopPropagation()"
+                  >
+                    <i class="fa-brands fa-facebook-messenger"></i>
+                    <span>Message</span>
+                  </a>
+                `
+                : ""
+            }
+
+          </div>
+        `
+        : ""
+    }
+
+  </div>
+
+  ${
+    user.today_feeling || user.instagram_username || user.facebook_url || user.messenger_url
+      ? `
+        <button class="lb-user-toggle">
+          View more
+        </button>
+      `
+      : ""
+  }
 `;
+
+const toggle = card.querySelector(".lb-user-toggle");
+
+if (toggle) {
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation(); // ⛔ empêche openUserProfile
+    card.classList.toggle("is-expanded");
+    toggle.textContent = card.classList.contains("is-expanded")
+      ? "View less"
+      : "View more";
+  });
+}
 
       card.addEventListener("click", () => {
         if (typeof openUserProfile === "function") {
