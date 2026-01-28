@@ -4278,6 +4278,32 @@ body:not(.auth-ready) .btn-join {
 .lb-user-socials {
   transform: translateY(4px); /* 🔽 descend légèrement les boutons */
 }
+.leaderboard-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.leaderboard-nearby-btn {
+  background: none;
+  border: none;
+
+  color: #EECD79; /* jaune Dream Real */
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+  padding: 0;
+}
+
+.leaderboard-nearby-btn:hover {
+  opacity: 0.85;
+}
+.leaderboard-nearby-btn.active {
+  color: #93C5FD;
+}
 
   </style>
 </head>
@@ -4542,9 +4568,16 @@ body:not(.auth-ready) .btn-join {
 ========================= -->
 <div class="leaderboard-heading">
   <h3>Leaderboard</h3>
-  <p class="leaderboard-sub">
-    Most active members right now
-  </p>
+
+  <div class="leaderboard-sub-row">
+    <p class="leaderboard-sub">
+      Most active members right now
+    </p>
+
+    <button id="nearby-btn" class="leaderboard-nearby-btn">
+      Nearby
+    </button>
+  </div>
 </div>
 
 <!-- 👇 CARTES UTILISATEURS (RIGHT COLUMN) -->
@@ -4575,6 +4608,14 @@ body:not(.auth-ready) .btn-join {
 </script>
 
 <script>
+  // =========================
+  // NEARBY — GLOBAL STATE
+  // =========================
+  let nearbyActive = false;
+  let myPosition = null;
+</script>
+
+<script>
 async function loadLeaderboardUsers() {
   const grid = document.getElementById("lb-users-grid");
   if (!grid) return;
@@ -4582,7 +4623,14 @@ async function loadLeaderboardUsers() {
   grid.innerHTML = "";
 
   try {
-    const res = await fetch(`${API_BASE}/api/users`);
+    let url = `${API_BASE}/api/users`;
+
+if (nearbyActive && myPosition) {
+  const radius = window.NEARBY_RADIUS || 15000;
+  url = `${API_BASE}/api/users/nearby?lat=${myPosition.lat}&lng=${myPosition.lng}&radius=${radius}`;
+}
+
+const res = await fetch(url);
     if (!res.ok) throw new Error("Leaderboard fetch failed");
 
     const data = await res.json();
@@ -4601,8 +4649,18 @@ async function loadLeaderboardUsers() {
       alt="${user.display_name || "User"}"
     />
     <span class="lb-user-name">
-      ${user.display_name || "User"}
-    </span>
+  ${user.display_name || "User"}
+</span>
+
+${
+  typeof user.distance === "number"
+    ? `<span class="lb-user-distance">
+        ${user.distance < 1000
+          ? `${user.distance} m`
+          : `${(user.distance / 1000).toFixed(1)} km`}
+      </span>`
+    : ""
+}
   </div>
 
   <!-- CONTENU OPTIONNEL — DÉPLIANT -->
@@ -4846,6 +4904,67 @@ if (!savedToken) {
 
 loadLeaderboardUsers();
 
+const nearbyBtn = document.getElementById("nearby-btn");
+
+if (nearbyBtn) {
+  nearbyBtn.addEventListener("click", async () => {
+    if (!nearbyActive) {
+
+      // 🔑 DEMANDE AU NAVIGATEUR
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+  async (pos) => {
+    myPosition = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+    };
+
+    // 🔴 AJOUT CRITIQUE — ENREGISTRE LA POSITION EN BASE
+    await fetch(`${API_BASE}/api/users/me/location`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        latitude: myPosition.lat,
+        longitude: myPosition.lng,
+      }),
+    });
+
+    nearbyActive = true;
+    nearbyBtn.classList.add("active");
+
+    loadLeaderboardUsers(); // 🔁 AVEC DISTANCE
+  },
+  () => {
+    // ❌ refus utilisateur
+    nearbyActive = false;
+    myPosition = null;
+    nearbyBtn.classList.remove("active");
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 8000,
+    maximumAge: 0,
+  }
+);
+
+    } else {
+      // 🔁 OFF
+      nearbyActive = false;
+      myPosition = null;
+      nearbyBtn.classList.remove("active");
+
+      loadLeaderboardUsers(); // 🔁 NORMAL
+    }
+  });
+}
+
   // =========================
 // CREATE POST — OPEN BUTTON (AUTH GUARD)
 // =========================
@@ -4868,6 +4987,20 @@ document
 // =========================
 function onUserAuthenticated(user) {
   console.log("✅ Authenticated user:", user);
+
+    // =========================
+  // 📍 USER LOCATION (SOURCE PRIORITAIRE)
+  // =========================
+  if (user.own_location?.lat && user.own_location?.lng) {
+    myPosition = {
+      lat: user.own_location.lat,
+      lng: user.own_location.lng,
+    };
+
+    console.log("📍 Using saved user location:", myPosition);
+  } else {
+    myPosition = null;
+  }
 
   // 🔓 auth state known (logged)
   document.body.classList.add("auth-ready");
