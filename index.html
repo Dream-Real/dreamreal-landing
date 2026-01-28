@@ -3965,7 +3965,7 @@ body:not(.auth-ready) .btn-join {
   display: flex;
   flex-direction: column;
 
-  height: 260px;          /* 🔑 HAUTEUR FIXE AU REPOS */
+  height: 220px;          /* 🔑 HAUTEUR FIXE AU REPOS */
   overflow: hidden;       /* 🔒 cache socials */
   transition: height 0.25s ease;
 }
@@ -4185,7 +4185,9 @@ body:not(.auth-ready) .btn-join {
   justify-content: center;
 
   gap: 6px;
-  margin-top: 6px;
+  margin-bottom: 4px;
+
+  transform: translateY(-13px); /* 🔑 remonte le mood SANS bouger les boutons */
 
   text-align: center;
 }
@@ -4193,7 +4195,7 @@ body:not(.auth-ready) .btn-join {
 .lb-user-mood-text {
   color: #ffffff;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -4254,15 +4256,27 @@ body:not(.auth-ready) .btn-join {
 
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: #93C5FD;
 
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
 }
+/* =========================
+   EXPANDED STATE — CARD
+========================= */
 
-.lb-user-toggle:hover {
-  color: #ffffff;
+.lb-user-card.is-expanded {
+  padding-bottom: 44px; /* 🔥 donne de l’air en bas */
+}
+.lb-user-card.is-expanded .lb-user-details {
+  margin-top: 24px; /* 🔽 pousse le contenu vers le bas */
+}
+.lb-user-card.is-expanded .lb-user-toggle {
+  margin-top: 24px; /* 🔽 bouton plus bas */
+}
+.lb-user-socials {
+  transform: translateY(4px); /* 🔽 descend légèrement les boutons */
 }
 
   </style>
