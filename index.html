@@ -1388,28 +1388,23 @@ main {
    LOOKING FOR — DESKTOP SCROLL (CLEAN)
 ========================= */
 
+/* =========================
+   LOOKING FOR — DESKTOP SCROLL (INVISIBLE)
+========================= */
+
 .looking-for-feed {
   height: 100%;
   overflow-y: auto;
   padding-right: 12px;
+
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge legacy */
 }
 
-/* Scroll discret — Looking For */
 .looking-for-feed::-webkit-scrollbar {
-  width: 6px;
+  display: none;                /* Chrome / Safari */
 }
-.looking-for-feed::-webkit-scrollbar-track {
-  background: transparent;
-  margin-top: 8px;
-  margin-bottom: 2px;
-}
-.looking-for-feed::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 6px;
-}
-.looking-for-feed::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
+
 /* =========================
    CREATE POST MODAL
 ========================= */
@@ -3547,7 +3542,7 @@ body:not(.auth-ready) .btn-join {
   flex-direction:column;
 
   /* hauteur FIXE */
-  height: min(88vh, 1100px); /* ⬅️ +1vh, +20px — micro confort */
+  height: min(86vh, 1100px); /* ⬅️ +1vh, +20px — micro confort */
   min-height:0;
 
   margin-top:64px;
@@ -3860,7 +3855,7 @@ body:not(.auth-ready) .btn-join {
    LEADERBOARD — RIGHT COLUMN OFFSET
 ========================= */
 .leaderboard-heading {
-  margin-top: 54px; /* ⬅️ DESCEND titre + sous-titre */
+  margin-top: 40px; /* ⬅️ DESCEND titre + sous-titre */
 }
 /* =========================
    LEADERBOARD — CARDS (4–10)
@@ -4296,6 +4291,11 @@ body:not(.auth-ready) .btn-join {
 
   cursor: pointer;
   padding: 0;
+
+   /* 🔑 ALIGNEMENT FIN */
+  position: relative;
+  top: -8px; /* ajuste -3 / -4 / -5 si besoin */
+  transform: translateX(-6px); /* ajuste : -8 / -10 / -12 / -14 */
 }
 
 .leaderboard-nearby-btn:hover {
@@ -4394,6 +4394,10 @@ section.leaderboard {
 
 .leaderboard-cards-clip::-webkit-scrollbar {
   display: none;
+}
+/* 🔧 Compensation largeur — cartes ranks 4 à 10 */
+.leaderboard-cards-clip .leaderboard-card {
+  width: calc(100% + 4px);
 }
 
   </style>
