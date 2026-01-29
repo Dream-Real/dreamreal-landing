@@ -1,0 +1,541 @@
+/* =========================================
+   Dream Real — Mobile Web (v1)
+   Canonical mobile-only stylesheet
+========================================= */
+
+/* =========================
+   RESET + BASE (FINAL — iOS SAFE)
+========================= */
+
+/* 🔒 Neutralise le viewport iOS (anti-gris, anti-rubber-band) */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+  background: transparent; /* ⛔ aucun fond ici */
+
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
+/* Typo + couleur globale */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  color: #ffffff;
+}
+
+/* Reset box model */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Racine mobile */
+.dr-mobile {
+  width: 100%;
+  height: 100%;
+}
+
+/* -------------------------
+   APP CONTAINER
+------------------------- */
+
+.dr-gradient {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #0b1120; /* fond uni, stable */
+}
+/* -------------------------
+   HEADER (FIXED)
+------------------------- */
+
+.mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  height: env(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
+
+  height: calc(env(safe-area-inset-top) + 56px);
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: transparent;
+}
+
+.logo-dr {
+  font-family: "Suez One", serif;
+  font-size: 38px;
+  font-weight: 400;
+  color: #eecd79;
+  line-height: 1;
+}
+
+.logo-dr span {
+  color: #ffffff;
+}
+
+.mobile-header-right {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+}
+
+/* -------------------------
+   MAIN SCROLL AREA
+------------------------- */
+
+.mobile-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  padding-top: 12px;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+
+  scrollbar-width: none; /* Firefox */
+}
+
+.mobile-scroll::-webkit-scrollbar {
+  display: none;
+}
+.mobile-scroll {
+  flex: 1;
+  min-height: 0;           /* 🔑 SAFARI FIX */
+  position: relative;
+  z-index: 1;
+}
+
+/* -------------------------
+   SECTION TITLES
+------------------------- */
+
+.section-title {
+  padding-left: 12px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-title h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* -------------------------
+   LOOKING FOR (HORIZONTAL)
+------------------------- */
+
+.looking-for-section {
+  margin-top: 6px;
+}
+
+.looking-for-scroll {
+  display: flex;
+  gap: 24px;
+
+  padding-left: 12px;
+  padding-right: 20px;
+
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: none;
+}
+
+.looking-for-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* -------------------------
+   FEED HEADER
+------------------------- */
+
+.feed-header {
+  margin-top: 20px;
+  margin-bottom: 6px;
+
+  padding-left: 12px;
+  padding-right: 12px;
+
+  display: flex;
+  align-items: center;
+}
+
+.feed-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.feed-filter-btn {
+  margin-left: auto;
+
+  background: none;
+  border: none;
+  padding: 6px 0;
+
+  font-size: 16px;
+  font-weight: 700;
+  color: #eecd79;
+
+  cursor: pointer;
+}
+
+.feed-filter-btn.active {
+  color: #93c5fd;
+}
+
+/* -------------------------
+   ACTIVE FILTERS
+------------------------- */
+
+.active-filters {
+  padding: 4px 12px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* -------------------------
+   FEED
+------------------------- */
+
+.feed {
+  position: relative;
+}
+
+/* -------------------------
+   SKELETON OVERLAY
+------------------------- */
+
+.feed-skeletons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+/* -------------------------
+   BOTTOM NAV
+------------------------- */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  height: 90px;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  background: rgba(11, 17, 32, 0.95);
+  backdrop-filter: blur(10px);
+
+  z-index: 100;
+}
+
+/* -------------------------
+   FILTER MODAL
+------------------------- */
+
+.filters-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  align-items: flex-end;
+}
+
+.filters-sheet {
+  width: 100%;
+  height: 65%;
+
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    #0b1120 0%,
+    #2a2d59 45%,
+    #5c3b84 100%
+  );
+}
+/* =========================================
+   MOBILE — POST ITEM
+   Mirrors App UX (Feed)
+========================================= */
+
+.post-item-mobile {
+  width: 100%;
+  padding-top: 8px;
+  position: relative;
+}
+
+/* -----------------------------------------
+   HEADER
+----------------------------------------- */
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 12px 0;
+}
+
+.post-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.post-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-user {
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 21px;
+}
+
+.post-location {
+  font-weight: 400;
+  opacity: 0.95;
+}
+
+.post-date {
+  font-size: 15px;
+  color: #9ca3af;
+  line-height: 21px;
+}
+
+/* -----------------------------------------
+   FEELING / ACTIVITY BUBBLE
+----------------------------------------- */
+
+.post-feeling-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin: 6px 12px 6px;
+  padding: 5px 10px;
+
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  font-size: 17px;
+  color: #ffffff;
+  line-height: 20px;
+}
+
+.post-feeling-bubble img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* -----------------------------------------
+   MESSAGE + VIEW MORE
+----------------------------------------- */
+
+.post-message {
+  padding: 0 12px;
+  margin-bottom: 6px;
+}
+
+.post-message p {
+  font-size: 17px;
+  line-height: 21px;
+  color: #e5e7eb;
+  margin: 0;
+}
+
+/* état réduit (≈ app) */
+.post-message p.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.view-more-btn {
+  background: none;
+  border: none;
+
+  padding: 0;
+  margin-top: 6px;
+
+  font-size: 16px;
+  font-weight: 500;
+  color: #93c5fd;
+
+  cursor: pointer;
+}
+
+/* -----------------------------------------
+   MEDIA
+----------------------------------------- */
+
+/* Single image */
+.post-image {
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  object-fit: cover;
+
+  background: #111827;
+  margin-top: 6px;
+}
+
+/* Carousel */
+.post-carousel {
+  display: flex;
+  gap: 8px;
+
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-top: 6px;
+}
+
+.post-carousel img {
+  width: calc(100vw - 24px);
+  height: 400px;
+
+  object-fit: cover;
+  border-radius: 6px;
+
+  scroll-snap-align: start;
+}
+
+/* YouTube */
+.post-youtube {
+  position: relative;
+  margin-top: 6px;
+}
+
+.post-youtube img {
+  width: 100%;
+  height: auto;
+  max-height: 520px;
+  object-fit: cover;
+}
+
+.yt-play {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 32px;
+  color: #ffffff;
+
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Video */
+.post-video {
+  width: 100%;
+  max-height: 520px;
+  margin-top: 6px;
+
+  background: #000;
+}
+
+/* -----------------------------------------
+   REACTIONS BAR
+----------------------------------------- */
+
+.post-reactions {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 6px 14px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+
+  font-size: 15px;
+  color: #f3f4f6;
+
+  border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+}
+
+/* -----------------------------------------
+   FACEBOOK LINK
+----------------------------------------- */
+
+.post-fb-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 0;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #93c5fd;
+
+  text-decoration: none;
+}
+
+/* -----------------------------------------
+   SEPARATOR
+----------------------------------------- */
+
+/* -----------------------------------------
+   SEPARATOR — APP-LIKE (DIFFUS)
+----------------------------------------- */
+.post-item-mobile::after {
+  content: "";
+  display: block;
+  height: 12px;
+}
+.mobile-scroll {
+  background: #0b1120;
+}
+
+.feed {
+  background: #0b1120;
+}
+/* 🔥 SAFARI FIX — kill rounded corners overlay */
+.filters-sheet {
+  border-radius: 0 !important;
+}
+.filters-modal {
+  pointer-events: none;
+}
+
+.filters-modal[hidden],
+.filters-modal.hidden {
+  display: none !important;
+}

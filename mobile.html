@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Dream Real — Mobile</title>
+
+    <!-- Font (identique à l’app) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Mobile-only CSS -->
+    <link rel="stylesheet" href="./css/mobile.css" />
+  </head>
+
+  <body class="dr-mobile">
+    <!-- 🌈 GRADIENT GLOBAL -->
+    <div class="dr-gradient">
+
+      <!-- =========================
+           HEADER FIXE (APP-LIKE)
+      ========================== -->
+      <header class="mobile-header">
+        <div class="mobile-header-left">
+          <span class="logo-dr">
+            D<span>R</span>
+          </span>
+        </div>
+
+        <button class="mobile-header-right" id="notifications-btn">
+          <!-- SVG ou icon injecté en JS -->
+        </button>
+      </header>
+
+      <!-- =========================
+           MAIN SCROLL AREA
+      ========================== -->
+      <main class="mobile-scroll" id="mobile-scroll">
+
+        <!-- =========================
+             LOOKING FOR (HORIZONTAL)
+        ========================== -->
+        <section class="looking-for-section">
+          <div class="section-title">
+            <h2>Looking for</h2>
+          </div>
+
+          <div class="looking-for-scroll" id="looking-for-scroll">
+            <!-- users injected by mobile.js -->
+          </div>
+        </section>
+
+        <!-- =========================
+             LAST POSTS HEADER
+        ========================== -->
+        <section class="feed-header">
+          <h2>Last Posts</h2>
+
+          <button class="feed-filter-btn" id="open-filters-btn">
+            Filters
+          </button>
+        </section>
+
+        <!-- =========================
+             ACTIVE FILTERS (OPTIONAL)
+        ========================== -->
+        <section
+          class="active-filters"
+          id="active-filters"
+          hidden
+        >
+          <!-- injected dynamically -->
+        </section>
+
+        <!-- =========================
+             FEED
+        ========================== -->
+        <section class="feed" id="feed">
+          <!-- PostItem mobile injected here -->
+        </section>
+
+        <!-- =========================
+             FEED SKELETONS (OVERLAY)
+        ========================== -->
+        <section class="feed-skeletons" id="feed-skeletons">
+          <!-- skeletons injected -->
+        </section>
+      </main>
+
+      <!-- =========================
+           BOTTOM NAV (FIXED)
+      ========================== -->
+      <nav class="bottom-nav">
+        <!-- same structure as app -->
+      </nav>
+
+      <!-- =========================
+           FILTER MODAL
+      ========================== -->
+      <div class="filters-modal" id="filters-modal" hidden>
+        <div class="filters-sheet">
+          <!-- feeling / activity steps -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- =========================
+         MOBILE JS
+    ========================== -->
+    <script src="./js/post-item-mobile.js"></script>
+    <script src="./js/mobile.js"></script>
+  </body>
+</html>
