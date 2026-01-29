@@ -3965,7 +3965,7 @@ body:not(.auth-ready) .btn-join {
   display: flex;
   flex-direction: column;
 
-  height: 220px;          /* 🔑 HAUTEUR FIXE AU REPOS */
+  height: 215px;          /* 🔑 HAUTEUR FIXE AU REPOS */
   overflow: hidden;       /* 🔒 cache socials */
   transition: height 0.25s ease;
 }
@@ -4161,7 +4161,7 @@ body:not(.auth-ready) .btn-join {
 ========================= */
 
 .lb-users-grid {
-  max-height: 108vh;
+  max-height: min(126vh, 980px); /* ✅ plus haut, mais plafonné */
   overflow-y: auto;
 
   padding-bottom: 16px; /* 🔑 évite que les dernières cartes soient coupées */
@@ -4379,6 +4379,22 @@ section.leaderboard {
     transform: translateY(-32px);
   }
 }
+/* =========================
+   LEADERBOARD LEFT — SCROLL CLIP
+========================= */
+
+.leaderboard-cards-clip {
+  max-height: 580px;          /* positions 4 + 5 visibles */
+  overflow-y: auto;
+  padding-right: 4px;
+
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.leaderboard-cards-clip::-webkit-scrollbar {
+  display: none;
+}
 
   </style>
 </head>
@@ -4562,6 +4578,7 @@ section.leaderboard {
   />
 </div>
 
+<div class="leaderboard-cards-clip">
 <div class="leaderboard-list leaderboard-cards">
 
   <!-- 4 -->
@@ -4621,6 +4638,7 @@ section.leaderboard {
   <img class="row-avatar" src="https://i.pravatar.cc/300?img=25" />
   <span class="row-name">Tom Schneider</span>
   <span class="row-xp">1980 Views</span>
+</div>
 </div>
 
 </div>
