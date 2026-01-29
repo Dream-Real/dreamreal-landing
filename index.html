@@ -559,7 +559,7 @@ main {
   font-size: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 0 0 12px;
+  margin: 0 0 22px;
   color: #ffffff;
 }
 
@@ -3672,7 +3672,7 @@ body:not(.auth-ready) .btn-join {
   font-size: 21px;
   line-height: 1.65;
   color: var(--muted);
-  margin-bottom: 28px;
+  margin-bottom: 40px;
 }
 
 /* Podium */
@@ -3841,7 +3841,7 @@ body:not(.auth-ready) .btn-join {
   font-size: 44px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin: 0 0 12px;
+  margin: 0 0 0px;
   color: #ffffff;
 }
 
@@ -3939,7 +3939,7 @@ body:not(.auth-ready) .btn-join {
 ========================= */
 
 .lb-users-grid {
-  margin-top: 18px;
+  margin-top: -3px;
 
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 cartes par ligne */
@@ -4366,6 +4366,19 @@ body:not(.auth-ready) .btn-join {
 .leaderboard-search {
   margin-bottom: 14px; /* 🔑 identique */
 }
+/* =========================
+   LEFT COLUMN — LEADERBOARD BLOCK OFFSET
+========================= */
+
+section.leaderboard {
+  position: relative;
+  transform: translateY(-53px); /* ajuste : -16 / -20 / -24 */
+}
+@media (max-width: 1024px) {
+  section.leaderboard {
+    transform: translateY(-32px);
+  }
+}
 
   </style>
 </head>
@@ -4468,7 +4481,7 @@ body:not(.auth-ready) .btn-join {
         </div>
 
         <p class="looking-for-sub">
-          People nearby open to connect right now
+          People to share with and things to explore.
         </p>
 
         <!-- 🔥 ACTIVE FILTER — LOOKING FOR -->
@@ -4488,6 +4501,19 @@ body:not(.auth-ready) .btn-join {
 
     </section>
     <section class="leaderboard">
+
+      <!-- =========================
+   LEADERBOARD — HEADING (LEFT COLUMN)
+========================= -->
+<div class="leaderboard-heading">
+  <h3>On the Leaderboard</h3>
+
+  <div class="leaderboard-sub-row">
+    <p class="leaderboard-sub">
+      See who’s gaining momentum.
+    </p>
+  </div>
+</div>
 
   <!-- PODIUM -->
   <div class="leaderboard-podium-wrapper">
@@ -4531,7 +4557,7 @@ body:not(.auth-ready) .btn-join {
   <input
     type="text"
     id="leaderboard-search-input"
-    placeholder="Search username"
+    placeholder="Search users"
     autocomplete="off"
   />
 </div>
@@ -4642,11 +4668,11 @@ body:not(.auth-ready) .btn-join {
      LEADERBOARD — HEADING (RIGHT COLUMN)
 ========================= -->
 <div class="leaderboard-heading">
-  <h3>Leaderboard</h3>
+  <h3>Ready to engage</h3>
 
   <div class="leaderboard-sub-row">
     <p class="leaderboard-sub">
-      Most active members right now
+      Members open to connect right now.
     </p>
 
     <button id="nearby-btn" class="leaderboard-nearby-btn">
