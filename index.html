@@ -4304,6 +4304,39 @@ body:not(.auth-ready) .btn-join {
 .leaderboard-nearby-btn.active {
   color: #93C5FD;
 }
+.leaderboard-search {
+  margin: 12px 0 16px;
+}
+
+.leaderboard-search input {
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+
+  font-size: 16px;
+  line-height: 1.2;
+
+  outline: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.leaderboard-search input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+/* 🚫 AUCUN EFFET AU FOCUS */
+.leaderboard-search input:focus,
+.leaderboard-search input:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+}
 
   </style>
 </head>
@@ -4459,7 +4492,14 @@ body:not(.auth-ready) .btn-join {
 
   </div>
 
-  <div class="leaderboard-divider"></div>
+  <div class="leaderboard-search">
+  <input
+    type="text"
+    id="leaderboard-search-input"
+    placeholder="Search username"
+    autocomplete="off"
+  />
+</div>
 
 <div class="leaderboard-list leaderboard-cards">
 
@@ -4621,6 +4661,9 @@ async function loadLeaderboardUsers() {
   if (!grid) return;
 
   grid.innerHTML = "";
+  // 🔑 utilisateur courant (pour exclure sa propre carte en Nearby)
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const currentUserId = currentUser?.id;
 
   try {
     let url = `${API_BASE}/api/users`;
@@ -4637,6 +4680,10 @@ const res = await fetch(url);
     const users = Array.isArray(data) ? data : data.users || [];
 
     users.forEach((user) => {
+       // 🚫 Ne pas afficher sa propre carte en mode Nearby
+  if (nearbyActive && currentUserId && user.id === currentUserId) {
+    return;
+  }
       const card = document.createElement("div");
       card.className = "lb-user-card";
 
@@ -4903,6 +4950,38 @@ if (!savedToken) {
 }
 
 loadLeaderboardUsers();
+
+// =========================
+// LEADERBOARD — SEARCH (USERNAME FILTER)
+// =========================
+const searchInput = document.getElementById("leaderboard-search-input");
+const leaderboardList = document.querySelector(".leaderboard-list");
+
+if (searchInput && leaderboardList) {
+  const cards = Array.from(
+    leaderboardList.querySelectorAll(".leaderboard-card")
+  );
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLowerCase();
+
+    cards.forEach((card) => {
+      const nameEl = card.querySelector(".row-name");
+      if (!nameEl) return;
+
+      const name = nameEl.textContent.toLowerCase();
+
+      // 🔁 RESET VISUEL SI CHAMP VIDE
+      if (!query) {
+        card.style.display = "";
+        return;
+      }
+
+      // 🔍 FILTRAGE NORMAL
+      card.style.display = !query || name.startsWith(query) ? "" : "none";
+    });
+  });
+}
 
 const nearbyBtn = document.getElementById("nearby-btn");
 
