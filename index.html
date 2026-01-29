@@ -4311,7 +4311,7 @@ body:not(.auth-ready) .btn-join {
 .leaderboard-search input {
   width: 100%;
   padding: 16px 18px;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.04);
   color: #fff;
@@ -4336,6 +4336,35 @@ body:not(.auth-ready) .btn-join {
   box-shadow: none;
   border-color: rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.04);
+}
+/* =========================
+   LEADERBOARD — PODIUM CARD
+   (MATCH OTHER CARDS)
+========================= */
+
+.leaderboard-podium-card {
+  padding: 28px 24px 32px; /* 🔑 padding interne UNIQUEMENT */
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  /* ❌ PAS de margin ici */
+}
+.leaderboard-podium-wrapper {
+  position: relative;
+  transform: translateY(-3px); /* 🔥 ÇA VA BOUGER, GARANTI */
+  z-index: 2;
+}
+/* =========================
+   LEADERBOARD — PODIUM CONTENT OFFSET
+========================= */
+
+.leaderboard-podium {
+  transform: translateY(27px); /* ajuste : 12 / 16 / 20 */
+}
+.leaderboard-search {
+  margin-bottom: 14px; /* 🔑 identique */
 }
 
   </style>
@@ -4461,35 +4490,41 @@ body:not(.auth-ready) .btn-join {
     <section class="leaderboard">
 
   <!-- PODIUM -->
-  <div class="leaderboard-podium">
+  <div class="leaderboard-podium-wrapper">
+    <div class="leaderboard-podium-card">
 
-    <div class="podium-card second">
-      <span class="rank-badge">2</span>
-      <div class="avatar-ring">
-        <img src="https://i.pravatar.cc/150?img=12" />
+      <div class="leaderboard-podium">
+
+        <div class="podium-card second">
+          <span class="rank-badge">2</span>
+          <div class="avatar-ring">
+            <img src="https://i.pravatar.cc/150?img=12" />
+          </div>
+          <strong>Liam Miller</strong>
+          <small>4520 Views</small>
+        </div>
+
+        <div class="podium-card first">
+          <img class="crown" src="/assets/icons/crownemoji.png" />
+          <div class="avatar-ring winner">
+            <img src="https://i.pravatar.cc/150?img=11" />
+          </div>
+          <strong>Ava Reyes</strong>
+          <small>4820 Views</small>
+        </div>
+
+        <div class="podium-card third">
+          <span class="rank-badge">3</span>
+          <div class="avatar-ring">
+            <img src="https://i.pravatar.cc/150?img=13" />
+          </div>
+          <strong>Zoe Nguyen</strong>
+          <small>4310 Views</small>
+        </div>
+
       </div>
-      <strong>Liam Miller</strong>
-      <small>4520 Views</small>
-    </div>
 
-    <div class="podium-card first">
-      <img class="crown" src="/assets/icons/crownemoji.png" />
-      <div class="avatar-ring winner">
-        <img src="https://i.pravatar.cc/150?img=11" />
-      </div>
-      <strong>Ava Reyes</strong>
-      <small>4820 Views</small>
     </div>
-
-    <div class="podium-card third">
-      <span class="rank-badge">3</span>
-      <div class="avatar-ring">
-        <img src="https://i.pravatar.cc/150?img=13" />
-      </div>
-      <strong>Zoe Nguyen</strong>
-      <small>4310 Views</small>
-    </div>
-
   </div>
 
   <div class="leaderboard-search">
