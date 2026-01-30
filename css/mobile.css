@@ -103,10 +103,26 @@ body {
 /* -------------------------
    MAIN SCROLL AREA
 ------------------------- */
+/* ✅ UN SEUL SCROLL CONTAINER : tout l'écran */
 .mobile-scroll {
   flex: 1;
   overflow-y: auto;
-  background: #0b1120;
+  -webkit-overflow-scrolling: touch;
+  background: transparent;
+}
+/* 🔥 Hide main scrollbar (app-like) */
+.mobile-scroll {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / Edge legacy */
+}
+
+.mobile-scroll::-webkit-scrollbar {
+  display: none;                  /* Safari / Chrome / iOS */
+}
+
+/* ✅ #feed ne scrolle pas */
+#feed {
+  overflow: visible;
 }
 
 /* -------------------------
@@ -561,11 +577,6 @@ body {
   display: block;
   height: 12px;
 }
-.mobile-scroll {
-  flex: 1;
-  overflow-y: auto;
-  background: transparent;
-}
 
 .feed {
   background: transparent;
@@ -587,10 +598,6 @@ body {
   display: none !important;
 }
 
-/* ✅ reclaim the space */
-.mobile-scroll {
-  padding-bottom: 24px !important;
-}
 /* 🔥 HARD KILL — FILTER MODAL */
 .filters-modal {
   display: none !important;

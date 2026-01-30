@@ -183,18 +183,32 @@ lookingForContainer.innerHTML = ""; // 🔥 LA LIGNE À AJOUTER
 
     // 👉 scroll vers le post correspondant
     item.addEventListener("click", () => {
-  const target = document.querySelector(
-    `[data-post-id="${post.id}"]`
-  );
-  if (!target) return;
+  requestAnimationFrame(() => {
+    const target = feedContainer.querySelector(
+      `[data-post-id="${post.id}"]`
+    );
+    if (!target) return;
 
-  const headerOffset = 72; // hauteur header app-like
-  const y =
-    target.getBoundingClientRect().top +
-    window.scrollY -
-    headerOffset;
+    const scrollContainer = document.querySelector(".mobile-scroll");
+    if (!scrollContainer) return;
 
-  window.scrollTo({ top: y, behavior: "smooth" });
+    const header = document.querySelector(".mobile-header");
+    const HEADER_OFFSET = header ? header.offsetHeight : 88;
+
+    const y =
+  target.offsetTop +
+  feedContainer.offsetTop;
+
+    // ✅ POSITION EXACTE DU POST DANS LE SCROLL CONTAINER
+
+    // 🎯 AJUSTEMENT UX FIN (équivalent app)
+    const UX_OFFSET = 20;
+
+    scrollContainer.scrollTo({
+      top: y - HEADER_OFFSET - UX_OFFSET,
+      behavior: "smooth",
+    });
+  });
 });
 
     lookingForContainer.appendChild(item);
@@ -213,7 +227,11 @@ function renderFeed(posts) {
   posts.forEach((post, index) => {
     try {
       const el = window.renderPostItemMobile(post);
-      feedContainer.appendChild(el);
+
+// 🔑 EXACTEMENT l’équivalent du onLayout de l’app
+el.setAttribute("data-post-id", post.id);
+
+feedContainer.appendChild(el);
     } catch (err) {
       console.warn("⚠️ Failed to render post", index, err);
     }
