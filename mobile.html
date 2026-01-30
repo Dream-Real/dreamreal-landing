@@ -34,9 +34,13 @@
           </span>
         </div>
 
-        <button class="mobile-header-right" id="notifications-btn">
-          <!-- SVG ou icon injecté en JS -->
-        </button>
+        <button
+  class="mobile-header-right btn-create"
+  id="mobile-create-btn"
+  aria-label="Create post"
+>
+  ＋
+</button>
       </header>
 
       <!-- =========================
@@ -115,7 +119,17 @@
     <!-- =========================
          MOBILE JS
     ========================== -->
+    <div id="create-post-root"></div>
+
     <script src="./js/post-item-mobile.js"></script>
-    <script src="./js/mobile.js"></script>
+
+<!-- CREATE POST (shared desktop / mobile) -->
+<script src="./components/create-post.js"></script>
+
+<!-- MOBILE LOGIC (bouton +, feed, etc.) -->
+<script src="./js/mobile.js"></script>
+<script>
+  console.log("🔥 INLINE SCRIPT OK");
+</script>
   </body>
 </html>

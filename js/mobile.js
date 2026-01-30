@@ -3,6 +3,8 @@
    Same logic as Desktop (no auth required)
 ========================================= */
 
+console.log("🚀 mobile.js LOADED");
+
 const API_URL =
   window.API_URL || "https://dreamreal-api.onrender.com";
 
@@ -253,3 +255,27 @@ function renderErrorState() {
     </div>
   `;
 }
+/* -----------------------------------------
+   CREATE POST (MOBILE)
+----------------------------------------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const createBtn = document.getElementById("mobile-create-btn");
+
+  if (!createBtn) {
+    console.warn("❌ #mobile-create-btn not found");
+    return;
+  }
+
+  console.log("➕ Create button detected (mobile)");
+
+  createBtn.addEventListener("click", () => {
+    console.log("🔥 CREATE CLICK (mobile)");
+
+    if (typeof window.openCreatePost === "function") {
+      window.openCreatePost();
+    } else {
+      console.warn("❌ window.openCreatePost not available");
+    }
+  });
+});

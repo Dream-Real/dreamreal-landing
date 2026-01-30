@@ -2,7 +2,9 @@
    CREATE POST — WINDOW SAFE VERSION (NO MODULES)
    ========================================================= */
 
-const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
+   console.log("🟢 create-post.js START");
+
+window.CDN_URL = window.CDN_URL || "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
 let localLinkPreview = null;
 
@@ -1369,6 +1371,12 @@ if (typeof renderFeed === "function") {
    ========================================================= */
 
 window.mountCreatePost = mountCreatePost;
+// 🔥 AUTO-MOUNT (MOBILE + DESKTOP SAFE)
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", mountCreatePost);
+} else {
+  mountCreatePost();
+}
 // =========================
 // GLOBAL OPEN CREATE POST
 // =========================
