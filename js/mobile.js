@@ -11,6 +11,7 @@ const API_URL =
 ----------------------------------------- */
 
 let feedContainer = null;
+let lookingForContainer = null;
 
 /* -----------------------------------------
    INIT
@@ -22,6 +23,7 @@ async function initMobileApp() {
   console.log("📱 initMobileApp (public feed)");
 
   feedContainer = document.querySelector("#feed");
+  lookingForContainer = document.querySelector("#looking-for-scroll");
 
   if (!feedContainer) {
     console.error("❌ #feed not found");
@@ -58,6 +60,13 @@ async function initMobileApp() {
           new Date(a.created_time).getTime()
       )
       .map(normalizePostForMobile);
+
+      console.log(
+  "🧪 FEELING SHAPE",
+  normalizedPosts.map(p => p.feeling)
+);
+
+      renderLookingFor(normalizedPosts);
 
     renderFeed(normalizedPosts);
 
@@ -108,6 +117,88 @@ function normalizePostForMobile(post) {
 
     created_time: post.created_time,
   };
+}
+
+function extractLookingForUsers(posts) {
+  return posts
+    .filter((p) => {
+      if (!p.feeling || !p.user_first_name) return false;
+
+      // ✅ FEED PUBLIC = feeling.title
+      return (
+        typeof p.feeling.title === "string" &&
+        p.feeling.title.toLowerCase() === "looking for"
+      );
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.created_time).getTime() -
+        new Date(a.created_time).getTime()
+    )
+    .slice(0, 10);
+}
+
+function renderLookingFor(posts) {
+  if (!lookingForContainer) return;
+
+  const users = extractLookingForUsers(posts);
+
+  if (!users.length) {
+  lookingForContainer.innerHTML = "";
+  lookingForContainer.style.display = "none";
+  return;
+}
+
+lookingForContainer.style.display = "flex";
+lookingForContainer.innerHTML = ""; // 🔥 LA LIGNE À AJOUTER
+
+  users.forEach((post) => {
+    const item = document.createElement("div");
+    item.className = "looking-for-item";
+
+    const emojiUrl = post.activity?.image
+      ? `https://dreamreal-images.s3.eu-west-3.amazonaws.com/${post.activity.image}`
+      : null;
+
+    item.innerHTML = `
+      <div class="looking-for-avatar-wrapper">
+        <img
+          class="looking-for-avatar"
+          src="${post.user_avatar}"
+        />
+        ${
+          emojiUrl
+            ? `<div class="looking-for-emoji">
+                <img src="${emojiUrl}" />
+              </div>`
+            : ""
+        }
+      </div>
+
+      <div class="looking-for-name">
+        <div>${post.user_first_name}</div>
+        <div>${post.user_last_name}</div>
+      </div>
+    `;
+
+    // 👉 scroll vers le post correspondant
+    item.addEventListener("click", () => {
+  const target = document.querySelector(
+    `[data-post-id="${post.id}"]`
+  );
+  if (!target) return;
+
+  const headerOffset = 72; // hauteur header app-like
+  const y =
+    target.getBoundingClientRect().top +
+    window.scrollY -
+    headerOffset;
+
+  window.scrollTo({ top: y, behavior: "smooth" });
+});
+
+    lookingForContainer.appendChild(item);
+  });
 }
 
 /* -----------------------------------------

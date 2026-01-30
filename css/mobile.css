@@ -29,6 +29,22 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+/* =========================
+   GLOBAL APP GRADIENT (APP-LIKE)
+========================= */
+
+.dr-gradient {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
+  background: linear-gradient(
+    180deg,
+    #0B1120 0%,
+    #2A2D59 45%,
+    #5C3B84 100%
+  );
+}
 
 /* -------------------------
    APP CONTAINER
@@ -60,6 +76,9 @@ body {
   justify-content: space-between;
 
   background: transparent;
+}
+:root {
+  --header-h: 56px;
 }
 
 .logo-dr {
@@ -131,6 +150,60 @@ body {
 
 .looking-for-scroll::-webkit-scrollbar {
   display: none;
+}
+/* =========================
+   LOOKING FOR — ITEMS
+========================= */
+
+.looking-for-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 86px;
+  cursor: pointer;
+}
+
+.looking-for-avatar-wrapper {
+  position: relative;
+}
+
+.looking-for-avatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 43px;
+  object-fit: cover;
+  margin-bottom: 14px;
+}
+
+.looking-for-emoji {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+
+  background: #ffffff;
+  border: 2px solid #eecd79;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.looking-for-emoji img {
+  width: 18px;
+  height: 18px;
+}
+
+.looking-for-name {
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 18px;
+  opacity: 0.95;
 }
 
 /* -------------------------
@@ -489,11 +562,13 @@ body {
   height: 12px;
 }
 .mobile-scroll {
-  background: #0b1120;
+  flex: 1;
+  overflow-y: auto;
+  background: transparent;
 }
 
 .feed {
-  background: #0b1120;
+  background: transparent;
 }
 /* 🔥 SAFARI FIX — kill rounded corners overlay */
 .filters-sheet {
