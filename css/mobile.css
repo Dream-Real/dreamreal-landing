@@ -346,6 +346,16 @@ body {
   padding-top: 8px;
   position: relative;
 }
+/* -----------------------------------------
+   POST SEPARATOR — APP PARITY
+----------------------------------------- */
+.post-item-mobile::after {
+  content: "";
+  display: block;
+  height: 4px; /* 👈 EXACTEMENT comme l’app */
+  margin-top: 11px; /* respiration */
+  background: rgba(255, 255, 255, 0.07);
+}
 
 /* -----------------------------------------
    HEADER
@@ -402,12 +412,16 @@ body {
   margin: 6px 12px 6px;
   padding: 5px 10px;
 
+  /* 🎯 ALIGNEMENT AVATAR */
+  transform: translateX(-12px); /* 42px avatar + 10px gap */
+
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.35);
 
   font-size: 17px;
   color: #ffffff;
   line-height: 20px;
+  margin-right: -10px;
 }
 
 .post-feeling-bubble img {
@@ -422,6 +436,7 @@ body {
 
 .post-message {
   padding: 0 12px;
+  margin-top: 4px;     /* 👈 respiration subtile */
   margin-bottom: 6px;
 }
 
@@ -445,13 +460,20 @@ body {
   border: none;
 
   padding: 0;
-  margin-top: 6px;
+  margin: 0;
 
   font-size: 16px;
   font-weight: 500;
+  line-height: 20px;          /* 🔑 même baseline que la bulle */
   color: #93c5fd;
 
   cursor: pointer;
+
+  display: inline-flex;       /* 🔑 inline typographique */
+  align-items: baseline;      /* 🔑 alignement texte */
+}
+.view-less-btn {
+  margin-left: 0px; /* ✅ respiration contrôlée */
 }
 
 /* -----------------------------------------
@@ -566,17 +588,8 @@ body {
 }
 
 /* -----------------------------------------
-   SEPARATOR
------------------------------------------ */
-
-/* -----------------------------------------
    SEPARATOR — APP-LIKE (DIFFUS)
 ----------------------------------------- */
-.post-item-mobile::after {
-  content: "";
-  display: block;
-  height: 12px;
-}
 
 .feed {
   background: transparent;

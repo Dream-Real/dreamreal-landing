@@ -108,57 +108,88 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
   `;
 
   /* ----------------------------------------
-     FEELING / ACTIVITY
-  ----------------------------------------- */
-  if (feeling && activity) {
-    const bubble = document.createElement("div");
-    bubble.className = "post-feeling-bubble";
-    bubble.innerHTML = `
-      <span>${feeling.title}</span>
-      ${
-        activity.image
-          ? `<img src="${CDN_URL}/${activity.image}" alt="" />`
-          : ""
-      }
-      <span>${activity.title}</span>
-    `;
-    container.appendChild(bubble);
-  }
+   FEELING / ACTIVITY + VIEW MORE (APP-LIKE)
+----------------------------------------- */
+let messageNode = null;
 
-  /* ----------------------------------------
-     MESSAGE + VIEW MORE
-  ----------------------------------------- */
-  if (message) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "post-message";
+if (feeling && activity) {
+  const row = document.createElement("div");
+  row.style.display = "flex";
+  row.style.alignItems = "center";
+  row.style.gap = "8px";
+  row.style.margin = "8px 12px 6px";
 
-    const cleanText = message.replace(/https?:\/\/\S+/gi, "").trim();
-    const text = document.createElement("p");
-    text.textContent = cleanText;
-    text.dataset.expanded = "false";
-
-    if (cleanText.length > 140) {
-      text.classList.add("collapsed");
-
-      const toggle = document.createElement("button");
-      toggle.className = "view-more-btn";
-      toggle.textContent = "View more";
-
-      toggle.onclick = () => {
-        const expanded = text.dataset.expanded === "true";
-        text.dataset.expanded = String(!expanded);
-        text.classList.toggle("collapsed", expanded);
-        toggle.textContent = expanded ? "View more" : "View less";
-      };
-
-      wrapper.appendChild(text);
-      wrapper.appendChild(toggle);
-    } else {
-      wrapper.appendChild(text);
+  const bubble = document.createElement("div");
+  bubble.className = "post-feeling-bubble";
+  bubble.innerHTML = `
+    <span>${feeling.title}</span>
+    ${
+      activity.image
+        ? `<img src="${CDN_URL}/${activity.image}" alt="" />`
+        : ""
     }
+    <span>${activity.title}</span>
+  `;
 
-    container.appendChild(wrapper);
+  row.appendChild(bubble);
+
+  // 👉 SI BIO PRÉSENTE → bouton View more
+  const cleanText = message.replace(/https?:\/\/\S+/gi, "").trim();
+
+  if (cleanText) {
+    const toggle = document.createElement("button");
+    toggle.className = "view-more-btn";
+    toggle.textContent = "View more";
+
+   toggle.onclick = () => {
+  if (!messageNode) return;
+
+  messageNode.style.display = "block";
+  messageNode.dataset.expanded = "true";
+
+  // 🔑 cacher View more quand la bio est visible
+  toggle.style.display = "none";
+};
+
+    row.appendChild(toggle);
+
+    // bio (cachée par défaut)
+    messageNode = document.createElement("div");
+    messageNode.className = "post-message";
+    messageNode.style.display = "none";
+    messageNode.dataset.expanded = "false";
+
+    const p = document.createElement("p");
+
+const textSpan = document.createElement("span");
+textSpan.textContent = cleanText;
+
+const viewLess = document.createElement("span");
+viewLess.textContent = "\u00A0\u00A0View less";
+viewLess.className = "view-more-btn"; // on réutilise le style
+viewLess.className = "view-more-btn view-less-btn"; // 👈 CLASSE DÉDIÉE
+viewLess.style.display = "inline";
+viewLess.style.cursor = "pointer";
+
+viewLess.onclick = () => {
+  messageNode.dataset.expanded = "false";
+  messageNode.style.display = "none";
+
+  // 🔑 réafficher View more
+  toggle.style.display = "inline-flex";
+};
+
+p.appendChild(textSpan);
+p.appendChild(viewLess);
+messageNode.appendChild(p);
   }
+
+  container.appendChild(row);
+
+  if (messageNode) {
+    container.appendChild(messageNode);
+  }
+}
 
   /* ----------------------------------------
      MEDIA
