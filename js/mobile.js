@@ -49,6 +49,8 @@ async function initMobileApp() {
 
     console.log("📦 RAW posts:", rawPosts.length);
 
+    console.log("🧪 RAW POSTS SAMPLE", rawPosts[0]);
+
     if (!rawPosts.length) {
       renderEmptyState();
       return;
@@ -103,6 +105,8 @@ function normalizePostForMobile(post) {
     youtube_url: post.youtube_url || null,
     youtube_thumbnail: post.youtube_thumbnail || null,
     video_url: post.video_url || null,
+
+    link_preview: post.link_preview || null,
 
     multiple_images:
       Array.isArray(post.multiple_images) && post.multiple_images.length

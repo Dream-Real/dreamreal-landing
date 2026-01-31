@@ -112,6 +112,11 @@ function getSafeAvatar(user) {
   return "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 }
 
+// 🧹 STRIP URL FROM TEXT (APP PARITY)
+function stripUrlFromText(text) {
+  return text.replace(/https?:\/\/[^\s]+/gi, "").trim();
+}
+
 // 🔗 LINK DETECTION (WEB — APP PARITY)
 function extractFirstUrl(text) {
   const match = text.match(/https?:\/\/[^\s]+/i);
@@ -463,6 +468,10 @@ let isSubmitting = false; // 🔒 sécurité anti double submit
 // 🔑 MEDIA DRAFT (PARITÉ APP)
 let draftMedia = [];           // [{ file, url }]
 let draftCarouselIndex = 0;
+
+// 🔒 STABILITÉ PREVIEW (MOBILE SAFARI)
+let lastPreviewType = null; // "none" | "link" | "youtube"
+let lastPreviewUrl = null;
   
 
 function resetCreatePost() {
@@ -852,11 +861,18 @@ function closeLocationPanel() {
      =============================== */
 
   message.oninput = () => {
-  const text = message.value || "";
-
-  // 🔗 détection lien
+  let text = message.value || "";
   const url = extractFirstUrl(text);
   const youtubeId = extractYouTubeId(url);
+
+  // ✅ PARITÉ APP — on retire l’URL du texte dès détection
+  if (url && !youtubeId) {
+  const cleaned = stripUrlFromText(text);
+  if (cleaned !== text) {
+    message.value = cleaned;
+    text = cleaned;
+  }
+}
 
     // 🔁 même lien déjà prêt → ne rien refaire
   if (
@@ -896,14 +912,19 @@ if (localLinkPreview.status === "detected") {
 
    renderPreview(); // ✅ AFFICHE LE LOADING IMMÉDIATEMENT
 
-  fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${window.AUTH.token}`,
-    },
-    body: JSON.stringify({ url }),
-  })
+  const headers = {
+  "Content-Type": "application/json",
+};
+
+if (window.AUTH?.token) {
+  headers.Authorization = `Bearer ${window.AUTH.token}`;
+}
+
+fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify({ url }),
+})
     .then((res) => res.ok ? res.json() : null)
     .then((data) => {
       if (!data) return;
@@ -923,12 +944,12 @@ if (localLinkPreview.status === "detected") {
       localLinkPreview = null;
     });
 }
-  } else {
-  // 🧹 aucun lien → reset
+ } else {
+  // ✅ EXACTEMENT COMME YOUTUBE :
+  // on ne supprime la preview QUE si aucune URL n’est détectable
   if (localLinkPreview) {
-    console.log("🧹 Link removed");
     localLinkPreview = null;
-    renderPreview(); // 🔥 OBLIGATOIRE
+    renderPreview();
   }
 }
 
@@ -938,11 +959,37 @@ if (localLinkPreview.status === "detected") {
  function renderPreview() {
   const mediaSlot = document.getElementById("cp-media-slot");
 
-  // RESET MEDIA SEULEMENT
-mediaSlot.innerHTML = "";
+   // ===============================
+  // 🔒 STABILITÉ PREVIEW (ANTI JUMP)
+  // ===============================
 
-// 🔥 RESET PREVIEW (OBLIGATOIRE — évite les doublons)
-preview.innerHTML = "";
+  const currentType =
+    localLinkPreview?.status === "youtube"
+      ? "youtube"
+      : localLinkPreview?.status === "ready"
+      ? "link"
+      : "none";
+
+  const currentUrl = localLinkPreview?.url || null;
+
+  if (
+    currentType === lastPreviewType &&
+    currentUrl === lastPreviewUrl
+  ) {
+    return; // ⛔️ RIEN À FAIRE → on ne touche pas au DOM
+  }
+
+  const shouldReset =
+  currentType !== "none" ||
+  lastPreviewType !== "none";
+
+lastPreviewType = currentType;
+lastPreviewUrl = currentUrl;
+
+if (shouldReset) {
+  preview.innerHTML = "";
+  mediaSlot.innerHTML = "";
+}
 
 // =========================
 // YOUTUBE PREVIEW — DRAFT (APP PARITY)

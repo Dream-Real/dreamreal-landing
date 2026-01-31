@@ -1424,3 +1424,106 @@ body {
 #cp-location-save {
   display: none !important;
 }
+/* =========================================
+   MOBILE ONLY — CREATE POST — YOUTUBE PREVIEW
+   App-like: edge-to-edge + 16:9 + no overflow
+========================================= */
+
+/* sécurité anti scroll horizontal dans la modale */
+.dr-mobile .cp-modal,
+.dr-mobile .cp-body {
+  overflow-x: hidden;
+}
+
+/* la preview youtube est dans #cp-preview -> on lui donne le même bord-à-bord que cp-media-slot */
+.dr-mobile .cp-preview .post-media.youtube-preview {
+  width: calc(100% + 48px);   /* 24px + 24px */
+  margin-left: -24px;
+  margin-right: -24px;
+
+  background: #000;
+  overflow: hidden;
+}
+
+/* conteneur ratio EXACT YouTube (comme l'app) */
+.dr-mobile .cp-preview .post-media.youtube-preview .yt-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;       /* 🔥 clé : YouTube = 16:9 */
+  background: #000;
+  overflow: hidden;
+}
+
+/* l’image remplit le ratio sans déformation */
+.dr-mobile .cp-preview .post-media.youtube-preview .yt-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* ✅ identique app: cover dans un 16:9 => pas de crop visible */
+  display: block;             /* ✅ évite les “gaps” inline */
+}
+
+/* overlay play centré */
+.dr-mobile .cp-preview .post-media.youtube-preview .yt-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  color: #fff;
+  background: rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+/* =========================================
+   MOBILE — CREATE POST — LINK PREVIEW
+   App-like, visible & edge-to-edge
+========================================= */
+
+.dr-mobile .cp-preview .cp-link-preview-draft {
+  width: calc(100% + 48px);   /* bord-à-bord comme YouTube */
+  margin-left: -24px;
+  margin-right: -24px;
+
+  background: rgba(26, 30, 53, 0.95);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+
+  overflow: hidden;
+}
+
+/* Image preview */
+.dr-mobile .cp-preview .cp-link-preview-draft img {
+  width: 100%;
+  height: 180px;              /* même logique que l’app */
+  object-fit: cover;
+  display: block;
+}
+
+/* Texte preview */
+.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-text {
+  padding: 14px 16px;
+}
+
+/* Site name */
+.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-site {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+/* Titre */
+.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+/* Description */
+.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-description {
+  font-size: 14px;
+  line-height: 1.35;
+  color: #d1d5db;
+}

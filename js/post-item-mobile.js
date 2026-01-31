@@ -191,7 +191,7 @@ messageNode.appendChild(p);
   }
 }
 
-  /* ----------------------------------------
+   /* ----------------------------------------
      MEDIA
   ----------------------------------------- */
 
@@ -209,6 +209,42 @@ messageNode.appendChild(p);
         window.open(`https://www.youtube.com/watch?v=${ytId}`, "_blank");
       container.appendChild(yt);
     }
+  }
+
+  // 🔥 LINK PREVIEW (CLASSIC — MOBILE, APP PARITY)
+  else if (post.link_preview && post.link_preview.url) {
+    const link = document.createElement("a");
+    link.className = "post-link-preview";
+    link.href = post.link_preview.url;
+    link.target = "_blank";
+    link.rel = "noopener";
+
+    link.innerHTML = `
+      ${
+        post.link_preview.image
+          ? `<img src="${post.link_preview.image}" alt="" />`
+          : ""
+      }
+      <div class="link-preview-text">
+        ${
+          post.link_preview.siteName
+            ? `<div class="site">${post.link_preview.siteName}</div>`
+            : ""
+        }
+        ${
+          post.link_preview.title
+            ? `<div class="title">${post.link_preview.title}</div>`
+            : ""
+        }
+        ${
+          post.link_preview.description
+            ? `<div class="desc">${post.link_preview.description}</div>`
+            : ""
+        }
+      </div>
+    `;
+
+    container.appendChild(link);
   }
 
   // Video
