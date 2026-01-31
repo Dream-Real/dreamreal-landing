@@ -1724,3 +1724,51 @@ body {
   max-width: 100vw !important;
   margin-left: calc(50% - 50vw); /* 🔥 clé absolue */
 }
+/* =========================================
+   FIX FINAL — Mood bubble visibility
+   WITHOUT pushing textarea
+========================================= */
+
+/* Inline row : aucune hauteur forcée par défaut */
+.cp-inline-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* 🔑 On réserve de la hauteur UNIQUEMENT s’il y a un mood */
+.cp-inline-row:has(#cp-inline-mood) {
+  min-height: 36px;
+}
+
+/* Espacement preview seulement si mood présent */
+.cp-inline-row:has(#cp-inline-mood) + .cp-preview {
+  margin-top: 6px;
+}
+
+/* La bulle reste une vraie box */
+#cp-inline-mood {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+/* =========================================
+   FIX FINAL — Location hidden when preview exists
+   Same logic as mood (NO layout push)
+========================================= */
+
+/* La ligne inline doit exister s'il y a une location */
+.cp-inline-row:has(#cp-inline-location) {
+  min-height: 28px;
+}
+
+/* Espacement preview uniquement si location présente */
+.cp-inline-row:has(#cp-inline-location) + .cp-preview {
+  margin-top: 6px;
+}
+
+/* La location doit être une vraie box */
+#cp-inline-location {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}

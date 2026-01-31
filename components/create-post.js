@@ -26,8 +26,6 @@ function waitForGooglePlaces(cb) {
 
 window.CDN_URL = window.CDN_URL || "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
-let localLinkPreview = null;
-
 async function uploadMediaFile(file) {
   const API_BASE = "https://dreamreal-api.onrender.com";
 
@@ -472,7 +470,8 @@ let draftCarouselIndex = 0;
 // 🔒 STABILITÉ PREVIEW (MOBILE SAFARI)
 let lastPreviewType = null; // "none" | "link" | "youtube"
 let lastPreviewUrl = null;
-  
+let lastMoodKey = null;
+let lastLocationKey = null;
 
 function resetCreatePost() {
   isSubmitting = false; // 🔓 reset sécurité submit (ICI EXACTEMENT)
@@ -488,8 +487,13 @@ draftCarouselIndex = 0;
 
   preview.innerHTML = "";
   // 🔥 FORCE RESET PREVIEW STATE (OBLIGATOIRE)
-lastPreviewType = null;
-lastPreviewUrl = null;
+  // 🔥 RESET COMPLET DES CACHES DE PREVIEW
+  lastPreviewType = null;
+  lastPreviewUrl = null;
+  lastMoodKey = null;
+  lastLocationKey = null;
+  localLinkPreview = null;
+
   updateSubmit();
   closeMoodPanel();
   locationInput.value = "";
@@ -508,6 +512,13 @@ triggers.forEach((trigger) => {
     mood = null;
     location = null;
     preview.innerHTML = "";
+
+        // 🔥 RESET COMPLET DES CACHES DE PREVIEW (OUVERTURE MODALE)
+    lastPreviewType = null;
+    lastPreviewUrl = null;
+    lastMoodKey = null;
+    lastLocationKey = null;
+    localLinkPreview = null;
 
     // ✅ RÉ-INJECTION SAFE DE L’USER
     const user = window.AUTH?.user;
@@ -981,19 +992,31 @@ if (draftMedia.length > 0) {
   lastPreviewUrl = null;
 }
 
-  if (
-    currentType === lastPreviewType &&
-    currentUrl === lastPreviewUrl
-  ) {
-    return; // ⛔️ RIEN À FAIRE → on ne touche pas au DOM
-  }
+  const currentMoodKey = mood
+  ? `${mood.feeling.id}-${mood.activity.id}`
+  : null;
 
-  const shouldReset =
-  currentType !== "none" ||
-  lastPreviewType !== "none";
+const currentLocationKey = location ? String(location) : null;
+
+if (
+  currentType === lastPreviewType &&
+  currentUrl === lastPreviewUrl &&
+  currentMoodKey === lastMoodKey &&
+  currentLocationKey === lastLocationKey
+) {
+  return; // ⛔️ SAFE
+}
+
+const shouldReset =
+  currentType !== lastPreviewType ||
+  currentUrl !== lastPreviewUrl ||
+  currentMoodKey !== lastMoodKey ||
+  currentLocationKey !== lastLocationKey;
 
 lastPreviewType = currentType;
 lastPreviewUrl = currentUrl;
+lastMoodKey = currentMoodKey;
+lastLocationKey = currentLocationKey;
 
 if (shouldReset) {
   preview.innerHTML = "";
@@ -1031,7 +1054,7 @@ if (
 ) {
   // 🔑 CONTEXTE FEED — OBLIGATOIRE POUR LE CSS
 const fakePost = document.createElement("div");
-fakePost.className = "post-item-mobile";
+fakePost.className = "post-item-mobile is-draft-preview";
 
 const wrapper = document.createElement("div");
 wrapper.className = "post-media link-preview";
