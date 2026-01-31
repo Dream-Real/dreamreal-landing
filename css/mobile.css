@@ -1256,3 +1256,171 @@ body {
   width: 34px !important;
   height: 34px !important;
 }
+/* =========================================
+   CREATE POST — LOCATION
+   Nearby pills = search input width
+========================================= */
+
+/* Liste "Nearby places" uniquement */
+#cp-location-nearby .cp-fa-item {
+  width: 100%;                 /* 👈 prend toute la largeur utile */
+  box-sizing: border-box;
+
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Alignement strict avec l'input */
+.cp-location-sheet .cp-fa-list {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Assure la même géométrie que #cp-location-input */
+#cp-location-nearby .cp-fa-item {
+  min-height: 46px;            /* même hauteur que l’input */
+  padding: 12px 14px;          /* même padding horizontal */
+  border-radius: 10px;         /* même radius */
+}
+/* =========================================
+   CREATE POST — LOCATION (FIX NEARBY PILLS)
+   - restore pill rounding
+   - add spacing under title
+   - location modal only
+========================================= */
+
+/* 1) Espace sous le header (titre + flèche) dans la modale Location */
+.cp-location-panel .cp-location-sheet .cp-fa-header {
+  margin-bottom: 10px; /* 👈 redescend tout le contenu qui suit */
+}
+
+/* 2) Redescendre spécifiquement le bloc Nearby places */
+#cp-location-nearby {
+  margin-top: 10px; /* 👈 évite que les pills soient collées au titre */
+}
+
+/* 3) Nearby pills : même largeur que l'input, MAIS look "pill" restauré */
+#cp-location-nearby .cp-fa-item {
+  width: 100%;
+  box-sizing: border-box;
+
+  /* 🔁 RESTORE PILL LOOK */
+  border-radius: 999px;                 /* 👈 pill arrondie comme avant */
+  padding: 12px 18px;                   /* 👈 padding pill (confort) */
+  min-height: 46px;                     /* garde la hauteur “input-like” */
+}
+
+/* 4) Optionnel mais recommandé : garder un spacing entre les pills */
+#cp-location-nearby .cp-fa-item + .cp-fa-item {
+  margin-top: 10px; /* au lieu de margin-bottom:10px global si tu l’as ailleurs */
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Fix spacing under "Nearby places" title
+========================================= */
+
+/* Titre "Nearby places" */
+.cp-location-section-title {
+  margin-bottom: 14px; /* 👈 ESPACE CLÉ */
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* Sécurité : aucune collision avec les pills */
+#cp-location-nearby .cp-fa-list {
+  margin-top: 0;
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Nearby places pills = same height as feelings
+========================================= */
+
+/* Pills Nearby Places */
+#cp-location-nearby .cp-fa-item {
+  min-height: 52px;              /* 👈 clé : même hauteur perçue */
+  padding: 12px 18px;            /* identique feelings / activities */
+  align-items: center;
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Nearby places title (bigger & clearer)
+========================================= */
+
+.cp-location-section-title {
+  font-size: 18px;        /* 👈 anciennement ~15–16 */
+  font-weight: 600;       /* cohérent avec le reste de la modale */
+  line-height: 22px;
+  margin-bottom: 12px;    /* respiration avec les pills */
+  opacity: 0.95;
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Align "Nearby places" with pills
+========================================= */
+
+.cp-location-section-title {
+  padding-left: 10px;   /* 👈 même offset visuel que le contenu des pills */
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Lift "Nearby places" title slightly
+========================================= */
+
+.cp-location-section-title {
+  margin-top: -6px;   /* 👈 remonte le titre (ajuste -4 / -6 / -8 si besoin) */
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Lift search + nearby block (no header move)
+========================================= */
+
+.cp-location-panel .cp-location-sheet {
+  gap: 0px; /* 👈 au lieu de 12px */
+}
+
+/* =========================================
+   CREATE POST — SEARCH INPUT
+   Remove blue tap / focus highlight (iOS)
+========================================= */
+
+/* Location search */
+#cp-location-input,
+#cp-activity-search {
+  -webkit-tap-highlight-color: transparent; /* 🔥 kill blue tap */
+  outline: none;
+}
+
+/* Focus / active states (iOS & Chrome mobile) */
+#cp-location-input:focus,
+#cp-location-input:active,
+#cp-activity-search:focus,
+#cp-activity-search:active {
+  outline: none;
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.12); /* garde ton style */
+}
+
+/* Safari iOS autofill / focus glow safety */
+#cp-location-input::-webkit-textfield-decoration-container,
+#cp-activity-search::-webkit-textfield-decoration-container {
+  box-shadow: none;
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Move Nearby title + pills DOWN as one block
+   (header & search untouched)
+========================================= */
+
+#cp-location-nearby {
+  margin-top: 18px; /* 👈 ajuste : 8 / 12 / 16 */
+}
+/* =========================================
+   CREATE POST — LOCATION
+   Remove Save / Cancel buttons
+========================================= */
+
+#cp-location-cancel,
+#cp-location-save {
+  display: none !important;
+}

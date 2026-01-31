@@ -4,6 +4,26 @@
 
    console.log("🟢 create-post.js START");
 
+   // =========================
+// GOOGLE PLACES — SAFE LOAD (MOBILE)
+// =========================
+function waitForGooglePlaces(cb) {
+  if (window.google?.maps?.places) {
+    cb();
+    return;
+  }
+
+  const interval = setInterval(() => {
+    if (window.google?.maps?.places) {
+      clearInterval(interval);
+      cb();
+    }
+  }, 50);
+
+  // sécurité
+  setTimeout(() => clearInterval(interval), 5000);
+}
+
 window.CDN_URL = window.CDN_URL || "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
 let localLinkPreview = null;
@@ -420,6 +440,8 @@ const locationCancel = document.getElementById("cp-location-cancel");
 const locationSave = document.getElementById("cp-location-save");
 const locationNearby = document.getElementById("cp-location-nearby");
 const locationNearbyList = document.getElementById("cp-location-nearby-list");
+const locationNearbyTitle =
+  locationNearby.querySelector(".cp-location-section-title");
 
 const triggers = document.querySelectorAll(".btn-create");
 
@@ -654,6 +676,10 @@ function openLocationPanel() {
   renderNearbyPlaces(); // ✅ AJOUT
 
   locationPanel.classList.remove("hidden");
+   // 🔑 ICI EXACTEMENT : init Google Places
+  waitForGooglePlaces(() => {
+    initLocationAutocomplete();
+  });
 }
 
 function renderNearbyPlaces() {
@@ -686,91 +712,123 @@ function renderNearbyPlaces() {
 }
 
 // ===============================
-// GOOGLE PLACES AUTOCOMPLETE (WEB)
+// GOOGLE PLACES AUTOCOMPLETE (WEB + MOBILE SAFE)
 // ===============================
 
 let placesService = null;
 let sessionToken = null;
 let locationDebounce = null;
 
-locationInput.addEventListener("input", () => {
-  // 🧹 annule l’appel précédent
-  clearTimeout(locationDebounce);
+// 🔒 empêche l'ajout multiple du listener
+let locationAutocompleteInitialized = false;
 
-  // ⏳ attend 300 ms après la dernière frappe
-  locationDebounce = setTimeout(() => {
-    // 🔒 sécurité Google
-    if (!window.google || !google.maps || !google.maps.places) {
-      console.warn("⚠️ Google Places not loaded");
-      return;
-    }
+function initLocationAutocomplete() {
+  if (!locationInput) return;
 
-    const query = locationInput.value.trim();
-    const currentQuery = query; // 🔒 snapshot anti-race-condition
-    locationResults.innerHTML = "";
+  // 🛑 STOP si déjà initialisé
+  if (locationAutocompleteInitialized) return;
+  locationAutocompleteInitialized = true; // 🔒 UNE SEULE FOIS
 
-    if (!query) {
-  locationResults.innerHTML = "";
-  locationNearby.classList.remove("hidden"); // 🔑 IMPORTANT
-  renderNearbyPlaces();
-  return;
-}
+  // ===============================
+  // HANDLER UNIQUE (desktop + mobile)
+  // ===============================
+  const handleLocationQuery = () => {
+    clearTimeout(locationDebounce);
 
-    locationNearby.classList.add("hidden");
-
-    // Init service une seule fois
-    if (!placesService) {
-      placesService = new google.maps.places.AutocompleteService();
-    }
-
-    // Session token = groupement facturation
-    sessionToken =
-      sessionToken ||
-      new google.maps.places.AutocompleteSessionToken();
-
-    placesService.getPlacePredictions(
-      {
-        input: query,
-        sessionToken,
-        types: ["geocode", "establishment"],
-      },
-      (predictions, status) => {
-  // 🔐 Ignore les réponses obsolètes
-  if (locationInput.value.trim() !== currentQuery) {
-    return;
-  }
-
-  if (
-    status !== google.maps.places.PlacesServiceStatus.OK ||
-    !predictions
-  ) {
-    return;
-  }
-
-        locationResults.innerHTML = "";
-
-        predictions.forEach((prediction) => {
-          const item = document.createElement("div");
-          item.className = "cp-fa-item";
-          item.textContent = prediction.description;
-
-          item.onclick = () => {
-            location = prediction.description;
-            locationInput.value = prediction.description;
-
-            renderPreview();
-            updateSubmit();
-            closeLocationPanel();
-
-            sessionToken = null; // 🔑 reset après sélection
-          };
-
-          locationResults.appendChild(item);
-        });
+    locationDebounce = setTimeout(() => {
+      // 🔐 sécurité Google
+      if (!window.google || !google.maps || !google.maps.places) {
+        console.warn("⚠️ Google Places not loaded");
+        return;
       }
-    );
-  }, 300); // 🎯 DEBOUNCE = 300ms (APP-LIKE)
-});
+
+      const query = locationInput.value.trim();
+      const currentQuery = query;
+
+      // =========================
+      // INPUT VIDE → NEARBY DEFAULT
+      // =========================
+      if (!query) {
+        locationNearbyList.innerHTML = "";
+
+        const title = locationNearby.querySelector(
+          ".cp-location-section-title"
+        );
+        if (title) title.style.display = "";
+
+        locationNearby.classList.remove("hidden");
+        renderNearbyPlaces();
+        return;
+      }
+
+      // =========================
+      // GOOGLE PLACES AUTOCOMPLETE
+      // =========================
+      if (!placesService) {
+        placesService = new google.maps.places.AutocompleteService();
+      }
+
+      sessionToken =
+        sessionToken ||
+        new google.maps.places.AutocompleteSessionToken();
+
+      placesService.getPlacePredictions(
+        {
+          input: query,
+          sessionToken,
+          types: ["geocode", "establishment"],
+        },
+        (predictions, status) => {
+          // 🔐 ignore réponses obsolètes
+          if (locationInput.value.trim() !== currentQuery) return;
+
+          if (
+            status !== google.maps.places.PlacesServiceStatus.OK ||
+            !predictions
+          ) {
+            return;
+          }
+
+          // 🔁 remplace les pills Nearby
+          locationNearbyList.innerHTML = "";
+
+          const title = locationNearby.querySelector(
+            ".cp-location-section-title"
+          );
+          if (title) title.style.display = "none";
+
+          locationNearby.classList.remove("hidden");
+
+          predictions.forEach((prediction) => {
+            const item = document.createElement("div");
+            item.className = "cp-fa-item";
+            item.textContent = prediction.description;
+
+            item.onclick = () => {
+              location = prediction.description;
+              locationInput.value = prediction.description;
+
+              renderPreview();
+              updateSubmit();
+              closeLocationPanel();
+
+              sessionToken = null; // 🔑 reset après sélection
+            };
+
+            locationNearbyList.appendChild(item);
+          });
+        }
+      );
+    }, 300); // 🎯 debounce app-like
+  };
+
+  // ===============================
+  // LISTENERS (desktop + mobile)
+  // ===============================
+  locationInput.addEventListener("input", handleLocationQuery);   // desktop
+  locationInput.addEventListener("keyup", handleLocationQuery);   // mobile Safari
+  locationInput.addEventListener("change", handleLocationQuery);  // iOS fallback
+}
 
 locationCancel.onclick = closeLocationPanel;
 
