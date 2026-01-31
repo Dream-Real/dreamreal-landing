@@ -1022,41 +1022,55 @@ if (localLinkPreview?.status === "youtube") {
 }
 
   // =========================
-// LINK PREVIEW — FEED PARITY
+// LINK PREVIEW — FEED PARITY (FIX FINAL)
 // =========================
-if (localLinkPreview && localLinkPreview.status === "ready" && !localLinkPreview.youtubeId) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "post-media link-preview cp-link-preview-draft";
+if (
+  localLinkPreview &&
+  localLinkPreview.status === "ready" &&
+  !localLinkPreview.youtubeId
+) {
+  // 🔑 CONTEXTE FEED — OBLIGATOIRE POUR LE CSS
+const fakePost = document.createElement("div");
+fakePost.className = "post-item-mobile";
 
-  wrapper.innerHTML = `
+const wrapper = document.createElement("div");
+wrapper.className = "post-media link-preview";
+
+wrapper.innerHTML = `
+  ${
+    localLinkPreview.image
+      ? `<img src="${localLinkPreview.image}" alt="" />`
+      : ""
+  }
+
+  <div class="link-preview-body">
     ${
-      localLinkPreview.image
-        ? `<img src="${localLinkPreview.image}" alt="" />`
+      localLinkPreview.siteName
+        ? `<div class="link-preview-site">${localLinkPreview.siteName}</div>`
         : ""
     }
 
-    <div class="link-preview-text">
-  ${
-    localLinkPreview.siteName
-      ? `<div class="link-preview-site">${localLinkPreview.siteName}</div>`
-      : ""
-  }
+    ${
+      localLinkPreview.title
+        ? `<div class="link-preview-title">${localLinkPreview.title}</div>`
+        : ""
+    }
 
-  ${
-    localLinkPreview.title
-      ? `<div class="link-preview-title">${localLinkPreview.title}</div>`
-      : ""
-  }
+    ${
+      localLinkPreview.description
+        ? `<div class="link-preview-desc">${localLinkPreview.description}</div>`
+        : ""
+    }
+  </div>
+`;
 
-  ${
-    localLinkPreview.description
-      ? `<div class="link-preview-description">${localLinkPreview.description}</div>`
-      : ""
-  }
-</div>
-  `;
+wrapper.onclick = () => {
+  window.open(localLinkPreview.url, "_blank");
+};
 
-  preview.appendChild(wrapper);
+// 🔥 STRUCTURE IDENTIQUE AU FEED
+fakePost.appendChild(wrapper);
+preview.appendChild(fakePost);
 }
 
     // =========================

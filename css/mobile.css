@@ -519,13 +519,24 @@ body {
 }
 
 .post-carousel img {
-  width: calc(100vw - 24px);
+  width: 100%;
+  max-width: 100%;
   height: 400px;
 
   object-fit: cover;
   border-radius: 6px;
 
   scroll-snap-align: start;
+  display: block;
+}
+.post-carousel {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.post-carousel > * {
+  flex: 0 0 100%;
+  max-width: 100%;
 }
 
 /* YouTube */
@@ -1476,57 +1487,6 @@ body {
   background: rgba(0,0,0,0.25);
   pointer-events: none;
 }
-/* =========================================
-   MOBILE — CREATE POST — LINK PREVIEW
-   App-like, visible & edge-to-edge
-========================================= */
-
-.dr-mobile .cp-preview .cp-link-preview-draft {
-  width: calc(100% + 48px);   /* bord-à-bord comme YouTube */
-  margin-left: -24px;
-  margin-right: -24px;
-
-  background: rgba(26, 30, 53, 0.95);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-
-  overflow: hidden;
-}
-
-/* Image preview */
-.dr-mobile .cp-preview .cp-link-preview-draft img {
-  width: 100%;
-  height: 180px;              /* même logique que l’app */
-  object-fit: cover;
-  display: block;
-}
-
-/* Texte preview */
-.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-text {
-  padding: 14px 16px;
-}
-
-/* Site name */
-.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-site {
-  font-size: 13px;
-  color: #9ca3af;
-  margin-bottom: 4px;
-}
-
-/* Titre */
-.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 4px;
-}
-
-/* Description */
-.dr-mobile .cp-preview .cp-link-preview-draft .link-preview-description {
-  font-size: 14px;
-  line-height: 1.35;
-  color: #d1d5db;
-}
 /* =========================================================
    FIX CROIX MEDIA (SINGLE + CAROUSEL)
    ========================================================= */
@@ -1557,4 +1517,210 @@ body {
   font-size: 16px;
   cursor: pointer;
   z-index: 10;
+}
+/* =========================================================
+   HIDE SCROLLBAR — CREATE POST CAROUSEL
+   ========================================================= */
+
+.cp-carousel {
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* iOS / momentum scroll */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Chrome / Safari / Edge */
+.cp-carousel::-webkit-scrollbar {
+  display: none;
+}
+.feed,
+.post-item-mobile,
+.post-message,
+.post-media,
+.post-image,
+.post-video,
+.post-youtube {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+/* =========================================
+   MOBILE FEED — CLASSIC LINK PREVIEW
+   (ALIGNED WITH post-item-mobile.js)
+========================================= */
+
+.post-item-mobile .post-media.link-preview {
+  margin: 6px 12px 0;
+  border-radius: 10px;
+  overflow: hidden;
+
+  /* ✅ enlève la bordure grise */
+  border: none;
+
+  background: transparent;
+}
+
+/* clickable area */
+.post-item-mobile .post-media.link-preview a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* image */
+.post-item-mobile .post-media.link-preview img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+
+  /* ✅ on garde la séparation image/texte (pas la bordure externe) */
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 🔑 TEXTE — ESPACEMENT APP-LIKE */
+.post-item-mobile .link-preview-body {
+  padding: 14px 16px 16px; /* ← clé : décollage bordure */
+}
+
+/* site */
+.post-item-mobile .link-preview-site {
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* title */
+.post-item-mobile .link-preview-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+/* description */
+.post-item-mobile .link-preview-desc {
+  font-size: 14px;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+/* 🔑 sépare visuellement image et texte */
+.post-item-mobile .post-media.link-preview .link-preview-body {
+  display: block;
+  background: rgba(26, 30, 53, 0.95); /* même fond que l'app */
+  /* 🔑 AJOUT ICI */
+  padding: 14px 16px 16px; /* +4px en haut = respiration image → texte */
+}
+/* 🔑 RESPIRATION IMAGE → TEXTE (SOURCE DE VÉRITÉ APP) */
+.post-item-mobile .link-preview-site {
+  margin-top: 10px; /* ← EXACTEMENT ce que fait RN visuellement */
+}
+/* =========================================
+   CREATE POST — CLASSIC LINK PREVIEW
+   EXACT SAME RENDER AS FEED
+========================================= */
+
+.cp-preview .post-media.link-preview {
+  margin: 6px 0 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* image */
+.cp-preview .post-media.link-preview img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* body */
+.cp-preview .post-media.link-preview .link-preview-body {
+  display: block;
+  background: rgba(26, 30, 53, 0.95);
+  padding: 14px 16px 16px;
+}
+
+/* site */
+.cp-preview .link-preview-site {
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* title */
+.cp-preview .link-preview-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+/* description */
+.cp-preview .link-preview-desc {
+  font-size: 14px;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+/* CREATE — neutralise les artefacts du feed */
+.post-item-mobile.is-draft-preview::after {
+  display: none;
+}
+
+.post-item-mobile.is-draft-preview {
+  padding-top: 0;
+}
+/* =========================================
+   CREATE — neutralise le séparateur du feed
+========================================= */
+.post-item-mobile.is-draft-preview::after {
+  content: none;        /* 👈 plus robuste que display:none */
+}
+
+.post-item-mobile.is-draft-preview {
+  padding-bottom: 0;    /* sécurité visuelle */
+}
+/* =========================================
+   CREATE POST — KILL FEED SEPARATOR (FINAL)
+========================================= */
+.cp-preview .post-item-mobile::after {
+  content: none !important;
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+}
+/* =========================================
+   FIX DEFINITIF — YOUTUBE PREVIEW CROP (iOS)
+========================================= */
+
+/* 1️⃣ Autoriser le débordement HORIZONTAL uniquement ici */
+.dr-mobile .cp-preview {
+  overflow-x: visible !important;
+}
+
+/* 2️⃣ La preview elle-même ne doit JAMAIS être limitée */
+.dr-mobile .cp-preview .post-media.youtube-preview {
+  max-width: 100vw !important;
+  overflow: visible !important;
+}
+
+/* 3️⃣ L’image doit suivre le viewport, pas le container paddé */
+.dr-mobile .cp-preview .post-media.youtube-preview img {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  margin-left: calc(50% - 50vw); /* 🔥 clé absolue */
 }

@@ -212,40 +212,45 @@ messageNode.appendChild(p);
   }
 
   // 🔥 LINK PREVIEW (CLASSIC — MOBILE, APP PARITY)
-  else if (post.link_preview && post.link_preview.url) {
-    const link = document.createElement("a");
-    link.className = "post-link-preview";
-    link.href = post.link_preview.url;
-    link.target = "_blank";
-    link.rel = "noopener";
+else if (post.link_preview && post.link_preview.url) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "post-media link-preview";
 
-    link.innerHTML = `
+  wrapper.innerHTML = `
+    <a
+      class="link-preview"
+      href="${post.link_preview.url}"
+      target="_blank"
+      rel="noopener"
+    >
       ${
         post.link_preview.image
           ? `<img src="${post.link_preview.image}" alt="" />`
           : ""
       }
+
       <div class="link-preview-text">
         ${
           post.link_preview.siteName
-            ? `<div class="site">${post.link_preview.siteName}</div>`
+            ? `<div class="link-preview-site">${post.link_preview.siteName}</div>`
             : ""
         }
         ${
           post.link_preview.title
-            ? `<div class="title">${post.link_preview.title}</div>`
+            ? `<div class="link-preview-title">${post.link_preview.title}</div>`
             : ""
         }
         ${
           post.link_preview.description
-            ? `<div class="desc">${post.link_preview.description}</div>`
+            ? `<div class="link-preview-description">${post.link_preview.description}</div>`
             : ""
         }
       </div>
-    `;
+    </a>
+  `;
 
-    container.appendChild(link);
-  }
+  container.appendChild(wrapper);
+}
 
   // Video
   else if (videoUrl) {
