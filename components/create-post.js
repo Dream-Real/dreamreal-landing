@@ -487,6 +487,9 @@ draftMedia = [];
 draftCarouselIndex = 0;
 
   preview.innerHTML = "";
+  // 🔥 FORCE RESET PREVIEW STATE (OBLIGATOIRE)
+lastPreviewType = null;
+lastPreviewUrl = null;
   updateSubmit();
   closeMoodPanel();
   locationInput.value = "";
@@ -972,6 +975,12 @@ fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
 
   const currentUrl = localLinkPreview?.url || null;
 
+  // 🔓 NE PAS BLOQUER LE RENDER SI MEDIA CHANGE
+if (draftMedia.length > 0) {
+  lastPreviewType = null;
+  lastPreviewUrl = null;
+}
+
   if (
     currentType === lastPreviewType &&
     currentUrl === lastPreviewUrl
@@ -1096,10 +1105,42 @@ if (draftMedia.length === 1) {
   let mediaEl;
   if (m.file.type.startsWith("video")) {
   mediaEl = document.createElement("video");
+
   const objectUrl = URL.createObjectURL(m.file);
   mediaEl.src = objectUrl;
   mediaEl.dataset.objectUrl = objectUrl;
+
+  // ✅ ATTRS CRITIQUES iOS/Safari
+  mediaEl.muted = true;
+  mediaEl.playsInline = true;
+  mediaEl.setAttribute("playsinline", "");
+  mediaEl.setAttribute("webkit-playsinline", "");
+  mediaEl.preload = "metadata";
   mediaEl.controls = true;
+
+  wrapper.style.background = "transparent";
+mediaEl.style.background = "transparent";
+
+  // ✅ FORCE RENDER FIRST FRAME (sinon écran noir)
+  const prime = async () => {
+    try {
+
+      // 1) play (muted => autorisé), 2) pause immédiat
+      const p = mediaEl.play();
+      if (p && p.catch) await p.catch(() => {});
+      mediaEl.pause();
+
+      // 3) seek minuscule pour déclencher un paint
+      // (0.01 marche mieux que 0 sur iOS)
+      mediaEl.currentTime = 0.01;
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // prime au bon moment
+  mediaEl.addEventListener("loadedmetadata", prime, { once: true });
+  mediaEl.addEventListener("canplay", prime, { once: true });
 }else {
     mediaEl = new Image();
     const objectUrl = URL.createObjectURL(m.file);
@@ -1126,6 +1167,9 @@ mediaEl.dataset.objectUrl = objectUrl;
   }
   draftMedia = [];
   draftCarouselIndex = 0;
+    // 🔥 FORCE RE-RENDER (anti-jump override)
+  lastPreviewType = null;
+  lastPreviewUrl = null;
   renderPreview();
   updateSubmit();
 };

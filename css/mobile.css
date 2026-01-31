@@ -1527,3 +1527,34 @@ body {
   line-height: 1.35;
   color: #d1d5db;
 }
+/* =========================================================
+   FIX CROIX MEDIA (SINGLE + CAROUSEL)
+   ========================================================= */
+
+.cp-media-preview,
+.cp-carousel,
+.cp-carousel-slide {
+  position: relative;
+}
+
+.cp-carousel-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+}
