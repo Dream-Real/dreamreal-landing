@@ -880,9 +880,15 @@ function closeLocationPanel() {
   const youtubeId = extractYouTubeId(url);
 
   // ✅ PARITÉ APP — on retire l’URL du texte dès détection
-  if (url && !youtubeId) {
+  // ⚠️ ON NE STRIP L’URL QUE POUR YOUTUBE
+if (youtubeId) {
   const cleaned = stripUrlFromText(text);
-  if (cleaned !== text) {
+
+  // 🔑 GARANTIE BACKEND : message jamais vide pour YouTube
+  if (!cleaned) {
+    message.value = " "; // espace volontaire (comme l’app)
+    text = " ";
+  } else if (cleaned !== text) {
     message.value = cleaned;
     text = cleaned;
   }
@@ -985,6 +991,15 @@ fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
       : "none";
 
   const currentUrl = localLinkPreview?.url || null;
+
+// 🔥 FORCE RENDER quand un link passe en "ready"
+if (
+  localLinkPreview?.status === "ready" &&
+  lastPreviewType === "link" &&
+  lastPreviewUrl === localLinkPreview.url
+) {
+  lastPreviewType = null;
+}
 
   // 🔓 NE PAS BLOQUER LE RENDER SI MEDIA CHANGE
 if (draftMedia.length > 0) {
@@ -1286,7 +1301,9 @@ if (mood) {
 }
 
   function updateSubmit() {
-  const hasText = message.value.trim().length > 0;
+  const hasText =
+  message.value.trim().length > 0 ||
+  (localLinkPreview && localLinkPreview.status === "youtube");
   const hasMood = !!mood;
   const hasLocation = !!location;
   const hasMedia = draftMedia.length > 0;
@@ -1326,6 +1343,17 @@ console.log("🧪 SNAPSHOT LINK PREVIEW (SUBMIT)", linkPreviewSnapshot);
 
   console.log("🟢 SUBMIT AUTORISÉ — ON CONTINUE");
 
+  // 🔥 GARANTIE MESSAGE NON VIDE POUR YOUTUBE (OBLIGATOIRE)
+let finalMessage = message.value;
+
+if (
+  localLinkPreview &&
+  localLinkPreview.status === "youtube" &&
+  !finalMessage.trim()
+) {
+  finalMessage = " "; // EXACTEMENT comme l’app
+}
+
   // =========================
   // BUILD LOCAL POST (MOCK)
   // =========================
@@ -1363,7 +1391,7 @@ const localPost = {
     user_first_name: user.first_name || "",
 user_last_name: user.last_name || "",
 user_avatar: getSafeAvatar(user),
-    message: message.value.trim() || null,
+    message: finalMessage,
     created_time: now,
 
     location: location
@@ -1450,7 +1478,7 @@ if (linkPreviewSnapshot) {
 
     const payload = {
       client_id: clientId,
-      message: message.value.trim() || null,
+      message: finalMessage,
 
       feeling: mood
         ? {
