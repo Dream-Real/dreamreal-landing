@@ -745,11 +745,18 @@ body {
   padding: 0 24px 8px;
 }
 
+/* =========================================
+   CREATE POST — USER AVATAR (MODAL)
+   Bigger, app-like
+========================================= */
+
 .cp-user img {
-  width: 40px;
-  height: 40px;
+  width: 48px;          /* 👈 anciennement 40px */
+  height: 48px;
+
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
 }
 
 .cp-user span {
@@ -1069,4 +1076,183 @@ body {
 
   padding: 0 14px;
   font-size: 16px;
+}
+/* =========================
+   CREATE POST — ACTIVITY SEARCH
+   Desktop parity (mobile)
+========================= */
+
+/* Wrapper — même logique que desktop / location */
+.cp-fa-search {
+  padding: 0 24px 12px;   /* aligné avec header & list */
+  margin: 0;
+}
+
+/* Champ de recherche */
+#cp-activity-search {
+  width: 100%;
+  height: 46px;                 /* EXACT desktop & location */
+
+  background-color: #2A2D59;
+  color: #ffffff;
+
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+
+  padding: 0 14px;
+  font-size: 16px;
+  line-height: 1;
+
+  outline: none;
+  box-shadow: none;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Placeholder — desktop exact */
+#cp-activity-search::placeholder {
+  color: rgba(248,250,252,0.6);
+  font-weight: 400;
+}
+
+/* Focus — clean, no glow */
+#cp-activity-search:focus {
+  border-color: rgba(147,197,253,0.45);
+  outline: none;
+  box-shadow: none;
+}
+
+/* Alignement search → list (no visual jump) */
+.cp-feeling-panel .cp-fa-search + .cp-fa-list {
+  margin-top: 0;
+  padding-top: 4px;
+}
+/* =========================
+   CREATE POST — ACTIVITIES PANEL OFFSET
+   (Search + Pills block)
+   SAFE: does NOT affect Feelings
+========================= */
+
+/* Décale TOUT le bloc "search + list" vers le bas */
+.cp-feeling-panel.is-activities {
+  padding-top: 12px; /* ⬅️ ajuste ici : 8 / 12 / 16 */
+}
+
+/* Barre de recherche */
+.cp-feeling-panel.is-activities .cp-fa-search {
+  margin-top: 12px;   /* ⬅️ descend la search */
+  padding-bottom: 12px;
+}
+
+/* Liste des activities (pills) */
+.cp-feeling-panel.is-activities .cp-fa-list {
+  padding-top: 8px;   /* ⬅️ descend les pills avec la search */
+}
+/* =========================
+   CREATE POST — ACTIVITIES HEADER OFFSET
+   Title + Back Arrow ONLY
+========================= */
+
+.cp-feeling-panel.is-activities .cp-fa-header {
+  padding-top: 6px;      /* ⬆️ remonte légèrement tout le header */
+  padding-bottom: 12px;
+}
+
+/* Flèche back */
+.cp-feeling-panel.is-activities .cp-fa-back {
+  top: 8px;              /* ⬆️ remonte la flèche indépendamment */
+}
+
+/* Titre */
+.cp-feeling-panel.is-activities .cp-fa-title {
+  margin-top: -2px;       /* ⬆️ micro-ajustement optique */
+}
+/* =========================================
+   CREATE POST — SELECTED MOOD / ACTIVITY
+   Same visual as FEED feeling bubble
+========================================= */
+
+#cp-inline-mood {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  /* mêmes espacements que .post-feeling-bubble */
+  padding: 5px 10px;
+  margin: 6px 0;
+
+  /* même géométrie */
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+
+  /* typo identique */
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #ffffff;
+
+  /* fond transparent (comme feed) */
+  background: transparent;
+
+  /* interaction */
+  cursor: pointer;
+}
+
+/* Emoji / icône activity */
+#cp-inline-mood img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* Texte feeling / activity */
+#cp-inline-mood span {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Hover / tap feedback (mobile subtil) */
+#cp-inline-mood:active {
+  opacity: 0.85;
+}
+/* =========================================
+   CREATE POST — INLINE MOOD OFFSET
+   Décalage horizontal (modal only)
+========================================= */
+
+#cp-inline-mood {
+  margin-left: 18px; /* 👈 ajuste ici : 8 / 12 / 16 */
+}
+/* =========================================
+   CREATE POST — HEADER MICRO OFFSET
+   (Title + Close icon ONLY)
+========================================= */
+
+/* Remonte légèrement le titre */
+.cp-header h3 {
+  position: relative;
+  top: -2px;            /* 👈 ajuste ici : -1 / -2 / -3 */
+}
+
+/* Remonte légèrement la croix */
+.cp-close {
+  position: absolute;
+  right: 8px;
+  top: 6px;             /* 👈 anciennement implicite, now controlled */
+}
+/* =========================================
+   CREATE POST — LOCATION ICON ONLY (FIX)
+========================================= */
+
+.cp-mini-btn[data-action="location"] .cp-icon {
+  width: 34px;   /* taille visible */
+  height: 34px;
+}
+
+/* 🔥 OVERRIDE SVG INLINE SIZE */
+.cp-mini-btn[data-action="location"] .cp-icon svg {
+  width: 34px !important;
+  height: 34px !important;
 }
