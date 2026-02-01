@@ -879,20 +879,7 @@ function closeLocationPanel() {
   const url = extractFirstUrl(text);
   const youtubeId = extractYouTubeId(url);
 
-  // ✅ PARITÉ APP — on retire l’URL du texte dès détection
   // ⚠️ ON NE STRIP L’URL QUE POUR YOUTUBE
-if (youtubeId) {
-  const cleaned = stripUrlFromText(text);
-
-  // 🔑 GARANTIE BACKEND : message jamais vide pour YouTube
-  if (!cleaned) {
-    message.value = " "; // espace volontaire (comme l’app)
-    text = " ";
-  } else if (cleaned !== text) {
-    message.value = cleaned;
-    text = cleaned;
-  }
-}
 
     // 🔁 même lien déjà prêt → ne rien refaire
   if (
@@ -904,18 +891,19 @@ if (youtubeId) {
     return;
   }
 
-  // 🎥 YOUTUBE → traitement dédié (AVANT preview classique)
-  if (youtubeId) {
-    localLinkPreview = {
-      url,
-      youtubeId,
-      status: "youtube",
-    };
+  // 🎥 YOUTUBE → détection ONLY (aucune mutation du textarea)
+if (youtubeId) {
 
-    renderPreview();
-    updateSubmit();
-    return; // ⛔️ CRITIQUE : on stoppe ici
-  }
+  localLinkPreview = {
+    url,
+    youtubeId,
+    status: "youtube",
+  };
+
+  renderPreview();
+  updateSubmit();
+  return;
+}
 
   if (url) {
     // ⚠️ on ne refetch PAS si déjà détecté
@@ -955,6 +943,12 @@ fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
         status: "ready",
       };
 
+      // 🧹 RETIRE L’URL BRUTE DU TEXTE (LINK CLASSIQUE)
+  const cleaned = stripUrlFromText(message.value);
+  if (cleaned !== message.value) {
+    message.value = cleaned || "";
+  }
+
       console.log("🔗 Link preview ready", localLinkPreview);
       renderPreview(); // 🔥 IMPORTANT
       updateSubmit();
@@ -992,15 +986,6 @@ fetch(`https://dreamreal-api.onrender.com/api/link-preview`, {
 
   const currentUrl = localLinkPreview?.url || null;
 
-// 🔥 FORCE RENDER quand un link passe en "ready"
-if (
-  localLinkPreview?.status === "ready" &&
-  lastPreviewType === "link" &&
-  lastPreviewUrl === localLinkPreview.url
-) {
-  lastPreviewType = null;
-}
-
   // 🔓 NE PAS BLOQUER LE RENDER SI MEDIA CHANGE
 if (draftMedia.length > 0) {
   lastPreviewType = null;
@@ -1012,6 +997,15 @@ if (draftMedia.length > 0) {
   : null;
 
 const currentLocationKey = location ? String(location) : null;
+
+// 🛡️ GARDE-FOU — LINK PASSE EN READY → FORCE RENDER
+if (
+  localLinkPreview?.status === "ready" &&
+  lastPreviewType === "link" &&
+  lastPreviewUrl === localLinkPreview.url
+) {
+  lastPreviewType = null;
+}
 
 if (
   currentType === lastPreviewType &&
@@ -1050,11 +1044,30 @@ if (localLinkPreview?.status === "youtube") {
   const thumbnail = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
 
   wrapper.innerHTML = `
+    <button class="link-preview-remove" aria-label="Remove video">✕</button>
     <div class="yt-thumb">
       <img src="${thumbnail}" alt="" />
       <div class="yt-play-overlay">▶</div>
     </div>
   `;
+
+  const removeBtn = wrapper.querySelector(".link-preview-remove");
+
+  removeBtn.onclick = (e) => {
+    e.stopPropagation();
+
+    // 🔥 reset preview YouTube
+    localLinkPreview = null;
+
+    // 🔥 reset guards (CRITIQUE)
+    lastPreviewType = null;
+    lastPreviewUrl = null;
+    lastMoodKey = null;
+    lastLocationKey = null;
+
+    renderPreview();
+    updateSubmit();
+  };
 
   preview.appendChild(wrapper);
 }
@@ -1075,6 +1088,8 @@ const wrapper = document.createElement("div");
 wrapper.className = "post-media link-preview";
 
 wrapper.innerHTML = `
+  <button class="link-preview-remove" aria-label="Remove link">✕</button>
+
   ${
     localLinkPreview.image
       ? `<img src="${localLinkPreview.image}" alt="" />`
@@ -1101,6 +1116,27 @@ wrapper.innerHTML = `
     }
   </div>
 `;
+
+const removeBtn = wrapper.querySelector(".link-preview-remove");
+
+if (removeBtn) {
+  removeBtn.onclick = (e) => {
+    e.stopPropagation(); // ⛔️ empêche l’ouverture du lien
+
+    localLinkPreview = null;
+
+    // 🔥 reset guards preview (CRITIQUE)
+    lastPreviewType = null;
+    lastPreviewUrl = null;
+
+    // ✅ AJOUT ICI (TRÈS IMPORTANT)
+    lastMoodKey = null;
+    lastLocationKey = null;
+
+    renderPreview();
+    updateSubmit();
+  };
+}
 
 wrapper.onclick = () => {
   window.open(localLinkPreview.url, "_blank");
@@ -1303,7 +1339,9 @@ if (mood) {
   function updateSubmit() {
   const hasText =
   message.value.trim().length > 0 ||
-  (localLinkPreview && localLinkPreview.status === "youtube");
+  (localLinkPreview &&
+    (localLinkPreview.status === "youtube" ||
+     localLinkPreview.status === "ready"));
   const hasMood = !!mood;
   const hasLocation = !!location;
   const hasMedia = draftMedia.length > 0;
@@ -1344,11 +1382,13 @@ console.log("🧪 SNAPSHOT LINK PREVIEW (SUBMIT)", linkPreviewSnapshot);
   console.log("🟢 SUBMIT AUTORISÉ — ON CONTINUE");
 
   // 🔥 GARANTIE MESSAGE NON VIDE POUR YOUTUBE (OBLIGATOIRE)
+// 🔥 GARANTIE MESSAGE NON VIDE (YOUTUBE + LINK CLASSIQUE)
 let finalMessage = message.value;
 
 if (
   localLinkPreview &&
-  localLinkPreview.status === "youtube" &&
+  (localLinkPreview.status === "youtube" ||
+   localLinkPreview.status === "ready") &&
   !finalMessage.trim()
 ) {
   finalMessage = " "; // EXACTEMENT comme l’app
