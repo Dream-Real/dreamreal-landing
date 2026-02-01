@@ -211,43 +211,40 @@ messageNode.appendChild(p);
     }
   }
 
-  // 🔥 LINK PREVIEW (CLASSIC — MOBILE, APP PARITY)
+// 🔥 LINK PREVIEW (CLASSIC — MOBILE, APP PARITY)
 else if (post.link_preview && post.link_preview.url) {
   const wrapper = document.createElement("div");
   wrapper.className = "post-media link-preview";
 
   wrapper.innerHTML = `
-    <a
-      class="link-preview"
-      href="${post.link_preview.url}"
-      target="_blank"
-      rel="noopener"
-    >
-      ${
-        post.link_preview.image
-          ? `<img src="${post.link_preview.image}" alt="" />`
-          : ""
-      }
+  ${
+    post.link_preview.image
+      ? `<img src="${post.link_preview.image}" alt="" />`
+      : ""
+  }
 
-      <div class="link-preview-text">
-        ${
-          post.link_preview.siteName
-            ? `<div class="link-preview-site">${post.link_preview.siteName}</div>`
-            : ""
-        }
-        ${
-          post.link_preview.title
-            ? `<div class="link-preview-title">${post.link_preview.title}</div>`
-            : ""
-        }
-        ${
-          post.link_preview.description
-            ? `<div class="link-preview-description">${post.link_preview.description}</div>`
-            : ""
-        }
-      </div>
-    </a>
-  `;
+  <div class="link-preview-body">
+    ${
+      post.link_preview.siteName
+        ? `<div class="link-preview-site">${post.link_preview.siteName}</div>`
+        : ""
+    }
+    ${
+      post.link_preview.title
+        ? `<div class="link-preview-title">${post.link_preview.title}</div>`
+        : ""
+    }
+    ${
+      post.link_preview.description
+        ? `<div class="link-preview-desc">${post.link_preview.description}</div>`
+        : ""
+    }
+  </div>
+`;
+
+wrapper.onclick = () => {
+  window.open(post.link_preview.url, "_blank");
+};
 
   container.appendChild(wrapper);
 }
@@ -263,18 +260,29 @@ else if (post.link_preview && post.link_preview.url) {
   }
 
   // Images
-  else if (images.length > 1) {
-    const carousel = document.createElement("div");
-    carousel.className = "post-carousel";
+else if (images.length > 1) {
+  const carousel = document.createElement("div");
+  carousel.className = "post-carousel";
 
-    images.forEach((src) => {
-      const img = document.createElement("img");
-      img.src = src;
-      carousel.appendChild(img);
-    });
+  images.forEach((src) => {
+    const img = document.createElement("img");
+    img.src = src;
+    carousel.appendChild(img);
+  });
 
-    container.appendChild(carousel);
-  }
+  let scrollTimeout = null;
+
+carousel.addEventListener("scroll", () => {
+  carousel.classList.add("is-scrolling");
+
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => {
+    carousel.classList.remove("is-scrolling");
+  }, 150); // 👈 légèrement plus long que le snap
+});
+
+  container.appendChild(carousel);
+}
 
   else if (images.length === 1) {
     const img = document.createElement("img");
