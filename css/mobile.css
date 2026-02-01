@@ -1792,3 +1792,64 @@ body {
 .cp-preview .post-media.link-preview .link-preview-body {
   margin-top: -2px;
 }
+/* =========================
+   CAROUSEL DOTS — MOBILE
+========================= */
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* =========================
+   CAROUSEL DOTS — FINAL TUNING
+========================= */
+
+.carousel-dots span {
+  width: 9px;              /* ⬆️ dots inactifs plus grands */
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.45);
+  opacity: 0.65;
+  transform: scale(1);      /* taille normale */
+  transition: background-color .25s ease,
+              transform .25s ease,
+              opacity .25s ease;
+}
+
+.carousel-dots span.active {
+  width: 9px;               /* ⬇️ dot actif plus petit */
+  height: 9px;
+  background: #EECD79;
+  opacity: 1;
+  transform: scale(1);      /* pas d’effet “pop” excessif */
+}
+.post-media.carousel {
+  display: flex;
+  flex-direction: column;
+}
+/* 🔥 FIX DEFINITIF — allow dots to be visible */
+.post-media.carousel {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+.post-media.carousel .post-carousel {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+/* =========================
+   FIX FINAL — CAROUSEL DOTS VISIBILITY
+   (override global overflow kill)
+========================= */
+
+.post-media.carousel {
+  overflow: visible !important;
+}
+
+.post-media.carousel .carousel-dots {
+  position: relative;
+  z-index: 2;
+}

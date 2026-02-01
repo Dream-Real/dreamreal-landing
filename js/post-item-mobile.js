@@ -265,23 +265,47 @@ else if (images.length > 1) {
   carousel.className = "post-carousel";
 
   images.forEach((src) => {
-    const img = document.createElement("img");
-    img.src = src;
-    carousel.appendChild(img);
-  });
-
-  let scrollTimeout = null;
-
-carousel.addEventListener("scroll", () => {
-  carousel.classList.add("is-scrolling");
-
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(() => {
-    carousel.classList.remove("is-scrolling");
-  }, 150); // 👈 légèrement plus long que le snap
+  const img = document.createElement("img");
+  img.src = src;
+  carousel.appendChild(img);
 });
 
-  container.appendChild(carousel);
+  /* ---------- DOTS ---------- */
+const dots = document.createElement("div");
+dots.className = "carousel-dots";
+
+images.forEach((_, i) => {
+  const dot = document.createElement("span");
+  if (i === 0) dot.classList.add("active");
+  dots.appendChild(dot);
+});
+
+/* ---------- SYNC SCROLL → DOTS ---------- */
+let raf = null;
+const GAP = 12;
+
+carousel.addEventListener("scroll", () => {
+  if (raf) return;
+
+  raf = requestAnimationFrame(() => {
+    const pageWidth = carousel.clientWidth + GAP;
+    const index = Math.round(carousel.scrollLeft / pageWidth);
+
+    [...dots.children].forEach((d, i) => {
+      d.classList.toggle("active", i === index);
+    });
+
+    raf = null;
+  });
+});
+
+  const mediaWrapper = document.createElement("div");
+mediaWrapper.className = "post-media carousel";
+
+mediaWrapper.appendChild(carousel);
+mediaWrapper.appendChild(dots);
+
+container.appendChild(mediaWrapper);
 }
 
   else if (images.length === 1) {
