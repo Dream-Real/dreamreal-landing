@@ -92,14 +92,31 @@ function hydrateForm(user) {
 
 function bindEvents() {
   const avatarInput = document.getElementById("cpf-avatar-input");
+  const avatarBtn   = document.getElementById("cpf-avatar-btn");
   const submitBtn   = document.getElementById("cpf-submit");
 
-  avatarInput.addEventListener("change", handleAvatarPick);
+  // sécurité
+  if (!avatarInput || !avatarBtn || !submitBtn) {
+    console.warn("❌ CPF elements not found");
+    return;
+  }
 
-  ["cpf-first-name", "cpf-last-name"].forEach((id) => {
-    document.getElementById(id).addEventListener("input", updateSubmitState);
+  // ✅ clic sur le texte → ouvre le file picker
+  avatarBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    avatarInput.click();
   });
 
+  // ✅ changement de fichier
+  avatarInput.addEventListener("change", handleAvatarPick);
+
+  // ✅ inputs
+  ["cpf-first-name", "cpf-last-name"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", updateSubmitState);
+  });
+
+  // ✅ submit
   submitBtn.addEventListener("click", submitProfile);
 }
 
