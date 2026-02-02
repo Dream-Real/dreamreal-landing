@@ -2520,3 +2520,75 @@ button:active {
   outline: none !important;
   box-shadow: none !important;
 }
+.filters-modal:not([hidden]) {
+  pointer-events: auto;
+}
+/* =========================================
+   FILTERS — MOBILE (APP / DESKTOP PARITY)
+========================================= */
+
+/* Sheet padding */
+.filters-sheet {
+  padding: 20px 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Pills grid */
+.filters-sheet .filters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+/* Individual pill */
+.filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+  min-height: 48px;
+
+  background: rgba(26, 30, 53, 0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Emoji / icon */
+.filter-pill img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* Active / tap feedback */
+.filter-pill:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+/* Empty state */
+.filters-empty {
+  text-align: center;
+  font-size: 15px;
+  color: #9ca3af;
+  padding: 40px 0;
+}
+/* 🔥 FIX FINAL — FILTER MODAL INTERACTION */
+.filters-modal {
+  pointer-events: auto !important;
+}
+/* 🔥 FIX FINAL — FILTER SHEET VISIBILITY */
+.filters-sheet {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}

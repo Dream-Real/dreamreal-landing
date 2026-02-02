@@ -5,6 +5,132 @@
 
 console.log("🚀 mobile.js LOADED");
 
+window.FEED_FILTERS = window.FEED_FILTERS || {
+  feeling: null,
+  activity: null,
+};
+
+// =========================
+// MOBILE FILTERS — FEELINGS (DESKTOP PARITY)
+// =========================
+function renderMobileFeelings() {
+  // 🔒 SAFETY — FEELINGS NOT LOADED
+  if (!Array.isArray(window.FEELINGS) || !window.FEELINGS.length) {
+    console.warn("⚠️ FEELINGS not loaded");
+
+    const modal = document.getElementById("filters-modal");
+    const sheet = modal?.querySelector(".filters-sheet");
+
+    if (sheet) {
+      sheet.innerHTML = `
+        <div class="filters-empty">
+          No filters available
+        </div>
+      `;
+    }
+
+    return;
+  }
+  const modal = document.getElementById("filters-modal");
+  if (!modal) return;
+
+  const sheet = modal.querySelector(".filters-sheet");
+  if (!sheet) return;
+
+  sheet.innerHTML = `<div class="filters-grid"></div>`;
+const grid = sheet.querySelector(".filters-grid");
+
+  window.FEELINGS.forEach((feeling) => {
+    const pill = document.createElement("div");
+    pill.className = "filter-pill";
+
+    pill.innerHTML = `
+      <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${feeling.image}" />
+      <span>${feeling.title}</span>
+    `;
+
+    pill.onclick = () => {
+      // 🔑 PARITÉ DESKTOP
+      window.FEED_FILTERS.feeling = feeling;
+      window.FEED_FILTERS.activity = null;
+
+      // 🔥 AJOUT — filtre immédiat comme desktop
+  window.renderFilteredFeed();
+
+      renderMobileActivities(feeling.id);
+    };
+
+    grid.appendChild(pill);
+  });
+}
+
+// =========================
+// MOBILE FILTERS — ACTIVITIES (DESKTOP PARITY)
+// =========================
+function renderMobileActivities(feelingId) {
+  // 🔒 SAFETY — ACTIVITIES NOT LOADED
+  if (!Array.isArray(window.ACTIVITIES) || !window.ACTIVITIES.length) {
+    console.warn("⚠️ ACTIVITIES not loaded");
+
+    const modal = document.getElementById("filters-modal");
+    const sheet = modal?.querySelector(".filters-sheet");
+
+    if (sheet) {
+      sheet.innerHTML = `
+        <div class="filters-empty">
+          No activities available
+        </div>
+      `;
+    }
+
+    return;
+  }
+  const modal = document.getElementById("filters-modal");
+  if (!modal) return;
+
+  const sheet = modal.querySelector(".filters-sheet");
+  if (!sheet) return;
+
+  sheet.innerHTML = `<div class="filters-grid"></div>`;
+const grid = sheet.querySelector(".filters-grid");
+
+  const related = window.ACTIVITIES.filter(
+    (a) => a.feeling_id === feelingId
+  );
+
+  // 🔹 ALL (exact desktop logic)
+  const allBtn = document.createElement("div");
+  allBtn.className = "filter-pill";
+  allBtn.innerHTML = `<span>All</span>`;
+
+  allBtn.onclick = () => {
+    window.FEED_FILTERS.activity = null;
+    window.renderFilteredFeed();
+    closeMobileFilters();
+  };
+
+  grid.appendChild(allBtn);
+
+  // 🔹 ACTIVITIES
+  related.forEach((activity) => {
+    const pill = document.createElement("div");
+    pill.className = "filter-pill";
+
+    pill.innerHTML = `
+      <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />
+      <span>${activity.title}</span>
+    `;
+
+    pill.onclick = () => {
+      window.FEED_FILTERS.activity = activity;
+      window.renderFilteredFeed();
+      closeMobileFilters();
+    };
+
+    grid.appendChild(pill);
+  });
+}
+
 const API_URL =
   window.API_URL || "https://dreamreal-api.onrender.com";
 
@@ -23,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileApp();
   initCreatePost();
   initHeaderAvatar();
-  initCompleteProfile(); // 👈 AJOUT ICI
 });
 
 async function initMobileApp() {
@@ -69,6 +194,11 @@ async function initMobileApp() {
           new Date(a.created_time).getTime()
       )
       .map(normalizePostForMobile);
+
+      // =========================
+// 🔑 SOURCE UNIQUE DE VÉRITÉ — FILTERS (DESKTOP PARITY)
+// =========================
+window.FEED_POSTS = normalizedPosts;
 
       console.log(
   "🧪 FEELING SHAPE",
@@ -264,6 +394,15 @@ function renderErrorState() {
     </div>
   `;
 }
+
+function closeMobileFilters() {
+  const modal = document.getElementById("filters-modal");
+  if (!modal) return;
+
+  modal.hidden = true;
+  document.body.style.overflow = "";
+}
+
 /* -----------------------------------------
    CREATE POST (MOBILE)
 ----------------------------------------- */
@@ -352,159 +491,57 @@ function initHeaderAvatar() {
     console.log("👤 Mobile avatar rendered");
   }
 }
-/* =========================================
-   COMPLETE PROFILE — MOBILE (APP PARITY)
-========================================= */
+// =========================
+// FEED — FILTERED RENDER (MOBILE PARITY)
+// =========================
+window.renderFilteredFeed = function () {
+  if (!Array.isArray(window.FEED_POSTS)) return;
 
-let cpfAvatarBase64 = null;
-let cpfExistingAvatar = null;
+  const { feeling, activity } = window.FEED_FILTERS || {};
 
-function initCompleteProfile() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  fetch(`${API_URL}/api/users/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => (res.ok ? res.json() : null))
-    .then((data) => {
-      if (!data) return;
-
-      const user = data.user || data;
-
-      const f = user.first_name?.trim();
-      const l = user.last_name?.trim();
-      const a = user.avatar?.trim();
-
-      // 🔒 PROFIL COMPLET → rien à faire
-      if (f && l && a) {
-        localStorage.setItem("user", JSON.stringify(user));
-        return;
-      }
-
-      // ❗ PROFIL INCOMPLET → MODALE
-      openCompleteProfileModal(user);
-    })
-    .catch(() => {});
-}
-
-function openCompleteProfileModal(user) {
-  const overlay = document.getElementById("cpf-overlay");
-  if (!overlay) return;
-
-  overlay.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-
-  // Pré-fill
-  document.getElementById("cpf-first-name").value =
-    user.first_name || "";
-  document.getElementById("cpf-last-name").value =
-    user.last_name || "";
-
-  if (user.avatar) {
-    cpfExistingAvatar = user.avatar;
-    showCpfAvatar(user.avatar);
-  }
-
-  bindCpfEvents();
-  updateCpfSubmitState();
-}
-
-function bindCpfEvents() {
-  const fileInput = document.getElementById("cpf-avatar-input");
-  const submitBtn = document.getElementById("cpf-submit");
-
-  fileInput.onchange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      cpfAvatarBase64 = reader.result;
-      showCpfAvatar(reader.result);
-      updateCpfSubmitState();
-    };
-    reader.readAsDataURL(file);
-  };
-
-  ["cpf-first-name", "cpf-last-name"].forEach((id) => {
-    document.getElementById(id).oninput = updateCpfSubmitState;
-  });
-
-  submitBtn.onclick = submitCompleteProfile;
-}
-
-function showCpfAvatar(src) {
-  const img = document.getElementById("cpf-avatar-preview");
-  const plus = document.getElementById("cpf-avatar-placeholder");
-  const btn = document.getElementById("cpf-avatar-btn");
-
-  img.src = src;
-  img.classList.remove("hidden");
-  plus.classList.add("hidden");
-
-  btn.textContent = "Change avatar";
-}
-
-function updateCpfSubmitState() {
-  const f = document
-    .getElementById("cpf-first-name")
-    .value.trim();
-  const l = document
-    .getElementById("cpf-last-name")
-    .value.trim();
-
-  const canSubmit = f && l && (cpfAvatarBase64 || cpfExistingAvatar);
-  document.getElementById("cpf-submit").disabled = !canSubmit;
-}
-
-async function submitCompleteProfile() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  const btn = document.getElementById("cpf-submit");
-  btn.textContent = "Saving…";
-  btn.disabled = true;
-
-  const payload = {
-    first_name: document
-      .getElementById("cpf-first-name")
-      .value.trim(),
-    last_name: document
-      .getElementById("cpf-last-name")
-      .value.trim(),
-    avatar: cpfAvatarBase64 || cpfExistingAvatar,
-  };
-
-  const res = await fetch(`${API_URL}/api/users/me`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    alert("Server error");
-    btn.textContent = "Continue";
-    btn.disabled = false;
+  // 🔑 AUCUN FILTRE → FEED COMPLET (DESKTOP PARITY)
+  if (!feeling && !activity) {
+    renderFeed(window.FEED_POSTS);
     return;
   }
 
-  const data = await res.json();
-  localStorage.setItem("user", JSON.stringify(data.user));
+  const filtered = window.FEED_POSTS.filter((post) => {
+    // 🔒 UX safety — si filtre actif, exclut posts sans mood
+    if ((feeling || activity) && !post.feeling) return false;
 
-  closeCompleteProfileModal();
-}
+    const matchFeeling =
+      !feeling || post.feeling?.title === feeling.title;
 
-function closeCompleteProfileModal() {
-  const overlay = document.getElementById("cpf-overlay");
-  if (!overlay) return;
+    const matchActivity =
+      !activity || post.activity?.title === activity.title;
 
-  overlay.classList.add("hidden");
-  document.body.style.overflow = "";
+    return matchFeeling && matchActivity;
+  });
 
-  // 🔁 refresh avatar header
-  initHeaderAvatar();
-}
+  renderFeed(filtered);
+};
+/* -----------------------------------------
+   FILTERS — OPEN MODAL (MOBILE)
+----------------------------------------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const openFiltersBtn = document.getElementById("open-filters-btn");
+  const filtersModal = document.getElementById("filters-modal");
+
+  if (!openFiltersBtn || !filtersModal) {
+    console.warn("❌ Mobile filters button or modal not found");
+    return;
+  }
+
+  openFiltersBtn.addEventListener("click", () => {
+  console.log("🔥 FILTERS CLICKED");
+
+  // 🔑 RESET PARCOURS DE SÉLECTION (COMME APP / DESKTOP)
+  window.FEED_FILTERS.activity = null;
+
+  filtersModal.hidden = false;
+  document.body.style.overflow = "hidden";
+
+  renderMobileFeelings();
+});
+});
