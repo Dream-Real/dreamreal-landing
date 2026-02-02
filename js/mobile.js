@@ -39,15 +39,11 @@ function renderMobileFeelings() {
 
  sheet.innerHTML = `
   <div class="filters-sheet-header">
-    <button class="filters-back-btn hidden" aria-label="Back">
-  <i class="fa-solid fa-chevron-left"></i>
-</button>
+    <button class="filters-back-btn hidden" aria-label="Back"></button>
 
-<div class="filters-sheet-title">Choose filter</div>
+    <div class="filters-sheet-title">Choose filter</div>
 
-<button class="filters-close-btn" aria-label="Close">
-  <i class="fa-solid fa-xmark"></i>
-</button>
+    <button class="filters-close-btn" aria-label="Close"></button>
   </div>
 
   <div class="filters-content">
@@ -56,10 +52,9 @@ function renderMobileFeelings() {
 `;
 
 const closeBtn = sheet.querySelector(".filters-close-btn");
-
-closeBtn.onclick = () => {
-  closeMobileFilters(); // ferme TOUT
-};
+if (closeBtn) {
+  closeBtn.onclick = closeMobileFilters;
+}
 
 const grid = sheet.querySelector(".filters-grid");
 
@@ -73,15 +68,9 @@ const grid = sheet.querySelector(".filters-grid");
     `;
 
     pill.onclick = () => {
-      // 🔑 PARITÉ DESKTOP
-      window.FEED_FILTERS.feeling = feeling;
-      window.FEED_FILTERS.activity = null;
-
-      // 🔥 AJOUT — filtre immédiat comme desktop
-  window.renderFilteredFeed();
-
-      renderMobileActivities(feeling.id);
-    };
+  window.setFilterFeeling(feeling);
+  renderMobileActivities(feeling.id);
+};
 
     grid.appendChild(pill);
   });
@@ -116,15 +105,11 @@ function renderMobileActivities(feelingId) {
 
   sheet.innerHTML = `
   <div class="filters-sheet-header">
-    <button class="filters-back-btn" aria-label="Back">
-  <i class="fa-solid fa-chevron-left"></i>
-</button>
+    <button class="filters-back-btn" aria-label="Back"></button>
 
-<div class="filters-sheet-title">Choose filter</div>
+    <div class="filters-sheet-title">Choose filter</div>
 
-<button class="filters-close-btn hidden" aria-label="Close">
-  <i class="fa-solid fa-xmark"></i>
-</button>
+    <button class="filters-close-btn hidden" aria-label="Close"></button>
   </div>
 
   <div class="filters-content">
@@ -133,10 +118,9 @@ function renderMobileActivities(feelingId) {
 `;
 
 const backBtn = sheet.querySelector(".filters-back-btn");
-
-backBtn.onclick = () => {
-  renderMobileFeelings(); // retour FEELINGS (sans fermer)
-};
+if (backBtn) {
+  backBtn.onclick = renderMobileFeelings;
+}
 
 const grid = sheet.querySelector(".filters-grid");
 
@@ -150,10 +134,9 @@ const grid = sheet.querySelector(".filters-grid");
   allBtn.innerHTML = `<span>All</span>`;
 
   allBtn.onclick = () => {
-    window.FEED_FILTERS.activity = null;
-    window.renderFilteredFeed();
-    closeMobileFilters();
-  };
+  window.setFilterActivity(null);
+  closeMobileFilters();
+};
 
   grid.appendChild(allBtn);
 
@@ -168,10 +151,9 @@ const grid = sheet.querySelector(".filters-grid");
     `;
 
     pill.onclick = () => {
-      window.FEED_FILTERS.activity = activity;
-      window.renderFilteredFeed();
-      closeMobileFilters();
-    };
+  window.setFilterActivity(activity);
+  closeMobileFilters();
+};
 
     grid.appendChild(pill);
   });
@@ -254,6 +236,7 @@ window.FEED_POSTS = normalizedPosts;
       renderLookingFor(normalizedPosts);
 
     renderFeed(normalizedPosts);
+    renderActiveFilters(); // ✅ OBLIGATOIRE
 
   } catch (err) {
     console.error("❌ Feed fetch error:", err);
@@ -548,6 +531,7 @@ window.renderFilteredFeed = function () {
   // 🔑 AUCUN FILTRE → FEED COMPLET (DESKTOP PARITY)
   if (!feeling && !activity) {
     renderFeed(window.FEED_POSTS);
+    renderActiveFilters();
     return;
   }
 
@@ -565,7 +549,89 @@ window.renderFilteredFeed = function () {
   });
 
   renderFeed(filtered);
+  renderActiveFilters();
 };
+
+// =========================
+// ACTIVE FILTERS — RENDER (MOBILE PARITY)
+// =========================
+function renderActiveFilters() {
+  const container = document.getElementById("active-filters");
+  if (!container) return;
+
+  const { feeling, activity } = window.FEED_FILTERS;
+
+  container.innerHTML = "";
+
+  // 🔒 Aucun filtre → cacher
+  if (!feeling && !activity) {
+    container.classList.add("hidden");
+    return;
+  }
+
+  container.classList.remove("hidden");
+
+  // 🔹 FEELING
+  if (feeling) {
+  const pill = document.createElement("div");
+  pill.className = "active-filter-pill feeling";
+
+  pill.innerHTML = `
+    <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${feeling.image}" />
+    <span>${feeling.title}</span>
+  `;
+
+  pill.onclick = () => {
+    window.clearFilters();
+  };
+
+  container.appendChild(pill);
+}
+
+  // 🔹 ACTIVITY
+  if (activity) {
+  const pill = document.createElement("div");
+  pill.className = "active-filter-pill activity";
+
+  pill.innerHTML = `
+    <img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${activity.image}" />
+    <span>${activity.title}</span>
+  `;
+
+  pill.onclick = () => {
+    window.setFilterActivity(null);
+  };
+
+  container.appendChild(pill);
+}
+}
+
+// =========================
+// FILTER ACTIONS — SOURCE UNIQUE (MOBILE PARITY)
+// =========================
+window.setFilterFeeling = function (feeling) {
+  window.FEED_FILTERS.feeling = feeling;
+  window.FEED_FILTERS.activity = null;
+
+  window.renderFilteredFeed();
+  renderActiveFilters();
+};
+
+window.setFilterActivity = function (activity) {
+  window.FEED_FILTERS.activity = activity;
+
+  window.renderFilteredFeed();
+  renderActiveFilters();
+};
+
+window.clearFilters = function () {
+  window.FEED_FILTERS.feeling = null;
+  window.FEED_FILTERS.activity = null;
+
+  window.renderFilteredFeed();
+  renderActiveFilters();
+};
+
 /* -----------------------------------------
    FILTERS — OPEN MODAL (MOBILE)
 ----------------------------------------- */
@@ -581,8 +647,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   openFiltersBtn.addEventListener("click", () => {
   console.log("🔥 FILTERS CLICKED");
-
-  window.FEED_FILTERS.activity = null;
 
   filtersModal.hidden = false;
   document.body.style.overflow = "hidden";

@@ -2807,3 +2807,61 @@ backdrop-filter: blur(8px);
   transform: translateY(-50%) translateY(4px);
   /* 👆 ajuste ici : 1px / 2px / 3px */
 }
+/* =========================================
+   ACTIVE FILTERS — MOBILE (APP / DESKTOP PARITY)
+========================================= */
+
+.active-filters {
+  display: flex;
+  gap: 10px;
+
+  padding: 6px 12px;
+  margin: 6px 0 10px;
+
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.active-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.active-filters.hidden {
+  display: none;
+}
+
+/* Base pill */
+.active-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Feeling — jaune Dream Real */
+.active-filter-pill.feeling {
+  background: #EECD79;
+  color: #1E1E2E;
+}
+
+/* Activity — bleu Dream Real */
+.active-filter-pill.activity {
+  background: #93C5FD;
+  color: #0B1120;
+}
+
+.active-filter-pill img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
