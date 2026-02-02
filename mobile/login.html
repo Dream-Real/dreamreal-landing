@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
+  <title>Dream Real — Login</title>
+
+  <!-- FONT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- 🔥 MOBILE CSS -->
+  <link rel="stylesheet" href="../css/mobile.css?v=1">
+
+  <!-- 🔥 FONT AWESOME (OBLIGATOIRE) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+</head>
+
+<body class="dr-mobile login-page">
+  <!-- BACKGROUND -->
+  <div class="login-bg">
+    <div class="bg-image active"></div>
+    <div class="bg-image"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="login-header">
+    <span class="logo-dr">
+      <span class="d">D</span><span class="r">R</span>
+    </span>
+    <span class="login-subtitle">Their stories</span>
+  </header>
+
+  <!-- MAIN -->
+  <main class="login-content">
+    <h1 class="login-title">Your dream</h1>
+
+    <button class="btn btn-facebook">
+      <i class="fa fa-facebook"></i>
+      Continue with Facebook
+    </button>
+
+    <button class="btn btn-email" id="open-email">
+      <i class="fa fa-envelope"></i>
+      Continue with Email
+    </button>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="login-footer">
+    By signing up, you agree to our
+    <u>Terms</u> and <u>Privacy Policy</u>.
+  </footer>
+
+  <!-- EMAIL OVERLAY -->
+  <div class="auth-overlay hidden" id="email-overlay">
+    <div class="auth-box">
+      <h2>Enter your email</h2>
+      <input id="auth-email" type="email" />
+      <button id="send-otp">Send code</button>
+      <button class="ghost">Cancel</button>
+    </div>
+  </div>
+
+  <!-- OTP OVERLAY -->
+  <div class="auth-overlay hidden" id="otp-overlay">
+    <div class="auth-box">
+      <h2>Enter the 6-digit code</h2>
+      <input id="auth-otp" type="text" maxlength="6" />
+      <button id="verify-otp">Verify code</button>
+      <button class="ghost">Cancel</button>
+    </div>
+  </div>
+</body>
+</html>

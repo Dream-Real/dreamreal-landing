@@ -274,12 +274,19 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("➕ Create button detected (mobile)");
 
   createBtn.addEventListener("click", () => {
-    console.log("🔥 CREATE CLICK (mobile)");
+  console.log("🔥 CREATE CLICK (mobile)");
 
-    if (typeof window.openCreatePost === "function") {
-      window.openCreatePost();
-    } else {
-      console.warn("❌ window.openCreatePost not available");
-    }
-  });
+  const token = localStorage.getItem("token");
+
+  // 🔐 Pas connecté → login mobile
+  if (!token) {
+    window.location.href = "/mobile/login.html";
+    return;
+  }
+
+  // ✅ Connecté → Create Post
+  if (typeof window.openCreatePost === "function") {
+    window.openCreatePost();
+  }
+});
 });
