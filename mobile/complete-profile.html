@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" class="complete-profile-page">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <title>Dream Real — Complete profile</title>
+
+    <!-- FONT -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- MOBILE CSS -->
+    <link rel="stylesheet" href="../css/mobile.css" />
+  </head>
+
+  <body class="dr-mobile complete-profile-page">
+    <div class="dr-gradient">
+
+      <!-- LOADER -->
+      <div id="cpf-loader" class="cpf-loader">
+        <div class="cpf-spinner"></div>
+      </div>
+
+      <!-- CONTENT -->
+     <main class="cpf-scroll" id="cpf-scroll">
+        <div class="cpf-container">
+
+          <h1 class="cpf-title">Complete your profile</h1>
+
+          <div class="cpf-form">
+
+            <div class="cpf-avatar-section">
+              <label class="cpf-avatar-circle">
+                <img id="cpf-avatar-preview" class="hidden" />
+                <span id="cpf-avatar-placeholder">+</span>
+                <input
+                  id="cpf-avatar-input"
+                  type="file"
+                  accept="image/*"
+                  hidden
+                />
+              </label>
+
+              <button
+                id="cpf-avatar-btn"
+                type="button"
+                class="cpf-avatar-btn"
+              >
+                Add avatar
+              </button>
+            </div>
+
+            <input
+              id="cpf-first-name"
+              type="text"
+              placeholder="First name"
+              class="cpf-input"
+            />
+
+            <input
+              id="cpf-last-name"
+              type="text"
+              placeholder="Last name"
+              class="cpf-input"
+            />
+
+            <button
+              id="cpf-submit"
+              class="cpf-submit"
+              disabled
+            >
+              Continue
+            </button>
+
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- API -->
+    <script>
+      window.API_URL = "https://dreamreal-api.onrender.com";
+    </script>
+
+    <!-- COMPLETE PROFILE LOGIC -->
+    <script src="./js/complete-profile.js"></script>
+
+  </body>
+</html>

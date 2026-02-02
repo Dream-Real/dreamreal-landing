@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileApp();
   initCreatePost();
   initHeaderAvatar();
+  initCompleteProfile(); // 👈 AJOUT ICI
 });
 
 async function initMobileApp() {
@@ -350,4 +351,160 @@ function initHeaderAvatar() {
     avatarWrapper.classList.remove("hidden");
     console.log("👤 Mobile avatar rendered");
   }
+}
+/* =========================================
+   COMPLETE PROFILE — MOBILE (APP PARITY)
+========================================= */
+
+let cpfAvatarBase64 = null;
+let cpfExistingAvatar = null;
+
+function initCompleteProfile() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  fetch(`${API_URL}/api/users/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => {
+      if (!data) return;
+
+      const user = data.user || data;
+
+      const f = user.first_name?.trim();
+      const l = user.last_name?.trim();
+      const a = user.avatar?.trim();
+
+      // 🔒 PROFIL COMPLET → rien à faire
+      if (f && l && a) {
+        localStorage.setItem("user", JSON.stringify(user));
+        return;
+      }
+
+      // ❗ PROFIL INCOMPLET → MODALE
+      openCompleteProfileModal(user);
+    })
+    .catch(() => {});
+}
+
+function openCompleteProfileModal(user) {
+  const overlay = document.getElementById("cpf-overlay");
+  if (!overlay) return;
+
+  overlay.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+
+  // Pré-fill
+  document.getElementById("cpf-first-name").value =
+    user.first_name || "";
+  document.getElementById("cpf-last-name").value =
+    user.last_name || "";
+
+  if (user.avatar) {
+    cpfExistingAvatar = user.avatar;
+    showCpfAvatar(user.avatar);
+  }
+
+  bindCpfEvents();
+  updateCpfSubmitState();
+}
+
+function bindCpfEvents() {
+  const fileInput = document.getElementById("cpf-avatar-input");
+  const submitBtn = document.getElementById("cpf-submit");
+
+  fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      cpfAvatarBase64 = reader.result;
+      showCpfAvatar(reader.result);
+      updateCpfSubmitState();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  ["cpf-first-name", "cpf-last-name"].forEach((id) => {
+    document.getElementById(id).oninput = updateCpfSubmitState;
+  });
+
+  submitBtn.onclick = submitCompleteProfile;
+}
+
+function showCpfAvatar(src) {
+  const img = document.getElementById("cpf-avatar-preview");
+  const plus = document.getElementById("cpf-avatar-placeholder");
+  const btn = document.getElementById("cpf-avatar-btn");
+
+  img.src = src;
+  img.classList.remove("hidden");
+  plus.classList.add("hidden");
+
+  btn.textContent = "Change avatar";
+}
+
+function updateCpfSubmitState() {
+  const f = document
+    .getElementById("cpf-first-name")
+    .value.trim();
+  const l = document
+    .getElementById("cpf-last-name")
+    .value.trim();
+
+  const canSubmit = f && l && (cpfAvatarBase64 || cpfExistingAvatar);
+  document.getElementById("cpf-submit").disabled = !canSubmit;
+}
+
+async function submitCompleteProfile() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  const btn = document.getElementById("cpf-submit");
+  btn.textContent = "Saving…";
+  btn.disabled = true;
+
+  const payload = {
+    first_name: document
+      .getElementById("cpf-first-name")
+      .value.trim(),
+    last_name: document
+      .getElementById("cpf-last-name")
+      .value.trim(),
+    avatar: cpfAvatarBase64 || cpfExistingAvatar,
+  };
+
+  const res = await fetch(`${API_URL}/api/users/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    alert("Server error");
+    btn.textContent = "Continue";
+    btn.disabled = false;
+    return;
+  }
+
+  const data = await res.json();
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  closeCompleteProfileModal();
+}
+
+function closeCompleteProfileModal() {
+  const overlay = document.getElementById("cpf-overlay");
+  if (!overlay) return;
+
+  overlay.classList.add("hidden");
+  document.body.style.overflow = "";
+
+  // 🔁 refresh avatar header
+  initHeaderAvatar();
 }

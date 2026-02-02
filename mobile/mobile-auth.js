@@ -128,12 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       console.log("✅ Mobile auth success:", data.user);
 
-      // 🔁 redirect
       if (data.needs_profile) {
-        window.location.href = "/mobile/complete-profile.html";
-      } else {
-        window.location.href = "/mobile.html";
-      }
+  window.location.href = "complete-profile.html";
+} else {
+  window.location.href = "../mobile.html";
+}
     } catch (err) {
       console.error("❌ OTP verify error:", err);
       alert("Login failed");
@@ -156,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("♻️ Mobile session restored");
 
       // 🔁 auto-redirect if already logged
-      window.location.href = "/mobile.html";
+      window.location.href = "../mobile.html";
     } catch (e) {
       console.warn("⚠️ Invalid cached user");
       localStorage.removeItem("token");
