@@ -37,7 +37,16 @@ function renderMobileFeelings() {
   const sheet = modal.querySelector(".filters-sheet");
   if (!sheet) return;
 
-  sheet.innerHTML = `<div class="filters-grid"></div>`;
+ sheet.innerHTML = `
+  <div class="filters-sheet-header">
+    <div class="filters-sheet-title">Choose filter</div>
+  </div>
+
+  <div class="filters-content">
+    <div class="filters-grid"></div>
+  </div>
+`;
+
 const grid = sheet.querySelector(".filters-grid");
 
   window.FEELINGS.forEach((feeling) => {
@@ -91,7 +100,16 @@ function renderMobileActivities(feelingId) {
   const sheet = modal.querySelector(".filters-sheet");
   if (!sheet) return;
 
-  sheet.innerHTML = `<div class="filters-grid"></div>`;
+  sheet.innerHTML = `
+  <div class="filters-sheet-header">
+    <div class="filters-sheet-title">Choose filter</div>
+  </div>
+
+  <div class="filters-content">
+    <div class="filters-grid"></div>
+  </div>
+`;
+
 const grid = sheet.querySelector(".filters-grid");
 
   const related = window.ACTIVITIES.filter(
@@ -536,12 +554,14 @@ document.addEventListener("DOMContentLoaded", () => {
   openFiltersBtn.addEventListener("click", () => {
   console.log("🔥 FILTERS CLICKED");
 
-  // 🔑 RESET PARCOURS DE SÉLECTION (COMME APP / DESKTOP)
   window.FEED_FILTERS.activity = null;
 
   filtersModal.hidden = false;
   document.body.style.overflow = "hidden";
 
-  renderMobileFeelings();
+  // 🔑 ATTEND LE REPAINT AVANT D’INJECTER
+  requestAnimationFrame(() => {
+    renderMobileFeelings();
+  });
 });
 });
