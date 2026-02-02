@@ -507,13 +507,21 @@ draftCarouselIndex = 0;
    =============================== */
 
 triggers.forEach((trigger) => {
-  trigger.onclick = () => {
+  trigger.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 🔐 GARDE-FOU ABSOLU — PAS CONNECTÉ → RIEN NE S’OUVRE
+    if (!window.AUTH?.token) {
+      return;
+    }
+
     // 🔄 reset état Create Post
     mood = null;
     location = null;
     preview.innerHTML = "";
 
-        // 🔥 RESET COMPLET DES CACHES DE PREVIEW (OUVERTURE MODALE)
+    // 🔥 RESET COMPLET DES CACHES DE PREVIEW (OUVERTURE MODALE)
     lastPreviewType = null;
     lastPreviewUrl = null;
     lastMoodKey = null;
