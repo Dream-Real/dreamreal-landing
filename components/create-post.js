@@ -110,6 +110,50 @@ function getSafeAvatar(user) {
   return "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 }
 
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user"));
+  } catch {
+    return null;
+  }
+}
+
+function hydrateCreatePostUser() {
+  const user = getCurrentUser();
+  if (!user) {
+    console.warn("⚠️ hydrateCreatePostUser: no user");
+    return;
+  }
+
+  const avatarEl = document.getElementById("cp-user-avatar");
+  const usernameEl = document.getElementById("cp-username");
+
+  // 🔥 AVATAR — JAMAIS DE BLOB
+  if (avatarEl) {
+    avatarEl.src =
+      typeof user.avatar === "string" &&
+      user.avatar.startsWith("http")
+        ? user.avatar
+        : "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+    // 🛡️ Safari / WebKit hard safety
+    avatarEl.removeAttribute("srcset");
+    avatarEl.loading = "eager";
+    avatarEl.decoding = "sync";
+    avatarEl.style.display = "block";
+  }
+
+  // 👤 USERNAME
+  if (usernameEl) {
+    usernameEl.textContent =
+      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+      user.email ||
+      "User";
+  }
+
+  console.log("✅ Create Post user hydrated (SAFE)");
+}
+
 // 🧹 STRIP URL FROM TEXT (APP PARITY)
 function stripUrlFromText(text) {
   return text.replace(/https?:\/\/[^\s]+/gi, "").trim();
@@ -528,22 +572,7 @@ triggers.forEach((trigger) => {
     lastLocationKey = null;
     localLinkPreview = null;
 
-    // ✅ RÉ-INJECTION SAFE DE L’USER
-    const user = window.AUTH?.user;
-    const avatarEl = document.getElementById("cp-user-avatar");
-    const usernameEl = document.getElementById("cp-username");
-
-    if (avatarEl) {
-      avatarEl.src = getSafeAvatar(user);
-      avatarEl.style.display = "block";
-    }
-
-    if (user && usernameEl) {
-      usernameEl.textContent =
-        `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-        user.name ||
-        "User";
-    }
+    hydrateCreatePostUser();
 
     // ✅ ouverture modale
     overlay.classList.remove("hidden");
@@ -1159,7 +1188,7 @@ preview.appendChild(fakePost);
   // USERNAME + LOCATION (FEED-LIKE)
   // =========================
   if (usernameEl) {
-  const user = window.AUTH?.user || {};
+  const user = getCurrentUser() || {};
 
   const fullName =
     `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
@@ -1407,7 +1436,7 @@ if (
   // =========================
   const now = new Date().toISOString();
 
-  const user = window.AUTH?.user || {};
+  const user = getCurrentUser() || {};
 
   const clientId = `client_${Date.now()}`;
 
@@ -1650,26 +1679,7 @@ window.openCreatePost = function () {
     return;
   }
 
-    // ✅ HYDRATATION USER (CRITIQUE — FIX AVATAR)
-  const user = window.AUTH?.user;
-  const avatarEl = document.getElementById("cp-user-avatar");
-  const usernameEl = document.getElementById("cp-username");
-
-  if (avatarEl) {
-  avatarEl.src =
-    user?.avatar && user.avatar.startsWith("http")
-      ? user.avatar
-      : "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-
-  avatarEl.style.display = "block";
-}
-
-  if (user && usernameEl) {
-    usernameEl.textContent =
-      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-      user.name ||
-      "User";
-  }
+  hydrateCreatePostUser();
 
   overlay.classList.remove("hidden");
   document.body.style.overflow = "hidden";
