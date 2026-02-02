@@ -237,6 +237,7 @@ window.FEED_POSTS = normalizedPosts;
 
     renderFeed(normalizedPosts);
     renderActiveFilters(); // ✅ OBLIGATOIRE
+    updateFiltersButton(); // ✅ OBLIGATOIRE
 
   } catch (err) {
     console.error("❌ Feed fetch error:", err);
@@ -604,6 +605,25 @@ function renderActiveFilters() {
 
   container.appendChild(pill);
 }
+updateFiltersButton();
+}
+
+// =========================
+// FILTER BUTTON — TEXT + COLOR (MOBILE PARITY)
+// =========================
+function updateFiltersButton() {
+  const btn = document.getElementById("open-filters-btn");
+  if (!btn) return;
+
+  const { feeling, activity } = window.FEED_FILTERS || {};
+
+  if (feeling || activity) {
+    btn.textContent = "Clear";
+    btn.classList.add("is-clear");
+  } else {
+    btn.textContent = "Filters";
+    btn.classList.remove("is-clear");
+  }
 }
 
 // =========================
@@ -615,6 +635,7 @@ window.setFilterFeeling = function (feeling) {
 
   window.renderFilteredFeed();
   renderActiveFilters();
+  updateFiltersButton();
 };
 
 window.setFilterActivity = function (activity) {
@@ -622,6 +643,7 @@ window.setFilterActivity = function (activity) {
 
   window.renderFilteredFeed();
   renderActiveFilters();
+  updateFiltersButton();
 };
 
 window.clearFilters = function () {
@@ -630,6 +652,7 @@ window.clearFilters = function () {
 
   window.renderFilteredFeed();
   renderActiveFilters();
+  updateFiltersButton();
 };
 
 /* -----------------------------------------
@@ -646,6 +669,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   openFiltersBtn.addEventListener("click", () => {
+  const { feeling, activity } = window.FEED_FILTERS || {};
+
+  // 🔵 MODE CLEAR → reset des filtres + feed global
+  if (feeling || activity) {
+    window.clearFilters();
+    return;
+  }
+
+  // 🟡 MODE FILTERS → ouverture modale
   console.log("🔥 FILTERS CLICKED");
 
   filtersModal.hidden = false;

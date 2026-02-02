@@ -2865,3 +2865,6 @@ backdrop-filter: blur(8px);
   height: 20px;
   object-fit: contain;
 }
+.feed-filter-btn.is-clear {
+  color: #93C5FD !important;
+}
