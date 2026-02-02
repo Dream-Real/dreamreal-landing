@@ -1857,13 +1857,16 @@ body {
    LOGIN — MOBILE (APP-LIKE)
 ================================ */
 
-/* 🌑 PAGE GLOBALE */
 body.login-page {
   margin: 0;
   min-height: 100vh;
   background: #000;
   color: #fff;
-  font-family: "Suez One", system-ui;
+
+  /* ✅ FONT SYSTÈME COMME L’APP */
+  font-family: -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
   overflow: hidden;
 
   display: flex;
@@ -1899,19 +1902,13 @@ body.login-page {
   z-index: 2;
 }
 
-.logo-dr {
-  font-size: 58px;
-  font-weight: 800;
-  line-height: 1;
-}
-
 .logo-dr .d { color: #EECD79; }
 .logo-dr .r { color: #fff; }
 
 .login-subtitle {
   display: block;
   font-size: 22px;
-  margin-top: -8px;
+  margin-top: -2px;
 }
 
 /* 🎯 CONTENU CENTRAL (CLÉ DU RENDU APP) */
@@ -1931,7 +1928,7 @@ body.login-page {
   font-size: 44px;
   font-weight: 800;
   margin-top: 20px;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
 }
 
 /* 🔘 BOUTONS */
@@ -1962,12 +1959,12 @@ body.login-page {
 /* 🔽 FOOTER (comme l’app) */
 .login-footer {
   position: absolute;
-  bottom: 52px;
+  bottom: 36px;
   width: 100%;
   padding: 0 24px;
   text-align: center;
 
-  font-size: 14px;
+  font-size: 15px;
   line-height: 18px;
   color: #d1d5db;
 }
@@ -1998,4 +1995,99 @@ body.login-page {
   border-radius: 12px;
 
   border: 1px solid #333;
+}
+
+/* =========================================
+   LOGIN — LOGO OVERRIDE (APP PARITY)
+========================================= */
+
+.login-page .logo-dr .d {
+  color: #EECD79;
+}
+
+.login-page .logo-dr .r {
+  color: #ffffff;
+}
+body.login-page .login-header .logo-dr {
+  font-size: 58px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+body.login-page .login-header .logo-dr .d {
+  color: #EECD79;
+}
+
+body.login-page .login-header .logo-dr .r {
+  color: #ffffff;
+}
+/* Their stories — system font */
+.login-subtitle {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+/* Your dream — system font, bold */
+.login-title {
+  font-family: inherit;
+  font-weight: 800;
+}
+.login-content {
+  transform: translateY(-12px);
+}
+/* =========================================
+   LOGIN — HIDE SCROLLBAR (APP-LIKE) (FINAL)
+========================================= */
+
+/* Le scroll est très souvent sur <html> (iOS / Safari) */
+html.login-page,
+body.login-page {
+  height: 100%;
+  overflow: hidden !important;      /* bloque le scroll + cache la barre */
+  overscroll-behavior: none;        /* évite l’effet “rubber band” */
+  scrollbar-width: none;            /* Firefox */
+}
+
+/* WebKit (Safari / iOS) */
+html.login-page::-webkit-scrollbar,
+body.login-page::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Sécurité : si un wrapper interne “déclenche” un overflow */
+body.login-page .login-content,
+body.login-page .login-bg,
+body.login-page .login-header,
+body.login-page .login-footer {
+  overflow: hidden;
+}
+/* =========================================
+   LOGIN — REAL SCROLL KILL (ROOT CAUSE FIX)
+========================================= */
+
+/* 🔥 LE VRAI COUPABLE */
+html.login-page .dr-mobile {
+  height: 100%;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* WebKit scrollbar kill (iOS / Safari / Chrome) */
+html.login-page .dr-mobile::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Firefox */
+html.login-page .dr-mobile {
+  scrollbar-width: none;
+}
+/* Autorise le scroll interne uniquement si nécessaire */
+.auth-box {
+  max-height: 85vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
