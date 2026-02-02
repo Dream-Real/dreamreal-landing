@@ -19,7 +19,11 @@ let lookingForContainer = null;
    INIT
 ----------------------------------------- */
 
-document.addEventListener("DOMContentLoaded", initMobileApp);
+document.addEventListener("DOMContentLoaded", () => {
+  initMobileApp();
+  initCreatePost();
+  initHeaderAvatar();
+});
 
 async function initMobileApp() {
   console.log("📱 initMobileApp (public feed)");
@@ -263,7 +267,7 @@ function renderErrorState() {
    CREATE POST (MOBILE)
 ----------------------------------------- */
 
-document.addEventListener("DOMContentLoaded", () => {
+function initCreatePost() {
   const createBtn = document.getElementById("mobile-create-btn");
 
   if (!createBtn) {
@@ -273,20 +277,77 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("➕ Create button detected (mobile)");
 
-  createBtn.addEventListener("click", () => {
-  console.log("🔥 CREATE CLICK (mobile)");
+  createBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/mobile/login.html";
+      return;
+    }
+
+    if (typeof window.openCreatePost === "function") {
+      window.openCreatePost();
+    }
+  });
+}
+/* -----------------------------------------
+   HEADER — USER AVATAR (AUTH ONLY)
+   Mobile parity with Desktop
+----------------------------------------- */
+
+function initHeaderAvatar() {
+  const avatarWrapper = document.getElementById("mobile-user-avatar");
+  const avatarImg = document.getElementById("mobile-user-avatar-img");
+
+  if (!avatarWrapper || !avatarImg) {
+  // Page sans avatar (login / autre) → comportement normal
+  return;
+}
 
   const token = localStorage.getItem("token");
+  const userRaw = localStorage.getItem("user");
 
-  // 🔐 Pas connecté → login mobile
   if (!token) {
-    window.location.href = "/mobile/login.html";
+    avatarWrapper.classList.add("hidden");
     return;
   }
 
-  // ✅ Connecté → Create Post
-  if (typeof window.openCreatePost === "function") {
-    window.openCreatePost();
+  // 🔁 fallback si user absent
+  if (!userRaw) {
+    fetch(`${API_URL}/api/users/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((user) => {
+        if (!user) return;
+
+        localStorage.setItem("user", JSON.stringify(user));
+        applyAvatar(user);
+      });
+
+    return;
   }
-});
-});
+
+  try {
+    const user = JSON.parse(userRaw);
+    applyAvatar(user);
+  } catch {
+    avatarWrapper.classList.add("hidden");
+  }
+
+  function applyAvatar(user) {
+    const fallback =
+      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+    avatarImg.src =
+      user.avatar && user.avatar.trim() ? user.avatar : fallback;
+
+    avatarWrapper.classList.remove("hidden");
+    console.log("👤 Mobile avatar rendered");
+  }
+}

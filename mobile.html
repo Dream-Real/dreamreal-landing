@@ -34,13 +34,29 @@
           </span>
         </div>
 
-        <button
-  class="mobile-header-right btn-create"
-  id="mobile-create-btn"
-  aria-label="Create post"
->
-  ＋
-</button>
+        <div class="mobile-header-right">
+
+  <!-- ➕ CREATE -->
+  <button
+    class="btn-create"
+    id="mobile-create-btn"
+    aria-label="Create post"
+  >
+    ＋
+  </button>
+
+  <!-- 👤 AVATAR USER (hidden par défaut) -->
+  <div
+    id="mobile-user-avatar"
+    class="mobile-user-avatar hidden"
+  >
+    <img
+      id="mobile-user-avatar-img"
+      alt="User avatar"
+    />
+  </div>
+
+</div>
       </header>
 
       <!-- =========================
