@@ -2561,56 +2561,88 @@ button:active {
 
 /* HEADER (FAIT PARTIE DU SHEET) */
 .filters-sheet-header {
-  padding: 20px 16px 12px;
+  position: relative;
+  padding: 20px 56px 12px; /* ⬅️ 56px à gauche ET droite */
   text-align: center;
   flex-shrink: 0;
 }
 
 /* TITLE */
 .filters-sheet-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   opacity: 0.95;
 }
 
-/* GRID */
-.filters-grid {
-  padding: 12px 16px 28px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+.filters-back-btn {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
 }
 
-/* PILLS */
-.filter-pill {
+.filters-close-btn {
+  position: absolute;
+  top: 50%;
+  right: 12px;   /* ✅ LA CLÉ */
+  transform: translateY(-50%);
+}
+
+/* Masquage contrôlé */
+.filters-back-btn.hidden,
+.filters-close-btn.hidden {
+  display: none;
+}
+
+/* LIST — APP PARITY (WRAPPED FLOW, NOT LIST) */
+.filters-grid {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  gap: 10px 10px;          /* espace horizontal + vertical */
+  padding: 12px 16px 28px;
+
   align-items: center;
-  gap: 10px;
+}
 
-  padding: 12px 14px;
-  min-height: 48px;
+/* PILLS — EXACT RN FILTERS */
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
 
-  background: rgba(26, 30, 53, 0.88);
-  border: 1px solid rgba(255,255,255,0.12);
+  gap: 8px;
+
+  padding: 8px 14px;          /* 🔥 hauteur RN réelle */
   border-radius: 999px;
 
-  font-size: 16px;
+background: rgba(255, 255, 255, 0.14);   /* 🔥 blanc poli RN */
+border: 0px solid rgba(255, 255, 255, 0.22);
+backdrop-filter: blur(8px);
+-webkit-font-smoothing: antialiased;
+
+  font-size: 16px;            /* filters ≠ username */
   font-weight: 600;
+  line-height: 20px;
+
   color: #ffffff;
 
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;        /* 🔑 largeur naturelle */
+
+  transition: opacity .12s ease;
 }
 
 .filter-pill img {
-  width: 22px;
-  height: 22px;
+  width: 24px;                /* 🔥 FILTERS = 24, PAS 28 */
+  height: 24px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .filter-pill:active {
-  transform: scale(0.97);
   opacity: 0.85;
 }
 
@@ -2625,8 +2657,153 @@ button:active {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+
+  /* 🔥 HIDE SCROLLBAR — APP PARITY */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge legacy */
 }
+
+.filters-content::-webkit-scrollbar {
+  display: none;                /* Safari / Chrome / iOS */
+}
+
 .filters-sheet {
   border-top-left-radius: 20px !important;
   border-top-right-radius: 20px !important;
+}
+/* ✅ FORCE LE GLYPHE RN (police système) */
+.filters-back-btn,
+.filters-close-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+  font-weight: 700;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+/* 🔥 FIX DEFINITIF — ICON BUTTONS (iOS / Safari) */
+.filters-back-btn,
+.filters-close-btn {
+  background: none !important;
+  color: #93c5fd !important;
+
+  font-size: 22px !important;
+  line-height: 1 !important;
+
+  border: none !important;
+  box-shadow: none !important;
+
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+/* =====================================================
+   🔥 HARD FIX — FILTER ICON BUTTONS (iOS SAFE)
+===================================================== */
+
+.filters-back-btn,
+.filters-close-btn {
+  all: unset; /* 🔥 CRITIQUE : annule les resets globaux */
+
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #93c5fd;
+  background: transparent;
+
+  cursor: pointer;
+
+  pointer-events: auto; /* 🔑 force interaction */
+  user-select: none;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+/* positions */
+.filters-back-btn { left: 12px; }
+.filters-close-btn { right: 12px; }
+
+/* =====================================================
+   🔥 ICON BUTTONS — FINAL APP PARITY
+===================================================== */
+
+.filters-back-btn,
+.filters-close-btn {
+  all: unset;
+
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: auto;
+  cursor: pointer;
+
+  color: #93c5fd;
+  font-size: 22px;
+  font-weight: 700;
+
+  z-index: 10;
+}
+
+/* ⬅️ LES DEUX À GAUCHE */
+.filters-back-btn,
+.filters-close-btn {
+  left: 12px;
+}
+
+/* VISIBILITÉ CONTRÔLÉE */
+.filters-back-btn.hidden,
+.filters-close-btn.hidden {
+  display: none;
+}
+
+/* GLYPHES */
+.filters-back-btn::before {
+  content: "←";
+}
+
+.filters-close-btn::before {
+  content: "✕";
+}
+/* =========================================
+   🔍 CROIX — SIZE OVERRIDE (ONLY)
+========================================= */
+
+.filters-close-btn::before {
+  font-size: 28px;     /* 👈 ajuste ici : 26 / 28 / 30 */
+  font-weight: 700;
+  line-height: 1;
+}
+/* =========================================
+   🔧 FILTERS — TITLE MICRO OFFSET
+========================================= */
+
+.filters-sheet-title {
+  position: relative;
+  top: -3px;   /* 👈 ajuste ici : -1 / -2 / -3 */
+}
+/* =========================================
+   🔧 FILTERS — BACK ARROW VERTICAL OFFSET
+========================================= */
+
+.filters-back-btn {
+  transform: translateY(-50%) translateY(4px);
+  /* 👆 ajuste ici : 1px / 2px / 3px */
 }

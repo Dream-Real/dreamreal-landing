@@ -46,15 +46,22 @@
   </button>
 
   <!-- 👤 AVATAR USER (hidden par défaut) -->
-  <div
-    id="mobile-user-avatar"
-    class="mobile-user-avatar hidden"
-  >
-    <img
-      id="mobile-user-avatar-img"
-      alt="User avatar"
-    />
-  </div>
+  <button
+  id="mobile-user-avatar"
+  class="mobile-user-avatar hidden"
+  aria-label="User menu"
+>
+  <span class="sr-only">User menu</span>
+  <img id="mobile-user-avatar-img" alt="User avatar" />
+</button>
+
+  <!-- 🔽 MENU LOGOUT (MOBILE) -->
+<div
+  id="mobile-user-menu"
+  class="mobile-user-menu hidden"
+>
+  <button id="mobile-logout-btn">Logout</button>
+</div>
 
 </div>
       </header>

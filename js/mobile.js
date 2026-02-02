@@ -39,13 +39,27 @@ function renderMobileFeelings() {
 
  sheet.innerHTML = `
   <div class="filters-sheet-header">
-    <div class="filters-sheet-title">Choose filter</div>
+    <button class="filters-back-btn hidden" aria-label="Back">
+  <i class="fa-solid fa-chevron-left"></i>
+</button>
+
+<div class="filters-sheet-title">Choose filter</div>
+
+<button class="filters-close-btn" aria-label="Close">
+  <i class="fa-solid fa-xmark"></i>
+</button>
   </div>
 
   <div class="filters-content">
     <div class="filters-grid"></div>
   </div>
 `;
+
+const closeBtn = sheet.querySelector(".filters-close-btn");
+
+closeBtn.onclick = () => {
+  closeMobileFilters(); // ferme TOUT
+};
 
 const grid = sheet.querySelector(".filters-grid");
 
@@ -102,13 +116,27 @@ function renderMobileActivities(feelingId) {
 
   sheet.innerHTML = `
   <div class="filters-sheet-header">
-    <div class="filters-sheet-title">Choose filter</div>
+    <button class="filters-back-btn" aria-label="Back">
+  <i class="fa-solid fa-chevron-left"></i>
+</button>
+
+<div class="filters-sheet-title">Choose filter</div>
+
+<button class="filters-close-btn hidden" aria-label="Close">
+  <i class="fa-solid fa-xmark"></i>
+</button>
   </div>
 
   <div class="filters-content">
     <div class="filters-grid"></div>
   </div>
 `;
+
+const backBtn = sheet.querySelector(".filters-back-btn");
+
+backBtn.onclick = () => {
+  renderMobileFeelings(); // retour FEELINGS (sans fermer)
+};
 
 const grid = sheet.querySelector(".filters-grid");
 
