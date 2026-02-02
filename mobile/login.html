@@ -67,9 +67,15 @@
   <div class="auth-overlay hidden" id="email-overlay">
     <div class="auth-box">
       <h2>Enter your email</h2>
-      <input id="auth-email" type="email" />
+      <input
+  id="auth-email"
+  class="auth-input"
+  type="text"
+  placeholder="you@example.com"
+  autocomplete="off"
+/>
       <button id="send-otp">Send code</button>
-      <button class="ghost">Cancel</button>
+      <button class="ghost" data-close>Cancel</button>
     </div>
   </div>
 
@@ -77,9 +83,16 @@
   <div class="auth-overlay hidden" id="otp-overlay">
     <div class="auth-box">
       <h2>Enter the 6-digit code</h2>
-      <input id="auth-otp" type="text" maxlength="6" />
+      <input
+  id="auth-otp"
+  class="auth-input"
+  type="text"
+  maxlength="6"
+  placeholder="123456"
+  autocomplete="off"
+/>
       <button id="verify-otp">Verify code</button>
-      <button class="ghost">Cancel</button>
+      <button class="ghost" data-close>Cancel</button>
     </div>
   </div>
   <script>
