@@ -3334,3 +3334,30 @@ body.cp-create-open {
 .cp-media-preview {
   position: relative; /* 🔑 CRUCIAL POUR LA CROIX */
 }
+/* =========================================
+   CREATE POST — LOCATION AUTOCOMPLETE (APP PARITY)
+========================================= */
+
+.cp-location-suggestion {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+}
+
+.cp-location-suggestion:last-child {
+  border-bottom: none;
+}
+
+.cp-location-main {
+  font-size: 17px;
+  font-weight: 500;
+  color: #f8fafc;
+  line-height: 1.25;
+}
+
+.cp-location-secondary {
+  margin-top: 2px;
+  font-size: 15px;
+  color: #9ca3af;
+  line-height: 1.25;
+}

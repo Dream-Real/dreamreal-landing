@@ -68,8 +68,8 @@ const grid = sheet.querySelector(".filters-grid");
     `;
 
     pill.onclick = () => {
-  window.setFilterFeeling(feeling);
-  renderMobileActivities(feeling.id);
+  // ❌ pas de commit ici
+  renderMobileActivities(feeling.id, feeling);
 };
 
     grid.appendChild(pill);
@@ -79,7 +79,7 @@ const grid = sheet.querySelector(".filters-grid");
 // =========================
 // MOBILE FILTERS — ACTIVITIES (DESKTOP PARITY)
 // =========================
-function renderMobileActivities(feelingId) {
+function renderMobileActivities(feelingId, feeling) {
   // 🔒 SAFETY — ACTIVITIES NOT LOADED
   if (!Array.isArray(window.ACTIVITIES) || !window.ACTIVITIES.length) {
     console.warn("⚠️ ACTIVITIES not loaded");
@@ -134,6 +134,7 @@ const grid = sheet.querySelector(".filters-grid");
   allBtn.innerHTML = `<span>All</span>`;
 
   allBtn.onclick = () => {
+  window.setFilterFeeling(feeling); // ✅ commit explicite
   window.setFilterActivity(null);
   closeMobileFilters();
 };
@@ -151,6 +152,7 @@ const grid = sheet.querySelector(".filters-grid");
     `;
 
     pill.onclick = () => {
+  window.setFilterFeeling(feeling); // ✅ commit ici
   window.setFilterActivity(activity);
   closeMobileFilters();
 };
@@ -431,6 +433,11 @@ function closeMobileFilters() {
 
   modal.hidden = true;
   document.body.style.overflow = "";
+
+  // 🔑 RESET NAVIGATION FLOW (IMPORTANT)
+  requestAnimationFrame(() => {
+    renderMobileFeelings();
+  });
 }
 
 /* -----------------------------------------

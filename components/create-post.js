@@ -749,6 +749,12 @@ function openLocationPanel() {
 function renderNearbyPlaces() {
   locationNearbyList.innerHTML = "";
 
+  // ✅ RESTORE LE TITRE "Nearby places"
+  const title = locationNearby.querySelector(
+    ".cp-location-section-title"
+  );
+  if (title) title.style.display = "";
+
   const NEARBY = [
     "Paris, France",
     "Montmartre",
@@ -758,8 +764,11 @@ function renderNearbyPlaces() {
 
   NEARBY.forEach((place) => {
     const item = document.createElement("div");
-    item.className = "cp-fa-item";
-    item.textContent = place;
+    item.className = "cp-location-suggestion";
+
+    item.innerHTML = `
+      <div class="cp-location-main">${place}</div>
+    `;
 
     item.onclick = () => {
       location = place;
@@ -864,23 +873,38 @@ function initLocationAutocomplete() {
           locationNearby.classList.remove("hidden");
 
           predictions.forEach((prediction) => {
-            const item = document.createElement("div");
-            item.className = "cp-fa-item";
-            item.textContent = prediction.description;
+  const item = document.createElement("div");
+  item.className = "cp-location-suggestion";
 
-            item.onclick = () => {
-              location = prediction.description;
-              locationInput.value = prediction.description;
+  const main =
+    prediction.structured_formatting?.main_text ||
+    prediction.description;
 
-              renderPreview();
-              updateSubmit();
-              closeLocationPanel();
+  const secondary =
+    prediction.structured_formatting?.secondary_text || "";
 
-              sessionToken = null; // 🔑 reset après sélection
-            };
+  item.innerHTML = `
+    <div class="cp-location-main">${main}</div>
+    ${
+      secondary
+        ? `<div class="cp-location-secondary">${secondary}</div>`
+        : ""
+    }
+  `;
 
-            locationNearbyList.appendChild(item);
-          });
+  item.onclick = () => {
+    location = prediction.description;
+    locationInput.value = prediction.description;
+
+    renderPreview();
+    updateSubmit();
+    closeLocationPanel();
+
+    sessionToken = null; // 🔑 reset après sélection
+  };
+
+  locationNearbyList.appendChild(item);
+});
         }
       );
     }, 300); // 🎯 debounce app-like
