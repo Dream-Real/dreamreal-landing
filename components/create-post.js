@@ -1195,16 +1195,7 @@ preview.appendChild(fakePost);
     user.name ||
     "User";
 
-  usernameEl.innerHTML = `
-    ${fullName}
-    ${
-      location
-        ? `<span class="inline-location" id="cp-inline-location">
-             in ${location}
-           </span>`
-        : ""
-    }
-  `;
+  usernameEl.innerHTML = `${fullName}${location ? `<span class="inline-location" id="cp-inline-location"> in ${location}</span>` : ""}`;
 
   // 🔁 RESET LOCATION ON CLICK (APP-LIKE)
   const inlineLocation = document.getElementById("cp-inline-location");
