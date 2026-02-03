@@ -1081,7 +1081,7 @@ if (localLinkPreview?.status === "youtube") {
   const thumbnail = `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
 
   wrapper.innerHTML = `
-    <button class="link-preview-remove" aria-label="Remove video">✕</button>
+    <button class="link-preview-remove" aria-label="Remove video"></button>
     <div class="yt-thumb">
       <img src="${thumbnail}" alt="" />
       <div class="yt-play-overlay">▶</div>
@@ -1125,7 +1125,7 @@ const wrapper = document.createElement("div");
 wrapper.className = "post-media link-preview";
 
 wrapper.innerHTML = `
-  <button class="link-preview-remove" aria-label="Remove link">✕</button>
+  <button class="link-preview-remove" aria-label="Remove link"></button>
 
   ${
     localLinkPreview.image

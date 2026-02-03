@@ -2989,3 +2989,94 @@ backdrop-filter: blur(8px);
   object-fit: cover;
   display: block;
 }
+/* =========================================
+   MOBILE FEED — LINK PREVIEW (CORRECT)
+========================================= */
+
+/* Container */
+.post-item-mobile .post-media.link-preview {
+  background: transparent;
+  border: none;
+  overflow: visible;
+}
+
+/* Image — AUCUNE bordure */
+.post-item-mobile .post-media.link-preview img {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+
+  /* coins supérieurs uniquement */
+  clip-path: inset(0 round 10px 10px 0 0);
+}
+
+/* Zone texte — bordure visible, fond transparent */
+.post-item-mobile .post-media.link-preview .link-preview-body {
+  background: transparent !important;
+
+  border: 1px solid rgba(255,255,255,0.18);
+  border-top: none; /* 🔑 continuité visuelle avec l’image */
+
+  border-radius: 0 0 10px 10px;
+
+  padding: 14px 16px 16px;
+}
+/* 🔑 1) Remonter le bloc texte dans son ensemble */
+.post-item-mobile .post-media.link-preview .link-preview-body {
+  padding-top: 10px;        /* ⬅️ au lieu de 14px */
+}
+
+/* 🔑 2) Supprimer toute marge parasite du premier texte */
+.post-item-mobile .link-preview-site {
+  margin-top: 0;           /* ⬅️ CRUCIAL */
+  margin-bottom: 6px;
+}
+
+/* 🔑 3) Sécurité : aucun margin-top caché ailleurs */
+.post-item-mobile .link-preview-title,
+.post-item-mobile .link-preview-desc {
+  margin-top: 0;
+}
+/* Description — plus lisible, app-like */
+.post-item-mobile .link-preview-desc {
+  font-size: 15px;      /* ⬆️ au lieu de 14px */
+  line-height: 1.45;    /* ⬆️ respiration maîtrisée */
+  color: #d1d5db;       /* inchangé */
+}
+
+/* =========================================
+   CREATE POST — LINK PREVIEW REMOVE (iOS PERFECT)
+========================================= */
+
+.cp-preview .link-preview-remove {
+  position: absolute;
+
+  width: 36px;
+  height: 36px;
+
+  top: 8px;
+  right: 8px;
+
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  padding: 0;
+}
+
+/* 🔑 CROIX DESSINÉE (PAS UN GLYPH TEXTE) */
+.cp-preview .link-preview-remove::before {
+  content: "✕";
+
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+
+  line-height: 1;
+  transform: translateY(-1.5px); /* 🎯 centrage optique EXACT iOS */
+}
