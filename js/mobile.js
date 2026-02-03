@@ -5,6 +5,13 @@
 
 console.log("🚀 mobile.js LOADED");
 
+// =========================
+// LEADERBOARD — SOURCE UNIQUE (DESKTOP PARITY)
+// =========================
+
+window.nearbyActive = false;
+window.myPosition = null;
+
 window.FEED_FILTERS = window.FEED_FILTERS || {
   feeling: null,
   activity: null,
@@ -164,6 +171,8 @@ const grid = sheet.querySelector(".filters-grid");
 const API_URL =
   window.API_URL || "https://dreamreal-api.onrender.com";
 
+  window.API_BASE = window.API_BASE || window.API_URL;
+
 /* -----------------------------------------
    DOM TARGETS
 ----------------------------------------- */
@@ -179,6 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileApp();
   initCreatePost();
   initHeaderAvatar();
+
+  // 👤 ME SCREEN uniquement si présent
+  if (document.getElementById("lb-users-grid")) {
+    initMobileMeScreen();
+  }
 });
 
 async function initMobileApp() {
@@ -696,3 +710,220 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 });
+
+// =========================
+// LEADERBOARD — RENDER USERS (DESKTOP → MOBILE)
+// =========================
+window.renderLeaderboardUsers = function (users) {
+  const grid = document.getElementById("lb-users-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  users.forEach((user) => {
+    const card = document.createElement("div");
+    card.className = "lb-user-card";
+
+    card.innerHTML = `
+      <div class="lb-user-header">
+        <img
+  class="lb-user-avatar"
+  src="${user.avatar || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}"
+/>
+
+<div class="lb-user-name">
+  ${
+    user.name ||
+    `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+    "User"
+  }
+</div>
+        ${
+  user.distance || user.distance_km
+    ? `<div class="lb-user-distance">${user.distance || user.distance_km} km away</div>`
+    : ""
+}
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+};
+
+// =========================
+// LEADERBOARD — LOAD USERS (DESKTOP PARITY)
+// =========================
+window.loadLeaderboardUsers = async function () {
+  const grid = document.getElementById("lb-users-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const currentUserId = currentUser?.id;
+
+  try {
+    let url = `${API_BASE}/api/users`;
+
+    if (nearbyActive && myPosition) {
+      const radius = window.NEARBY_RADIUS || 15000;
+      url = `${API_BASE}/api/users/nearby?lat=${myPosition.lat}&lng=${myPosition.lng}&radius=${radius}`;
+    }
+
+    console.log("📡 Leaderboard fetch:", url);
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!res.ok) {
+      console.warn("❌ leaderboard fetch failed", res.status);
+      return;
+    }
+
+    const data = await res.json();
+    const users = Array.isArray(data) ? data : data.users || [];
+
+    users.forEach((user) => {
+      // 🚫 Exclure soi-même en Nearby (parité desktop)
+      if (nearbyActive && currentUserId && user.id === currentUserId) return;
+
+      const card = document.createElement("div");
+      card.className = "lb-user-card";
+
+      card.innerHTML = `
+        <div class="lb-user-header">
+          <img
+            class="lb-user-avatar"
+            src="${user.avatar || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}"
+          />
+          <div class="lb-user-name">
+            ${user.display_name ||
+              `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+              "User"}
+          </div>
+          ${
+            typeof user.distance === "number"
+              ? `<div class="lb-user-distance">
+                  ${user.distance < 1000
+                    ? `${user.distance} m`
+                    : `${(user.distance / 1000).toFixed(1)} km`}
+                </div>`
+              : ""
+          }
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    console.error("❌ leaderboard error", err);
+  }
+};
+
+/* =========================================
+   MOBILE — ME SCREEN
+   Ready to engage (desktop logic reuse)
+========================================= */
+
+function initMobileMeScreen() {
+  const grid = document.getElementById("lb-users-grid");
+  const nearbyBtn = document.getElementById("me-nearby-btn");
+
+  if (!grid) {
+    console.warn("❌ lb-users-grid not found (me screen)");
+    return;
+  }
+
+  console.log("👤 initMobileMeScreen");
+
+  // 🔁 RÉUTILISATION DIRECTE DU DESKTOP
+  loadLeaderboardUsers?.();
+
+  /* =========================
+     NEARBY (EXACT DESKTOP)
+  ========================= */
+
+  if (nearbyBtn) {
+    nearbyBtn.addEventListener("click", async () => {
+      if (!nearbyActive) {
+        if (!navigator.geolocation) {
+          alert("Geolocation not supported");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            myPosition = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+            };
+
+            // 🔴 ENREGISTRE POSITION (SOURCE UNIQUE)
+            await fetch(`${API_BASE}/api/users/me/location`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              body: JSON.stringify({
+                latitude: myPosition.lat,
+                longitude: myPosition.lng,
+              }),
+            });
+
+            nearbyActive = true;
+            nearbyBtn.classList.add("active");
+
+            loadLeaderboardUsers();
+          },
+          () => {
+            nearbyActive = false;
+            myPosition = null;
+            nearbyBtn.classList.remove("active");
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 8000,
+            maximumAge: 0,
+          }
+        );
+      } else {
+        // 🔁 OFF
+        nearbyActive = false;
+        myPosition = null;
+        nearbyBtn.classList.remove("active");
+        loadLeaderboardUsers();
+      }
+    });
+  }
+
+  /* =========================
+     USER (CACHE ONLY)
+  ========================= */
+
+  const userRaw = localStorage.getItem("user");
+  if (userRaw) {
+    try {
+      const user = JSON.parse(userRaw);
+
+      const avatar = document.getElementById("me-avatar");
+      const name = document.getElementById("me-name");
+
+      if (avatar && user.avatar) {
+        avatar.src = user.avatar;
+      }
+
+      if (name) {
+        name.textContent =
+          `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+          user.name ||
+          "User";
+      }
+    } catch {
+      console.warn("⚠️ invalid cached user");
+    }
+  }
+}

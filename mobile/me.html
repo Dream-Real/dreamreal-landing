@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <title>Me — Dream Real</title>
+
+    <!-- FONT APP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- 🔑 EXACTEMENT LE MÊME CSS QUE mobile.html -->
+    <link rel="stylesheet" href="/css/mobile.css?v=20260131-1" />
+  </head>
+
+  <!-- 🔑 ROOT IDENTIQUE À L’APP -->
+  <body class="dr-mobile">
+  <div class="dr-gradient">
+
+    <header class="mobile-header">
+      <div class="mobile-header-left">
+        <button class="mobile-back-btn" onclick="history.back()">←</button>
+      </div>
+      <div class="mobile-header-right"></div>
+    </header>
+
+    <main class="mobile-scroll">
+
+      <!-- HERO -->
+      <section class="me-hero">
+
+        <!-- AVATAR + LOGOUT -->
+        <div class="me-avatar-zone">
+          <div class="me-avatar-wrapper">
+            <img
+              id="me-avatar"
+              src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+              alt="Avatar"
+            />
+          </div>
+
+          <button class="me-logout-btn">⎋</button>
+        </div>
+
+        <div class="me-welcome">Welcome back,</div>
+        <div class="me-username" id="me-name">User</div>
+
+        <!-- STATS -->
+        <div class="me-stats">
+          <div class="me-stat">
+            <strong>1890</strong>
+            <span>XP</span>
+          </div>
+          <div class="me-stat">
+            <strong>#17</strong>
+            <span>Rank</span>
+          </div>
+          <div class="me-stat">
+            <strong>4.8K</strong>
+            <span>Views</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- VIEWERS -->
+      <section class="me-viewers">
+
+        <div class="me-section-header">
+          <h2>Your Viewers</h2>
+
+          <div class="me-filters">
+            <button class="chip active">Top</button>
+            <button class="chip">Recent</button>
+            <button class="chip">Insights</button>
+          </div>
+        </div>
+
+        <div id="lb-users-grid" class="lb-users-grid">
+          <!-- cards injectées -->
+        </div>
+
+      </section>
+
+    </main>
+
+    <nav class="bottom-nav"></nav>
+  </div>
+
+    <!-- 🔑 SOURCE UNIQUE DE VÉRITÉ API (OBLIGATOIRE) -->
+  <script>
+    window.API_URL = "https://dreamreal-api.onrender.com";
+    window.API_BASE = window.API_URL;
+  </script>
+
+  <script src="/js/mobile.js"></script>
+</body>
+</html>

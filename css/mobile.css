@@ -3361,3 +3361,225 @@ body.cp-create-open {
   color: #9ca3af;
   line-height: 1.25;
 }
+/* =========================================
+   MOBILE — ME SCREEN
+   Ready to engage (desktop parity)
+========================================= */
+
+body.mobile.me {
+  background: linear-gradient(
+    180deg,
+    #0b1120 0%,
+    #2a2d59 50%,
+    #5c3b84 100%
+  );
+}
+/* =========================================
+   ME SCREEN — APP PARITY (1:1)
+========================================= */
+
+/* ---------- HERO CONTAINER ---------- */
+
+.me-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 32px;
+}
+
+/* ---------- AVATAR ZONE ---------- */
+
+.me-avatar-zone {
+  position: relative;
+  margin-top: 40px;
+  margin-bottom: 12px;
+}
+
+.me-avatar-wrapper {
+  background: #ffffff;
+  padding: 4px;                /* contour blanc */
+  border-radius: 74px;         /* 70 + padding */
+}
+
+.me-avatar-wrapper img {
+  width: 140px;
+  height: 140px;
+  border-radius: 70px;
+  object-fit: cover;
+}
+
+/* ---------- LOGOUT BUTTON ---------- */
+
+.me-logout-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 6px;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 17px;
+  border: none;
+
+  background: #2a2d59;
+  color: #eecd79;
+
+  font-size: 18px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- TEXT ---------- */
+
+.me-welcome {
+  color: #d1d5db;
+  font-size: 22px;
+  margin-top: 4px;
+}
+
+.me-username {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* ---------- STATS ---------- */
+
+.me-stats {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.me-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 20px;
+}
+
+.me-stat strong {
+  color: #eecd79;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.me-stat span {
+  color: #9ca3af;
+  font-size: 17px;
+}
+
+/* ---------- VIEWERS SECTION ---------- */
+
+.me-viewers {
+  padding-bottom: 96px; /* bottom nav space */
+}
+
+/* ---------- SECTION HEADER ---------- */
+
+.me-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  padding: 0 12px;
+  margin-bottom: 12px;
+}
+
+.me-section-header h2 {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ---------- FILTER CHIPS ---------- */
+
+.me-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.me-filters .chip {
+  padding: 6px 14px;
+
+  border-radius: 20px;
+  border: none;
+
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.me-filters .chip.active {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid #eecd79;
+  color: #eecd79;
+}
+
+/* ---------- GRID (CARDS) ---------- */
+
+.lb-users-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  padding: 0 12px;
+}
+
+/* ---------- CARD ---------- */
+
+.lb-user-card {
+  position: relative;
+  height: 220px;
+
+  border-radius: 8px;
+  overflow: hidden;
+
+  background: #222;
+}
+
+/* ---------- CARD IMAGE ---------- */
+
+.lb-user-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- CARD OVERLAY ---------- */
+
+.lb-user-card .lb-user-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+
+  padding: 10px;
+
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.lb-user-card .lb-user-name {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.lb-user-card .lb-user-meta {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 360px) {
+  .lb-users-grid {
+    grid-template-columns: 1fr;
+  }
+}
