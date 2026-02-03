@@ -2868,3 +2868,46 @@ backdrop-filter: blur(8px);
 .feed-filter-btn.is-clear {
   color: #93C5FD !important;
 }
+/* =========================================
+   YOUTUBE — PREVENT INITIAL UI FLASH
+========================================= */
+
+.youtube-embed iframe {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.youtube-embed.is-ready iframe {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* 🌄 BACKGROUND LOGIN (APP PARITY) */
+
+.login-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;          /* ✅ visible */
+}
+
+.bg-image {
+  position: absolute;
+  inset: 0;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.bg-image.active {
+  opacity: 1;
+}
+.login-header,
+.login-content,
+.login-footer {
+  position: relative;
+  z-index: 1;
+}

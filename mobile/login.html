@@ -30,9 +30,9 @@
 <body class="dr-mobile login-page">
   <!-- BACKGROUND -->
   <div class="login-bg">
-    <div class="bg-image active"></div>
-    <div class="bg-image"></div>
-  </div>
+  <div class="bg-image bg-a active"></div>
+  <div class="bg-image bg-b"></div>
+</div>
 
   <!-- HEADER -->
   <header class="login-header">
@@ -100,5 +100,45 @@
 </script>
 
 <script src="./mobile-auth.js"></script>
+<script>
+/* =========================================
+   LOGIN — BACKGROUND SLIDESHOW (APP PARITY)
+   Scoped to login.html ONLY
+========================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const images = [
+    "/images/bg12.jpg",
+    "/images/bg79.jpg",
+    "/images/bg2.jpg",
+    "/images/bg78.jpg",
+    "/images/bg80.jpg",
+    "/images/bg7.jpg",
+  ];
+
+  const layers = document.querySelectorAll(".login-bg .bg-image");
+  if (layers.length !== 2) return;
+
+  let index = 0;
+  let front = 0;
+
+  layers[0].style.backgroundImage = `url(${images[0]})`;
+  layers[1].style.backgroundImage = `url(${images[1]})`;
+
+  const preload = new Image();
+preload.src = images[1];
+
+  setInterval(() => {
+    const back = front === 0 ? 1 : 0;
+    index = (index + 1) % images.length;
+
+    layers[back].style.backgroundImage = `url(${images[index]})`;
+    layers[back].classList.add("active");
+    layers[front].classList.remove("active");
+
+    front = back;
+  }, 8000);
+});
+</script>
 </body>
 </html>
