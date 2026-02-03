@@ -3242,3 +3242,95 @@ body.cp-create-open {
 
   transform: none !important;  /* ❌ kill tout centrage */
 }
+/* =========================================
+   CREATE POST — LOCATION
+   REAL FIX (correct container)
+========================================= */
+
+/* Header location */
+.cp-location-panel .cp-fa-header {
+  padding-top: 0px !important;
+  padding-bottom: 12px !important;
+}
+
+/* Back arrow — LOCATION ONLY */
+.cp-location-panel #cp-location-back {
+  position: absolute;
+  top: -5px !important;      /* 👈 même référence que Activities */
+  left: 8px;
+  transform: none !important;
+}
+
+/* Title — align with other modals */
+.cp-location-panel .cp-fa-title {
+  position: relative;
+  top: 0 !important;
+}
+
+/* =========================================
+   FINAL — ACTIVITIES BACK ARROW (SOURCE OF TRUTH)
+========================================= */
+
+.cp-feeling-panel.is-activities .cp-fa-back {
+  all: unset;                 /* 🔥 reset total */
+  position: absolute;
+  top: 8px;
+  left: 4px;                  /* 👈 ICI ton décalage gauche */
+  
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: #93c5fd;
+  cursor: pointer;
+}
+/* =========================================
+   CREATE POST — MEDIA REMOVE (LINK PARITY)
+========================================= */
+
+.cp-carousel-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+
+  border: none;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* 🔑 CROIX DESSINÉE (IDENTIQUE LINK PREVIEW) */
+.cp-carousel-remove::before {
+  content: "✕";
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+
+  /* 🎯 centrage optique EXACT iOS */
+  transform: translateY(-1.5px);
+}
+/* =========================================
+   CREATE POST — MEDIA PREVIEW CONTAINER
+========================================= */
+
+.cp-media-preview {
+  position: relative; /* 🔑 CRUCIAL POUR LA CROIX */
+}

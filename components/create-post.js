@@ -578,6 +578,10 @@ triggers.forEach((trigger) => {
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
 
+    // ⬇️ ⬇️ ⬇️ AJOUTE CES 2 LIGNES ICI ⬇️ ⬇️ ⬇️
+    document.documentElement.classList.add("cp-create-open");
+    document.body.classList.add("cp-create-open");
+
     // ✅ recalcul état bouton POST
     updateSubmit();
   };
@@ -1276,7 +1280,6 @@ mediaEl.dataset.objectUrl = objectUrl;
   // ❌ BOUTON REMOVE (COMME CAROUSEL)
   const remove = document.createElement("button");
   remove.className = "cp-carousel-remove";
-  remove.textContent = "✕";
   remove.onclick = () => {
   if (mediaEl.dataset.objectUrl) {
     URL.revokeObjectURL(mediaEl.dataset.objectUrl);
@@ -1313,7 +1316,6 @@ img.dataset.objectUrl = objectUrl;
 
     const remove = document.createElement("button");
     remove.className = "cp-carousel-remove";
-    remove.textContent = "✕";
     remove.onclick = () => {
       URL.revokeObjectURL(img.dataset.objectUrl);
       draftMedia.splice(index, 1);
