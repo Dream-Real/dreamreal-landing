@@ -751,6 +751,23 @@ window.renderLeaderboardUsers = function (users) {
 };
 
 // =========================
+// LEADERBOARD — USER NORMALIZER (MOBILE PARITY)
+// =========================
+function normalizeUserForMobile(user) {
+  return {
+    ...user,
+
+    // 🔑 ALIGNEMENT BACKEND → MOBILE
+    feeling: user.today_feeling || null,
+    activity: user.today_activity || null,
+
+    instagram: user.instagram_username || null,
+    facebook: user.facebook_url || null,
+    messenger: user.messenger_url || null,
+  };
+}
+
+// =========================
 // LEADERBOARD — LOAD USERS (DESKTOP PARITY)
 // =========================
 window.loadLeaderboardUsers = async function () {
@@ -784,40 +801,74 @@ window.loadLeaderboardUsers = async function () {
     }
 
     const data = await res.json();
-    const users = Array.isArray(data) ? data : data.users || [];
+    const users = (Array.isArray(data) ? data : data.users || [])
+  .map(normalizeUserForMobile);
 
     users.forEach((user) => {
-      // 🚫 Exclure soi-même en Nearby (parité desktop)
-      if (nearbyActive && currentUserId && user.id === currentUserId) return;
+  // 🚫 Exclure soi-même en Nearby (PARITÉ DESKTOP — NE PAS TOUCHER)
+  if (nearbyActive && currentUserId && user.id === currentUserId) return;
 
-      const card = document.createElement("div");
-      card.className = "lb-user-card";
+  const card = document.createElement("div");
+  card.className = "lb-user-card";
 
-      card.innerHTML = `
-        <div class="lb-user-header">
-          <img
-            class="lb-user-avatar"
-            src="${user.avatar || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}"
-          />
-          <div class="lb-user-name">
-            ${user.display_name ||
-              `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-              "User"}
-          </div>
-          ${
-            typeof user.distance === "number"
-              ? `<div class="lb-user-distance">
-                  ${user.distance < 1000
-                    ? `${user.distance} m`
-                    : `${(user.distance / 1000).toFixed(1)} km`}
-                </div>`
-              : ""
-          }
-        </div>
-      `;
+  card.innerHTML = `
+  <img
+    src="${user.avatar || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}"
+    alt="${user.display_name || "User"}"
+  />
 
-      grid.appendChild(card);
-    });
+  <div class="lb-user-overlay">
+    <div class="lb-user-name">
+      ${user.display_name ||
+        `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+        "User"}
+    </div>
+
+    ${
+      user.feeling
+        ? `<div class="lb-user-mood">
+            ${
+              user.feeling.image
+                ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${user.feeling.image}" />`
+                : ""
+            }
+            <span>${user.feeling.title}</span>
+          </div>`
+        : ""
+    }
+
+    ${
+      typeof user.distance === "number"
+        ? `<div class="lb-user-meta">
+            ${user.distance < 1000
+              ? `${user.distance} m`
+              : `${(user.distance / 1000).toFixed(1)} km`}
+          </div>`
+        : ""
+    }
+
+    <div class="lb-user-socials">
+  ${
+    user.instagram
+      ? `<a href="https://www.instagram.com/${user.instagram}" target="_blank">IG</a>`
+      : ""
+  }
+  ${
+    user.facebook
+      ? `<a href="${user.facebook}" target="_blank">FB</a>`
+      : ""
+  }
+  ${
+    user.messenger
+      ? `<a href="${user.messenger}" target="_blank">MSG</a>`
+      : ""
+  }
+</div>
+  </div>
+`;
+
+  grid.appendChild(card);
+});
   } catch (err) {
     console.error("❌ leaderboard error", err);
   }
