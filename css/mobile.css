@@ -3726,3 +3726,160 @@ body.mobile.me {
   width: 22px;
   height: 22px;
 }
+/* =========================
+   HEADER — BURGER
+========================= */
+.btn-burger {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  color: rgba(255,255,255,0.92);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0; /* 🔥 LIGNE À AJOUTER */
+}
+
+/* =========================
+   DRAWER (RIGHT SLIDE)
+========================= */
+.mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9998;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(320px, 86vw);
+  z-index: 9999;
+
+  background: rgba(10, 16, 35, 0.96);
+  backdrop-filter: blur(16px);
+
+  border-left: 1px solid rgba(255,255,255,0.10);
+  box-shadow: -20px 0 60px rgba(0,0,0,0.45);
+
+  transform: translateX(100%);
+  transition: transform 180ms ease;
+
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+}
+
+.mobile-drawer.is-open {
+  transform: translateX(0);
+}
+
+.mobile-drawer.hidden,
+.mobile-drawer-overlay.hidden {
+  display: none;
+}
+
+.mobile-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 10px;
+}
+
+.mobile-drawer-title {
+  font-family: "Suez One", serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.92);
+}
+
+.mobile-drawer-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  color: rgba(255,255,255,0.92);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-drawer-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0 10px;
+}
+
+.mobile-drawer-tab {
+  border-radius: 999px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.86);
+  font-size: 13px;
+}
+
+.mobile-drawer-tab.active {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.mobile-drawer-body {
+  flex: 1;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  padding: 14px;
+}
+/* 🔧 FIX — ensure burger is visible */
+.mobile-header,
+.mobile-header-right {
+  overflow: visible !important;
+}
+.mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.btn-burger {
+  z-index: 1001;
+}
+.mobile-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  /* sécurité layout */
+  min-height: 42px;
+}
+.btn-burger:active,
+.btn-burger:focus,
+.btn-burger:focus-visible {
+  background: rgba(0,0,0,0.18) !important;
+  color: rgba(255,255,255,0.92) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.btn-burger {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+}
+button {
+  color: inherit;
+  background: none;
+}
+
+/* =========================
+   ME — HIDE HERO WHEN LOGGED OUT
+========================= */
+.dr-mobile.me:not(.is-logged-in) .me-hero {
+  display: none;
+}

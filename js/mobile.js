@@ -5,6 +5,22 @@
 
 console.log("🚀 mobile.js LOADED");
 
+// ==================================================
+// AUTH UI STATE — BODY CLASS
+// ==================================================
+(() => {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+
+  if (token && user) {
+    document.body.classList.add("is-logged-in");
+    console.log("🔐 UI state: logged in");
+  } else {
+    document.body.classList.remove("is-logged-in");
+    console.log("🔓 UI state: logged out");
+  }
+})();
+
 const ICON_INSTAGRAM = `
 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
   <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.66 0 3 1.34 3 3v10c0 1.66-1.34 3-3 3H7c-1.66 0-3-1.34-3-3V7c0-1.66 1.34-3 3-3h10zm-5 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm0 2a2.5 2.5 0 110 5 2.5 2.5 0 010-5z"/>
@@ -1064,3 +1080,61 @@ function bindMeFilterPills() {
   console.log("✅ Me filter pills bound");
   return true;
 }
+// =========================
+// MOBILE DRAWER — MENU
+// =========================
+document.addEventListener("DOMContentLoaded", () => {
+  const burgerBtn = document.getElementById("mobile-burger-btn");
+  const overlay = document.getElementById("mobile-drawer-overlay");
+  const drawer = document.getElementById("mobile-drawer");
+  const closeBtn = document.getElementById("mobile-drawer-close");
+  const tabMe = document.getElementById("mobile-drawer-tab-me");
+
+  if (!burgerBtn || !overlay || !drawer || !closeBtn || !tabMe) {
+    console.warn("❌ Drawer elements missing");
+    return;
+  }
+
+  const openDrawer = () => {
+    overlay.classList.remove("hidden");
+    drawer.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      drawer.classList.add("is-open");
+    });
+
+    burgerBtn.setAttribute("aria-expanded", "true");
+    drawer.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeDrawer = () => {
+    drawer.classList.remove("is-open");
+    burgerBtn.setAttribute("aria-expanded", "false");
+    drawer.setAttribute("aria-hidden", "true");
+
+    // petite transition puis hide
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+      drawer.classList.add("hidden");
+    }, 180);
+
+    document.body.style.overflow = "";
+  };
+
+  burgerBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const isOpen = drawer.classList.contains("is-open");
+    if (isOpen) closeDrawer();
+    else openDrawer();
+  });
+
+  overlay.addEventListener("click", closeDrawer);
+  closeBtn.addEventListener("click", closeDrawer);
+
+  // Tab "Me" → route vers me.html (propre)
+  tabMe.addEventListener("click", () => {
+    window.location.href = "/mobile/me.html";
+  });
+});

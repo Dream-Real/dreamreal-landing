@@ -45,6 +45,18 @@
     ＋
   </button>
 
+  <!-- ☰ BURGER -->
+<button
+  class="btn-burger"
+  id="mobile-burger-btn"
+  aria-label="Menu"
+  aria-expanded="false"
+  aria-controls="mobile-drawer"
+  type="button"
+>
+  ☰
+</button>
+
   <!-- 👤 AVATAR USER (hidden par défaut) -->
   <button
   id="mobile-user-avatar"
@@ -135,6 +147,40 @@
           <!-- feeling / activity steps -->
         </div>
       </div>
+
+      <!-- =========================
+     MOBILE DRAWER (MENU)
+========================= -->
+<div id="mobile-drawer-overlay" class="mobile-drawer-overlay hidden"></div>
+
+<aside id="mobile-drawer" class="mobile-drawer hidden" aria-hidden="true">
+  <div class="mobile-drawer-header">
+    <div class="mobile-drawer-title">Menu</div>
+
+    <button
+      id="mobile-drawer-close"
+      class="mobile-drawer-close"
+      aria-label="Close menu"
+      type="button"
+    >
+      ✕
+    </button>
+  </div>
+
+  <div class="mobile-drawer-tabs">
+    <button
+      id="mobile-drawer-tab-me"
+      class="mobile-drawer-tab active"
+      type="button"
+    >
+      Me
+    </button>
+  </div>
+
+  <div class="mobile-drawer-body">
+    <!-- Volet vierge pour l’instant -->
+  </div>
+</aside>
 
     </div>
 
