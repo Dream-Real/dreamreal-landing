@@ -5,6 +5,24 @@
 
 console.log("🚀 mobile.js LOADED");
 
+const ICON_INSTAGRAM = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+  <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.66 0 3 1.34 3 3v10c0 1.66-1.34 3-3 3H7c-1.66 0-3-1.34-3-3V7c0-1.66 1.34-3 3-3h10zm-5 3.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm0 2a2.5 2.5 0 110 5 2.5 2.5 0 010-5z"/>
+</svg>
+`;
+
+const ICON_FACEBOOK = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+  <path d="M22 12a10 10 0 10-11.5 9.95v-7.04H8v-2.91h2.5V9.8c0-2.47 1.47-3.84 3.73-3.84 1.08 0 2.2.2 2.2.2v2.42h-1.24c-1.22 0-1.6.76-1.6 1.54v1.85H16.3l-.4 2.91h-2.3v7.04A10 10 0 0022 12z"/>
+</svg>
+`;
+
+const ICON_MESSENGER = `
+<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+  <path d="M12 2C6.48 2 2 6.14 2 11.25c0 2.9 1.45 5.45 3.74 7.13V22l3.42-1.88c.88.25 1.82.38 2.84.38 5.52 0 10-4.14 10-9.25S17.52 2 12 2zm1.13 12.38l-2.55-2.72-5 2.72 5.45-5.8 2.55 2.72 5-2.72-5.45 5.8z"/>
+</svg>
+`;
+
 // =========================
 // LEADERBOARD — SOURCE UNIQUE (DESKTOP PARITY)
 // =========================
@@ -847,22 +865,56 @@ window.loadLeaderboardUsers = async function () {
         : ""
     }
 
-    <div class="lb-user-socials">
+   <div class="lb-user-socials">
+
   ${
     user.instagram
-      ? `<a href="https://www.instagram.com/${user.instagram}" target="_blank">IG</a>`
+      ? `
+        <a
+          class="lb-social ig"
+          href="https://www.instagram.com/${user.instagram}"
+          target="_blank"
+          rel="noopener"
+          onclick="event.stopPropagation()"
+        >
+          ${ICON_INSTAGRAM}
+        </a>
+      `
       : ""
   }
+
   ${
     user.facebook
-      ? `<a href="${user.facebook}" target="_blank">FB</a>`
+      ? `
+        <a
+          class="lb-social fb"
+          href="${user.facebook}"
+          target="_blank"
+          rel="noopener"
+          onclick="event.stopPropagation()"
+        >
+          ${ICON_FACEBOOK}
+        </a>
+      `
       : ""
   }
+
   ${
     user.messenger
-      ? `<a href="${user.messenger}" target="_blank">MSG</a>`
+      ? `
+        <a
+          class="lb-social ms"
+          href="${user.messenger}"
+          target="_blank"
+          rel="noopener"
+          onclick="event.stopPropagation()"
+        >
+          ${ICON_MESSENGER}
+        </a>
+      `
       : ""
   }
+
 </div>
   </div>
 `;

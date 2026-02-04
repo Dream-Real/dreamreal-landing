@@ -3542,14 +3542,14 @@ body.mobile.me {
   border-radius: 10px;
   overflow: hidden;
 
-  background: #1f2238;
+  background: transparent;   /* ✅ TRANSPARENCE TOTALE */
 }
 
 /* ---------- CARD IMAGE (TOP) ---------- */
 
 .lb-user-card img {
   width: 100%;
-  height: 150px;
+  height: 190px;   /* 🔥 image plus présente */
   object-fit: cover;
 }
 
@@ -3563,30 +3563,30 @@ body.mobile.me {
   flex-direction: column;
   gap: 8px;
 
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.45),
-    rgba(0, 0, 0, 0.25)
-  );
+  background: transparent; /* ✅ on ne change pas */
+
+  /* ✅ CONTOUR GRIS (même gris que les links) */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  /* ✅ pas de ligne horizontale entre image et bas */
+  border-top: none;
+
+  /* ✅ arrondi uniquement en bas pour épouser la card */
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 /* ---------- USERNAME ---------- */
 
 .lb-user-card .lb-user-name {
-  color: #ffffff;
+  color: #fff; /* bleu/noir Dream Real */
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-/* ---------- TODAY’S MOOD ---------- */
-
 .lb-user-mood {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  color: #e5e7eb;
-  font-size: 14px;
+  color: #fff; /* gray-700 */
+  font-size: 17px;
 }
 
 .lb-user-mood img {
@@ -3602,26 +3602,129 @@ body.mobile.me {
   margin-top: 6px;
 }
 
-.lb-user-socials a {
-  width: 32px;
-  height: 32px;
-
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.15);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #ffffff;
-  font-size: 14px;
-  text-decoration: none;
-}
-
 /* ---------- RESPONSIVE ---------- */
 
 @media (max-width: 360px) {
   .lb-users-grid {
     grid-template-columns: 1fr;
   }
+}
+.lb-user-socials {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.lb-user-socials .lb-social:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+/* =========================================
+   FONT AWESOME — FINAL (DO NOT TOUCH)
+========================================= */
+
+.lb-user-socials i {
+  font-size: 18px;
+  color: #e5e7eb;
+  line-height: 1;
+}
+/* =========================================
+   FONT AWESOME — WEBFONTS (CORRECT)
+========================================= */
+
+.fa-brands {
+  font-family: "Font Awesome 6 Brands" !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  display: inline-block;
+  line-height: 1;
+}
+.lb-user-mood {
+  display: flex;
+  align-items: center;   /* 🔥 CLÉ */
+  gap: 6px;
+}
+.lb-user-mood img {
+  width: 20px;
+  height: 20px;
+  display: block;        /* 🔥 évite l’alignement baseline */
+}
+.lb-user-mood span {
+  line-height: 1;
+  display: block;
+}
+.lb-user-socials {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+/* === SOCIAL CONTAINER === */
+.lb-user-socials {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+/* === BASE BUTTON === */
+.lb-social {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  color: #ffffff;
+
+  /* 🔑 jamais coupé */
+  overflow: visible;
+}
+
+/* === SVG === */
+.lb-social svg {
+  display: block;
+  fill: currentColor;
+}
+
+/* === INSTAGRAM === */
+.lb-social.ig {
+  background: #c13584;
+}
+
+/* === FACEBOOK === */
+.lb-social.fb {
+  background: #1877f2;
+}
+
+/* === MESSENGER (gradient propre, net) === */
+.lb-social.ms {
+  background: linear-gradient(
+    135deg,
+    #00b2ff,
+    #006aff,
+    #a033ff
+  );
+}
+
+/* === HOVER (facultatif) === */
+.lb-social:hover {
+  filter: brightness(1.1);
+}
+/* Facebook — icône légèrement plus grande */
+.lb-social.fb svg {
+  width: 23px;
+  height: 23px;
+  transform: translateX(1px); /* 🔥 décalage +1px à droite */
+}
+/* Instagram — icône légèrement plus grande */
+.lb-social.ig svg {
+  width: 20px;
+  height: 20px;
+}
+/* Messenger — icône légèrement plus grande */
+.lb-social.ms svg {
+  width: 22px;
+  height: 22px;
 }
