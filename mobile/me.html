@@ -17,6 +17,11 @@
       rel="stylesheet"
     />
 
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+/>
+
     <!-- 🔑 EXACTEMENT LE MÊME CSS QUE mobile.html -->
     <link rel="stylesheet" href="/css/mobile.css?v=20260131-1" />
   </head>
@@ -78,10 +83,9 @@
           <h2>Your Viewers</h2>
 
           <div class="me-filters">
-            <button class="chip active">Top</button>
-            <button class="chip">Recent</button>
-            <button class="chip">Insights</button>
-          </div>
+  <button class="chip active" data-filter="all">All</button>
+  <button class="chip" data-filter="nearby">Nearby</button>
+</div>
         </div>
 
         <div id="lb-users-grid" class="lb-users-grid">

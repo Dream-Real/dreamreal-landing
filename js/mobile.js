@@ -789,6 +789,13 @@ function normalizeUserForMobile(user) {
 // LEADERBOARD — LOAD USERS (DESKTOP PARITY)
 // =========================
 window.loadLeaderboardUsers = async function () {
+
+  // 🔒 GUARD — Nearby activé mais position absente → on bloque
+  if (nearbyActive && !myPosition) {
+    console.warn("⛔ Nearby active but position missing — abort fetch");
+    return;
+  }
+
   const grid = document.getElementById("lb-users-grid");
   if (!grid) return;
 
@@ -807,11 +814,7 @@ window.loadLeaderboardUsers = async function () {
 
     console.log("📡 Leaderboard fetch:", url);
 
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const res = await fetch(url);
 
     if (!res.ok) {
       console.warn("❌ leaderboard fetch failed", res.status);
@@ -820,7 +823,7 @@ window.loadLeaderboardUsers = async function () {
 
     const data = await res.json();
     const users = (Array.isArray(data) ? data : data.users || [])
-  .map(normalizeUserForMobile);
+      .map(normalizeUserForMobile);
 
     users.forEach((user) => {
   // 🚫 Exclure soi-même en Nearby (PARITÉ DESKTOP — NE PAS TOUCHER)
@@ -942,67 +945,6 @@ function initMobileMeScreen() {
 
   console.log("👤 initMobileMeScreen");
 
-  // 🔁 RÉUTILISATION DIRECTE DU DESKTOP
-  loadLeaderboardUsers?.();
-
-  /* =========================
-     NEARBY (EXACT DESKTOP)
-  ========================= */
-
-  if (nearbyBtn) {
-    nearbyBtn.addEventListener("click", async () => {
-      if (!nearbyActive) {
-        if (!navigator.geolocation) {
-          alert("Geolocation not supported");
-          return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            myPosition = {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            };
-
-            // 🔴 ENREGISTRE POSITION (SOURCE UNIQUE)
-            await fetch(`${API_BASE}/api/users/me/location`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              },
-              body: JSON.stringify({
-                latitude: myPosition.lat,
-                longitude: myPosition.lng,
-              }),
-            });
-
-            nearbyActive = true;
-            nearbyBtn.classList.add("active");
-
-            loadLeaderboardUsers();
-          },
-          () => {
-            nearbyActive = false;
-            myPosition = null;
-            nearbyBtn.classList.remove("active");
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 8000,
-            maximumAge: 0,
-          }
-        );
-      } else {
-        // 🔁 OFF
-        nearbyActive = false;
-        myPosition = null;
-        nearbyBtn.classList.remove("active");
-        loadLeaderboardUsers();
-      }
-    });
-  }
-
   /* =========================
      USER (CACHE ONLY)
   ========================= */
@@ -1029,4 +971,96 @@ function initMobileMeScreen() {
       console.warn("⚠️ invalid cached user");
     }
   }
+  // ✅ INITIAL LOAD — ALL USERS (OBLIGATOIRE)
+  nearbyActive = false;
+  myPosition = null;
+
+  console.log("📥 Initial leaderboard load (ALL)");
+  loadLeaderboardUsers();
+  // 🔑 Bind filters AFTER render (mobile-safe)
+requestAnimationFrame(() => {
+  bindMeFilterPills();
+});
+}
+function bindMeFilterPills() {
+  const pills = document.querySelectorAll(".me-filters .chip");
+  if (!pills.length) {
+    console.warn("⚠️ Pills not ready yet");
+    return false;
+  }
+
+  pills.forEach((pill) => {
+    pill.onclick = () => {
+      console.log("👉 PILL CLICKED", pill.dataset.filter);
+
+      pills.forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+
+      const mode = pill.dataset.filter;
+
+      // 🔵 ALL
+      if (mode === "all") {
+        nearbyActive = false;
+        myPosition = null;
+        loadLeaderboardUsers();
+        return;
+      }
+
+      // 🟣 NEARBY
+      if (mode === "nearby") {
+        if (!navigator.geolocation) {
+          alert("Geolocation not supported");
+          return;
+        }
+
+        nearbyActive = false;
+        myPosition = null;
+
+        navigator.geolocation.getCurrentPosition(
+  async (pos) => {
+    myPosition = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+    };
+
+    // 🔑 ÉTAPE CRITIQUE — PARITÉ DESKTOP
+    try {
+      await fetch(`${API_BASE}/api/users/me/location`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(localStorage.getItem("token")
+            ? { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            : {}),
+        },
+        body: JSON.stringify({
+          latitude: myPosition.lat,
+          longitude: myPosition.lng,
+        }),
+      });
+    } catch (err) {
+      console.warn("⚠️ Failed to persist location", err);
+    }
+
+    nearbyActive = true;
+    console.log("📍 Nearby ENABLED", myPosition);
+
+    loadLeaderboardUsers(); // ✅ maintenant le backend est prêt
+  },
+  () => {
+    nearbyActive = false;
+    myPosition = null;
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 8000,
+    maximumAge: 0,
+  }
+);
+      }
+    };
+  });
+
+  console.log("✅ Me filter pills bound");
+  return true;
 }

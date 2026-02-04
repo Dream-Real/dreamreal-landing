@@ -3532,48 +3532,46 @@ body.mobile.me {
   padding: 0 12px;
 }
 
-/* ---------- CARD (NEW STRUCTURE) ---------- */
+/* ---------- CARD (OVERLAY VERSION — FINAL) ---------- */
 
 .lb-user-card {
-  display: flex;
-  flex-direction: column;
-
-  min-height: 280px;
+  position: relative;
   border-radius: 10px;
   overflow: hidden;
-
-  background: transparent;   /* ✅ TRANSPARENCE TOTALE */
+  background: transparent;
 }
 
-/* ---------- CARD IMAGE (TOP) ---------- */
+/* ---------- CARD IMAGE ---------- */
 
 .lb-user-card img {
   width: 100%;
-  height: 190px;   /* 🔥 image plus présente */
+  height: 240px;
   object-fit: cover;
+  display: block;
 }
 
-/* ---------- CARD CONTENT (BOTTOM) ---------- */
+/* ---------- OVERLAY ---------- */
 
 .lb-user-card .lb-user-overlay {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-  padding: 12px;
+  padding: 14px 12px 12px;
+
   display: flex;
   flex-direction: column;
   gap: 8px;
 
-  background: transparent; /* ✅ on ne change pas */
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.55) 60%,
+    rgba(0,0,0,0.75) 100%
+  );
 
-  /* ✅ CONTOUR GRIS (même gris que les links) */
-  border: 1px solid rgba(255, 255, 255, 0.15);
-
-  /* ✅ pas de ligne horizontale entre image et bas */
-  border-top: none;
-
-  /* ✅ arrondi uniquement en bas pour épouser la card */
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border: none;
 }
 
 /* ---------- USERNAME ---------- */
