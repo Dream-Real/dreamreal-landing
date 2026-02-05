@@ -21,6 +21,12 @@
   </head>
 
   <body class="dr-mobile">
+
+      <div style="position:fixed;top:0;left:0;right:0;
+  background:red;color:white;z-index:9999;padding:6px">
+    MOBILE.HTML ROOT LOADED
+  </div>
+  
     <!-- 🌈 GRADIENT GLOBAL -->
     <div class="dr-gradient">
 
@@ -163,14 +169,22 @@
   </div>
 
   <div class="mobile-drawer-tabs">
-    <button
-      id="mobile-drawer-tab-me"
-      class="mobile-drawer-tab active"
-      type="button"
-    >
-      Me
-    </button>
-  </div>
+  <button
+    id="mobile-drawer-tab-me"
+    class="mobile-drawer-tab active"
+    type="button"
+  >
+    Me
+  </button>
+
+  <button
+    id="mobile-drawer-tab-map"
+    class="mobile-drawer-tab"
+    type="button"
+  >
+    Map
+  </button>
+</div>
 
  <div class="mobile-drawer-body">
 
@@ -276,6 +290,7 @@
   async
   defer
 ></script>
+
 <script src="./components/create-post.js"></script>
 
 <!-- MOBILE LOGIC (bouton +, feed, etc.) -->

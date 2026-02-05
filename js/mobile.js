@@ -279,6 +279,15 @@ async function initMobileApp() {
 // =========================
 window.FEED_POSTS = normalizedPosts;
 
+// =========================
+// 🗺️ MAP INIT (MOBILE PARITY)
+// =========================
+if (typeof window.initMobileMap === "function") {
+  window.initMobileMap(normalizedPosts);
+} else {
+  console.warn("⚠️ initMobileMap not loaded");
+}
+
       console.log(
   "🧪 FEELING SHAPE",
   normalizedPosts.map(p => p.feeling)
@@ -488,6 +497,50 @@ function closeMobileFilters() {
     renderMobileFeelings();
   });
 }
+
+/* =========================================
+   MAP → POST SHEET (BRIDGE)
+   Parity with RN MapScreen
+========================================= */
+
+window.openPostSheet = function openPostSheet(posts) {
+  if (!Array.isArray(posts) || !posts.length) {
+    console.warn("⚠️ openPostSheet called with empty posts");
+    return;
+  }
+
+  console.log("🪟 openPostSheet:", posts.length, "posts");
+
+  // 👉 Cas 1 : 1 seul post → scroll vers le post dans le feed
+  if (posts.length === 1) {
+    const post = posts[0];
+    const target = document.querySelector(
+      `[data-post-id="${post.id}"]`
+    );
+
+    if (target) {
+      const scrollContainer = document.querySelector(".mobile-scroll");
+      const header = document.querySelector(".mobile-header");
+      const HEADER_OFFSET = header ? header.offsetHeight : 88;
+
+      const y =
+        target.offsetTop +
+        (feedContainer?.offsetTop || 0);
+
+      scrollContainer?.scrollTo({
+        top: y - HEADER_OFFSET - 16,
+        behavior: "smooth",
+      });
+    }
+
+    return;
+  }
+
+  // 👉 Cas 2 : cluster → TODO bottom sheet multi-posts
+  console.warn(
+    "ℹ️ Multiple posts selected (cluster) — UI not implemented yet"
+  );
+};
 
 /* -----------------------------------------
    CREATE POST (MOBILE)
@@ -1174,6 +1227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const drawer = document.getElementById("mobile-drawer");
   const closeBtn = document.getElementById("mobile-drawer-close");
   const tabMe = document.getElementById("mobile-drawer-tab-me");
+    const tabMap = document.getElementById("mobile-drawer-tab-map");
 
   if (!burgerBtn || !overlay || !drawer || !closeBtn || !tabMe) {
     console.warn("❌ Drawer elements missing");
@@ -1222,6 +1276,12 @@ document.addEventListener("DOMContentLoaded", () => {
   tabMe.addEventListener("click", () => {
     window.location.href = "/mobile/me.html";
   });
+    // Tab "Map" → route vers map.html
+  if (tabMap) {
+    tabMap.addEventListener("click", () => {
+      window.location.href = "/mobile/map.html";
+    });
+  }
 });
 /* -----------------------------------------
    MOBILE — HARD RESET ON BACK (iOS SAFE)

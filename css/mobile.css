@@ -4958,3 +4958,101 @@ button {
 .mobile-drawer .leaderboard-card {
   border-radius: 14px;
 }
+.map-section {
+  position: relative;
+  width: 100%;
+  height: 42vh; /* comme l’app */
+  min-height: 320px;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.mobile-drawer-tabs {
+  display: flex;
+  gap: 12px;
+}
+
+.mobile-drawer-tab {
+  display: inline-flex; /* 🔥 AU LIEU DE none */
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 16px;
+  border-radius: 999px;
+
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.mobile-drawer-tab.active {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+}
+/* =========================
+   MOBILE DRAWER — TABS (ME / MAP)
+========================= */
+
+.mobile-drawer-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.mobile-drawer-tab {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mobile-drawer-tab.active {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+.mobile-drawer-tab:not(.active) {
+  display: none;
+}
+/* =========================
+   MOBILE DRAWER — TABS FIX
+========================= */
+
+.mobile-drawer-tabs {
+  display: flex;
+  gap: 12px;
+}
+
+.mobile-drawer-tab {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+
+  padding: 10px 0;
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.06);
+  color: #9ca3af;
+
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mobile-drawer-tab.active {
+  background: rgba(255,255,255,0.14);
+  color: #ffffff;
+}
