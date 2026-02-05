@@ -110,13 +110,6 @@ body {
   color: #ffffff;
 }
 
-.mobile-header-right {
-  background: none;
-  border: none;
-  padding: 6px;
-  cursor: pointer;
-}
-
 /* =========================
    HEADER — CREATE BUTTON
 ========================= */
@@ -3726,22 +3719,47 @@ body.mobile.me {
   width: 22px;
   height: 22px;
 }
-/* =========================
-   HEADER — BURGER
-========================= */
+
 .btn-burger {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.18);
-  color: rgba(255,255,255,0.92);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  line-height: 1;
-  flex-shrink: 0; /* 🔥 LIGNE À AJOUTER */
+  width: 24px;
+  height: 24px;
+
+  position: relative;
+
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 🔥 BURGER DESSINÉ ICI */
+.btn-burger::before {
+  content: "";
+
+  width: 22px;      /* ⬅️ 44 / 2 */
+  height: 2px;      /* ⬅️ 4 / 2 */
+
+  background: #ffffff;
+  border-radius: 2px;
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  /* ✨ 3 barres, écart divisé par 2 */
+  box-shadow:
+    0 -7px 0 #ffffff,
+    0  7px 0 #ffffff;
+}
+.btn-burger::before {
+  transform: translate(-50%, -50%) translateX(-18px);
+}
+
+.btn-burger {
+  margin-left: 34px; /* ou 8px / 12px */
 }
 
 /* =========================
@@ -3756,16 +3774,24 @@ body.mobile.me {
 
 .mobile-drawer {
   position: fixed;
-  top: 0;
   right: 0;
-  height: 100vh;
+  top: 0;
+  bottom: 0;
   width: min(320px, 86vw);
   z-index: 9999;
 
-  background: rgba(10, 16, 35, 0.96);
+  background: linear-gradient(
+    160deg,
+    #0b1120 0%,
+    #2a2d59 45%,
+    #5c2d91 100%
+  );
+
   backdrop-filter: blur(16px);
 
+  /* ✅ UNE SEULE border réelle (stable) */
   border-left: 1px solid rgba(255,255,255,0.10);
+
   box-shadow: -20px 0 60px rgba(0,0,0,0.45);
 
   transform: translateX(100%);
@@ -3773,7 +3799,36 @@ body.mobile.me {
 
   display: flex;
   flex-direction: column;
-  padding: 14px;
+
+  padding:
+    calc(14px + env(safe-area-inset-top))
+    14px
+    calc(14px + env(safe-area-inset-bottom));
+
+  /* 🔒 CRITIQUE — isole le fond du rendu */
+  isolation: isolate;
+}
+
+/* =========================
+   FAUSSES BORDURES HAUT / BAS
+   (stables, grises, jamais violettes)
+========================= */
+.mobile-drawer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  /* 🎯 dessin des lignes */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    inset 0 -1px 0 rgba(255,255,255,0.10);
+
+  z-index: 1;
+}
+
+.mobile-drawer.is-open {
+  transform: translateX(0);
 }
 
 .mobile-drawer.is-open {
@@ -3882,4 +3937,71 @@ button {
 ========================= */
 .dr-mobile.me:not(.is-logged-in) .me-hero {
   display: none;
+}
+/* 🔥 FORCE BURGER SIZE — NO OVERRIDE POSSIBLE */
+.mobile-header-right .btn-burger {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: none !important;
+  max-height: none !important;
+  flex: 0 0 64px !important;
+}
+.mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  position: relative; /* 🔑 CRUCIAL */
+}
+/* ✅ HEADER RIGHT = CONTAINER, PAS BOUTON */
+.mobile-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: default;
+
+  min-height: 0;
+  min-width: 0;
+}
+
+#mobile-create-btn {
+  font-size: 22px;      /* ⬆️ AVANT ~17px */
+  line-height: 1;       /* 🔑 évite qu’il soit écrasé */
+  font-weight: 600;
+
+  color: #eecd79;       /* gold DR */
+  background: none;
+  border: none;
+
+  padding: 6px 8px;     /* garde une zone de tap confortable */
+  cursor: pointer;
+
+  transform: translateX(34px); /* ➡️ décale vers la droite */
+}
+/* =========================================
+   🔥 KILL DEFINITIF — BURGER LEGACY / MINUSCULE
+========================================= */
+
+/* 1️⃣ Aucun span ne doit JAMAIS exister dans le burger */
+#mobile-burger-btn span,
+.btn-burger span {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 2️⃣ Supprime tout pseudo legacy éventuel */
+.btn-burger::after {
+  content: none !important;
+}
+
+/* 3️⃣ Le burger NE PEUT exister que via ::before */
+.btn-burger {
+  font-size: 0 !important;
+  line-height: 0 !important;
 }
