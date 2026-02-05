@@ -4437,8 +4437,8 @@ button {
 }
 
 .mobile-drawer .leaderboard-divider {
-  height: 1px;
-  background: rgba(255,255,255,0.08);
+  height: 20px;      /* garde l’espace */
+  background: none;  /* supprime la ligne */
 }
 
 .mobile-drawer .leaderboard-cards {
@@ -4523,7 +4523,7 @@ button {
 ========================= */
 
 .mobile-drawer .leaderboard-heading h3 {
-  font-size: 26px;
+  font-size: 23px;
   font-weight: 700;
   margin: 0 0 6px;
 }
@@ -4533,6 +4533,21 @@ button {
   line-height: 1.45;
   margin-bottom: 22px;
   color: rgba(255,255,255,0.7);
+}
+.mobile-drawer .leaderboard-sub {
+  white-space: nowrap;      /* ❌ interdit le retour à la ligne */
+  overflow: hidden;         /* sécurité */
+}
+
+.mobile-drawer .leaderboard-heading h3 {
+  margin-bottom: 2px;   /* ⬅️ avant : 6px */
+}
+
+.mobile-drawer .leaderboard-sub {
+  margin-top: 0;        /* ⬅️ sécurité */
+}
+.mobile-drawer .leaderboard-heading {
+  margin-top: -18px; /* ajuste : -6 / -8 / -10 / -12 */
 }
 
 /* =========================
@@ -4848,4 +4863,37 @@ button {
 .mobile-drawer .leaderboard-card .row-name {
   font-size: 15px;      /* ⬅️ réduit (16 → 14) */
   font-weight: 700;
+}
+/* =========================
+   LEADERBOARD — SPACER (NO LINE)
+========================= */
+
+.mobile-drawer .leaderboard-divider {
+  height: 20px;          /* ⬅️ espace vertical conservé */
+  margin: 0;             /* ⬅️ évite les doublons d’espacement */
+  background: none;      /* ❌ supprime la ligne grise */
+}
+/* Réduit l’espace entre podium et première carte */
+.mobile-drawer .leaderboard-podium-wrapper {
+  margin-bottom: -6px; /* 22 → 12 (ajuste : 8 / 10 / 12) */
+}
+/* =========================
+   LEADERBOARD — HEADING FULL-BLEED
+========================= */
+
+.mobile-drawer .leaderboard-heading {
+  width: calc(100% + 40px);
+  margin-left: -35px;
+
+  padding-left: 20px;
+  padding-right: 20px;
+}
+/* 🔥 KILL DRAWER FAKE BORDERS */
+.mobile-drawer::before {
+  content: none !important;
+  display: none !important;
+}
+/* 🎯 PODIUM — AVATAR RING (SOURCE OF TRUTH) */
+.mobile-drawer .avatar-ring {
+  padding: 3px; /* change ici UNIQUEMENT */
 }
