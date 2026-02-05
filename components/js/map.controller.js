@@ -2,6 +2,7 @@
    DREAM REAL — MAP CONTROLLER (MOBILE WEB)
    Parity with RN MapScreen
    Engine: Apple Maps (MapKit JS) / Google Maps
+   ✅ iOS SAFE: AdvancedMarker fallback + single openPostSheet
 ========================================= */
 
 console.log("🗺️ map.controller.js loaded");
@@ -10,7 +11,7 @@ console.log("🗺️ map.controller.js loaded");
    GLOBAL MAP STATE (RN PARITY)
 ----------------------------------------- */
 
-window.MAP_STATE = {
+window.MAP_STATE = window.MAP_STATE || {
   posts: [],
   filteredPosts: [],
   selectedPosts: null,
@@ -30,6 +31,8 @@ window.MAP_STATE = {
    ENGINE SELECTION
 ----------------------------------------- */
 
+// 🔒 For now we force Google (MapKit JS not wired in HTML)
+// If you later add MapKit JS properly, you can switch to auto-detect.
 const MAP_ENGINE = "google";
 
 console.log("🧭 Map engine:", MAP_ENGINE);
@@ -45,26 +48,31 @@ let mapAdapter = null;
 ----------------------------------------- */
 
 window.initMobileMap = function initMobileMap(posts) {
-  if (!Array.isArray(posts)) {
-    console.error("❌ initMobileMap: invalid posts");
-    return;
+  try {
+    if (!Array.isArray(posts)) {
+      console.error("❌ initMobileMap: invalid posts");
+      return;
+    }
+
+    // ✅ Normalize + keep only geolocated posts
+    window.MAP_STATE.posts = posts.filter(
+      (p) => p?.localLocation?.latitude && p?.localLocation?.longitude
+    );
+
+    window.MAP_STATE.filteredPosts = window.MAP_STATE.posts;
+
+    console.log("📍 Map posts:", window.MAP_STATE.posts.length);
+
+    if (MAP_ENGINE === "apple") {
+      loadAppleMap();
+    } else {
+      loadGoogleMap();
+    }
+
+    initGeolocation();
+  } catch (err) {
+    console.error("❌ initMobileMap crashed", err);
   }
-
-  MAP_STATE.posts = posts.filter(
-    (p) => p.localLocation?.latitude && p.localLocation?.longitude
-  );
-
-  MAP_STATE.filteredPosts = MAP_STATE.posts;
-
-  console.log("📍 Map posts:", MAP_STATE.posts.length);
-
-  if (MAP_ENGINE === "apple") {
-    loadAppleMap();
-  } else {
-    loadGoogleMap();
-  }
-
-  initGeolocation();
 };
 
 /* -----------------------------------------
@@ -79,18 +87,18 @@ function initGeolocation() {
 
   navigator.geolocation.watchPosition(
     (pos) => {
-      MAP_STATE.userLocation = {
+      window.MAP_STATE.userLocation = {
         lat: pos.coords.latitude,
         lng: pos.coords.longitude,
       };
 
       if (mapAdapter?.updateUserLocation) {
-        mapAdapter.updateUserLocation(MAP_STATE.userLocation);
+        mapAdapter.updateUserLocation(window.MAP_STATE.userLocation);
       }
 
-      if (!MAP_STATE.hasCenteredOnce && mapAdapter?.centerOnUser) {
-        mapAdapter.centerOnUser(MAP_STATE.userLocation);
-        MAP_STATE.hasCenteredOnce = true;
+      if (!window.MAP_STATE.hasCenteredOnce && mapAdapter?.centerOnUser) {
+        mapAdapter.centerOnUser(window.MAP_STATE.userLocation);
+        window.MAP_STATE.hasCenteredOnce = true;
       }
     },
     (err) => {
@@ -106,6 +114,8 @@ function initGeolocation() {
 
 /* -----------------------------------------
    APPLE MAPS (MapKit JS)
+   (kept for parity; not active unless MAP_ENGINE="apple"
+    AND MapKit JS loaded)
 ----------------------------------------- */
 
 function loadAppleMap() {
@@ -134,9 +144,7 @@ function createAppleMapAdapter() {
     },
 
     centerOnUser(coords) {
-      map.setCenterAnimated(
-        new mapkit.Coordinate(coords.lat, coords.lng)
-      );
+      map.setCenterAnimated(new mapkit.Coordinate(coords.lat, coords.lng));
       map.setRegionAnimated(
         new mapkit.CoordinateRegion(
           new mapkit.Coordinate(coords.lat, coords.lng),
@@ -157,7 +165,7 @@ function createAppleMapAdapter() {
     renderMarkers() {
       this.clearMarkers();
 
-      annotations = MAP_STATE.filteredPosts.map((post) => {
+      annotations = window.MAP_STATE.filteredPosts.map((post) => {
         const coord = new mapkit.Coordinate(
           post.localLocation.latitude,
           post.localLocation.longitude
@@ -168,10 +176,10 @@ function createAppleMapAdapter() {
           glyphImage: post.user_avatar,
         });
 
-        ann.data = post;
+        ann.__post = post;
 
         ann.addEventListener("select", () => {
-          openPostSheet([post]);
+          window.openPostSheet([post]);
         });
 
         map.addAnnotation(ann);
@@ -182,7 +190,7 @@ function createAppleMapAdapter() {
 }
 
 /* -----------------------------------------
-   GOOGLE MAPS (✅ CORRIGÉ — NO CLUSTERING)
+   GOOGLE MAPS (iOS SAFE)
 ----------------------------------------- */
 
 function loadGoogleMap() {
@@ -201,49 +209,99 @@ function createGoogleMapAdapter() {
 
   return {
     init() {
-      map = new google.maps.Map(document.getElementById("map"), {
+      const el = document.getElementById("map");
+      if (!el) {
+        console.error("❌ #map element not found");
+        return;
+      }
+
+      map = new google.maps.Map(el, {
         zoom: 13,
         disableDefaultUI: true,
+        gestureHandling: "greedy", // ✅ iOS Safari UX
       });
 
       this.renderMarkers();
     },
 
     centerOnUser(coords) {
+      if (!map) return;
       map.setCenter(coords);
       map.setZoom(14);
     },
 
     updateUserLocation() {
-      // optional blue dot later
+      // optional: blue dot later
     },
 
     clearMarkers() {
-      markers.forEach((m) => m.setMap(null));
+      // AdvancedMarkerElement does NOT implement setMap(null)
+      markers.forEach((m) => {
+        try {
+          if (m?.map !== undefined) m.map = null; // AdvancedMarkerElement
+          else if (typeof m?.setMap === "function") m.setMap(null); // Marker
+        } catch (e) {
+          // ignore
+        }
+      });
       markers = [];
     },
 
     renderMarkers() {
+      if (!map) return;
+
       this.clearMarkers();
 
-      markers = MAP_STATE.filteredPosts.map((post) => {
-        const marker = new google.maps.Marker({
-          position: {
-            lat: post.localLocation.latitude,
-            lng: post.localLocation.longitude,
-          },
-          map,
-          icon: {
-            url: post.user_avatar,
-            scaledSize: new google.maps.Size(42, 42),
-          },
-        });
+      markers = window.MAP_STATE.filteredPosts.map((post) => {
+        const position = {
+          lat: post.localLocation.latitude,
+          lng: post.localLocation.longitude,
+        };
 
-        marker.__post = post;
+        let marker;
 
-        marker.addListener("click", () => {
-          openPostSheet([post]);
-        });
+        // ✅ Prefer AdvancedMarkerElement when available
+        // ⚠️ On iOS Safari it can be undefined depending on version/config.
+        const AdvancedMarker = google.maps.marker?.AdvancedMarkerElement;
+
+        if (AdvancedMarker) {
+          const content = document.createElement("img");
+          content.src = post.user_avatar;
+          content.style.width = "42px";
+          content.style.height = "42px";
+          content.style.borderRadius = "50%";
+          content.style.objectFit = "cover";
+          content.style.boxShadow = "0 2px 6px rgba(0,0,0,0.35)";
+
+          marker = new AdvancedMarker({
+            position,
+            map,
+            content,
+          });
+
+          marker.__post = post;
+
+          // AdvancedMarker click event
+          marker.addListener("gmp-click", () => {
+            window.openPostSheet([post]);
+          });
+        } else {
+          // ✅ Fallback: classic Marker works everywhere
+          marker = new google.maps.Marker({
+            position,
+            map,
+            icon: {
+              url: post.user_avatar,
+              scaledSize: new google.maps.Size(42, 42),
+            },
+          });
+
+          marker.__post = post;
+
+          marker.addListener("click", () => {
+            window.openPostSheet([post]);
+          });
+        }
 
         return marker;
       });
@@ -256,8 +314,10 @@ function createGoogleMapAdapter() {
 ----------------------------------------- */
 
 window.applyMapFilters = function applyMapFilters() {
-  MAP_STATE.filteredPosts = MAP_STATE.posts.filter((post) => {
-    const { feeling, activity, onlyWithImages } = MAP_STATE.filters;
+  const state = window.MAP_STATE;
+
+  state.filteredPosts = state.posts.filter((post) => {
+    const { feeling, activity, onlyWithImages } = state.filters;
 
     if (feeling && post.feeling?.title !== feeling.title) return false;
     if (activity && post.activity?.title !== activity.title) return false;
@@ -265,29 +325,104 @@ window.applyMapFilters = function applyMapFilters() {
     if (onlyWithImages) {
       const hasImage =
         post.full_picture ||
-        (Array.isArray(post.multiple_images) &&
-          post.multiple_images.length > 0);
+        (Array.isArray(post.multiple_images) && post.multiple_images.length > 0);
       if (!hasImage) return false;
     }
 
     return true;
   });
 
-  mapAdapter?.renderMarkers();
+  mapAdapter?.renderMarkers?.();
+};
+
+/* =========================================
+   MAP → POST SHEET (RN PostModal parity)
+   ✅ SINGLE SOURCE OF TRUTH (no duplicate function names)
+========================================= */
+
+window.openPostSheet = function openPostSheet(posts) {
+  if (!Array.isArray(posts) || !posts.length) return;
+
+  // store selection (parity)
+  window.MAP_STATE.selectedPosts = posts;
+
+  const overlay = document.getElementById("map-post-overlay");
+  const sheet = document.getElementById("map-post-sheet");
+  const scroll = document.getElementById("map-post-scroll");
+
+  if (!overlay || !sheet || !scroll) {
+    console.warn("❌ Map post sheet DOM missing");
+    return;
+  }
+
+  overlay.classList.remove("hidden");
+  scroll.innerHTML = "";
+
+  const screenHeight = window.innerHeight;
+  const isMulti = posts.length > 1;
+
+  // 🟢 RN PARITY — HEIGHT LOGIC (simple v1)
+  const height = isMulti ? screenHeight * 0.85 : screenHeight * 0.6;
+  sheet.style.height = `${Math.round(height)}px`;
+
+  // inject posts (reuse feed renderer)
+  posts.forEach((post) => {
+    if (typeof window.renderPostItemMobile === "function") {
+      const el = window.renderPostItemMobile(post);
+      scroll.appendChild(el);
+    } else {
+      // fallback minimal (never crash)
+      const div = document.createElement("div");
+      div.style.padding = "16px";
+      div.style.color = "#fff";
+      div.textContent =
+        (post.user_first_name || "") +
+        " " +
+        (post.user_last_name || "") +
+        " — " +
+        (post.message || "");
+      scroll.appendChild(div);
+    }
+  });
+
+  initMapPostSheetDrag(overlay, scroll);
 };
 
 /* -----------------------------------------
-   POST SHEET BRIDGE
+   Drag / close logic — RN canCloseRef parity
 ----------------------------------------- */
 
-function openPostSheet(posts) {
-  MAP_STATE.selectedPosts = posts;
+function initMapPostSheetDrag(overlay, scroll) {
+  let startY = null;
+  let canClose = true;
 
-  if (typeof window.openPostSheet === "function") {
-    window.openPostSheet(posts);
-  } else {
-    console.warn("⚠️ openPostSheet not implemented");
-  }
+  // reset listeners (avoid stacking)
+  const handle = document.getElementById("map-post-handle");
+  if (!handle) return;
+
+  scroll.onscroll = () => {
+    canClose = scroll.scrollTop <= 0;
+  };
+
+  // Touch
+  handle.ontouchstart = (e) => {
+    startY = e.touches?.[0]?.clientY ?? null;
+  };
+
+  handle.ontouchend = (e) => {
+    if (startY === null || !canClose) return;
+
+    const endY = e.changedTouches?.[0]?.clientY ?? startY;
+    const dy = endY - startY;
+
+    if (dy > 80) overlay.classList.add("hidden");
+    startY = null;
+  };
+
+  // Click outside to close (nice parity)
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.classList.add("hidden");
+  };
 }
 
 /* -----------------------------------------
@@ -295,5 +430,5 @@ function openPostSheet(posts) {
 ----------------------------------------- */
 
 window.__MAP_DEBUG__ = {
-  state: MAP_STATE,
+  state: window.MAP_STATE,
 };
