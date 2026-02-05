@@ -4037,3 +4037,152 @@ button {
 .dr-back-yellow {
   color: #EECD79 !important; /* 💛 jaune Dream Real */
 }
+.mobile-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-header-title {
+  font-size: 23px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap;
+  margin-left: 68px; /* 👈 décalage doux vers la droite */
+}
+
+.mobile-header-title {
+  font-size: 23px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap;
+}
+
+/* ✨ uniquement "Dreamers" */
+.mobile-header-title .dreamers-word {
+  font-family: "Suez One", serif;
+  font-size: 25px;
+  font-weight: 400; /* Suez One n’a qu’un weight */
+  color: #EECD79 !important; /* 💛 jaune Dream Real */
+  letter-spacing: 0.3px;
+}
+.mobile-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  transform: translateY(-4px); /* 👈 ajuste ici (-1px / -2px / -3px) */
+}
+.mobile-header-left .filters-back-btn {
+  margin-left: -18px; /* 👈 décale vers la gauche sans la faire descendre */
+}
+.me-filters {
+  display: flex;
+  flex-wrap: nowrap;          /* 🔥 CRITIQUE : empêche la pill de disparaître */
+  gap: 10px;
+
+  margin-top: 16px;
+  margin-bottom: 4px;
+
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: 4px;
+}
+
+.me-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.me-filters .chip {
+  flex-shrink: 0;             /* 🔥 garantit que Viewers reste visible */
+}
+/* =========================================
+   🔥 ME SCREEN — FORCE FILTER CHIPS VISIBILITY
+========================================= */
+
+.dr-mobile.me .me-filters {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+}
+
+.dr-mobile.me .me-filters .chip {
+  display: inline-flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  min-height: 32px;
+  line-height: 1;
+
+  pointer-events: auto !important;
+}
+/* ===== VIEW MORE BUTTON ===== */
+.lb-view-more {
+  margin-top: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: #eecd79;
+
+  cursor: pointer;
+}
+
+/* ===== FULL OVERLAY ===== */
+.lb-user-overlay-full {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+
+  background: rgba(11, 17, 32, 0.92);
+  backdrop-filter: blur(8px);
+
+  z-index: 5;
+}
+
+.lb-user-overlay-full.hidden {
+  display: none;
+}
+
+.lb-user-mood-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.lb-user-mood-full img {
+  width: 24px;
+  height: 24px;
+}
+
+.lb-user-socials-full {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+.lb-user-card .lb-user-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  padding: 12px;
+
+  background: none; /* 🔥 PLUS AUCUNE OPACITÉ */
+}
+.lb-user-mood,
+.lb-user-socials {
+  display: none;
+}

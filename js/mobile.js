@@ -855,16 +855,36 @@ window.loadLeaderboardUsers = async function () {
     alt="${user.display_name || "User"}"
   />
 
-  <div class="lb-user-overlay">
-    <div class="lb-user-name">
-      ${user.display_name ||
-        `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-        "User"}
-    </div>
+  <!-- OVERLAY COMPACT (SUPERPOSÉ À L’IMAGE) -->
+<div class="lb-user-overlay">
+  <div class="lb-user-name">
+    ${user.display_name ||
+      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
+      "User"}
+  </div>
 
+  ${
+    user.feeling || user.instagram || user.facebook || user.messenger
+      ? `<button class="lb-view-more" type="button">View more</button>`
+      : ""
+  }
+
+  ${
+    typeof user.distance === "number"
+      ? `<div class="lb-user-meta">
+          ${user.distance < 1000
+            ? `${user.distance} m`
+            : `${(user.distance / 1000).toFixed(1)} km`}
+        </div>`
+      : ""
+  }
+</div>
+
+  <!-- 🔥 OVERLAY FULL (SUPERPOSITION) -->
+  <div class="lb-user-overlay-full hidden">
     ${
       user.feeling
-        ? `<div class="lb-user-mood">
+        ? `<div class="lb-user-mood-full">
             ${
               user.feeling.image
                 ? `<img src="https://dreamreal-images.s3.eu-west-3.amazonaws.com/${user.feeling.image}" />`
@@ -875,71 +895,44 @@ window.loadLeaderboardUsers = async function () {
         : ""
     }
 
-    ${
-      typeof user.distance === "number"
-        ? `<div class="lb-user-meta">
-            ${user.distance < 1000
-              ? `${user.distance} m`
-              : `${(user.distance / 1000).toFixed(1)} km`}
-          </div>`
-        : ""
-    }
-
-   <div class="lb-user-socials">
-
-  ${
-    user.instagram
-      ? `
-        <a
-          class="lb-social ig"
-          href="https://www.instagram.com/${user.instagram}"
-          target="_blank"
-          rel="noopener"
-          onclick="event.stopPropagation()"
-        >
+    <div class="lb-user-socials-full">
+      ${user.instagram ? `
+        <a class="lb-social ig" href="https://www.instagram.com/${user.instagram}" target="_blank" rel="noopener">
           ${ICON_INSTAGRAM}
-        </a>
-      `
-      : ""
-  }
+        </a>` : ""}
 
-  ${
-    user.facebook
-      ? `
-        <a
-          class="lb-social fb"
-          href="${user.facebook}"
-          target="_blank"
-          rel="noopener"
-          onclick="event.stopPropagation()"
-        >
+      ${user.facebook ? `
+        <a class="lb-social fb" href="${user.facebook}" target="_blank" rel="noopener">
           ${ICON_FACEBOOK}
-        </a>
-      `
-      : ""
-  }
+        </a>` : ""}
 
-  ${
-    user.messenger
-      ? `
-        <a
-          class="lb-social ms"
-          href="${user.messenger}"
-          target="_blank"
-          rel="noopener"
-          onclick="event.stopPropagation()"
-        >
+      ${user.messenger ? `
+        <a class="lb-social ms" href="${user.messenger}" target="_blank" rel="noopener">
           ${ICON_MESSENGER}
-        </a>
-      `
-      : ""
-  }
-
-</div>
+        </a>` : ""}
+    </div>
   </div>
 `;
 
   grid.appendChild(card);
+  const viewMoreBtn = card.querySelector(".lb-view-more");
+const fullOverlay = card.querySelector(".lb-user-overlay-full");
+
+if (viewMoreBtn && fullOverlay) {
+  viewMoreBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    fullOverlay.classList.remove("hidden");
+  });
+
+  fullOverlay.addEventListener("click", () => {
+    fullOverlay.classList.add("hidden");
+  });
+
+  fullOverlay.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", (e) => e.stopPropagation());
+  });
+}
 });
   } catch (err) {
     console.error("❌ leaderboard error", err);
@@ -1000,7 +993,26 @@ requestAnimationFrame(() => {
 });
 }
 function bindMeFilterPills() {
-  const pills = document.querySelectorAll(".me-filters .chip");
+  const container = document.querySelector(".me-filters");
+  if (!container) {
+    console.warn("❌ .me-filters not found");
+    return false;
+  }
+
+  // 🔥 FORCE LA CRÉATION DE LA PILL VIEWERS
+  let viewersBtn = container.querySelector('[data-filter="viewers"]');
+
+  if (!viewersBtn) {
+    viewersBtn = document.createElement("button");
+    viewersBtn.className = "chip";
+    viewersBtn.dataset.filter = "viewers";
+    viewersBtn.textContent = "Viewers";
+
+    container.appendChild(viewersBtn);
+    console.log("✅ Viewers pill injected");
+  }
+
+  const pills = container.querySelectorAll(".chip");
   if (!pills.length) {
     console.warn("⚠️ Pills not ready yet");
     return false;
@@ -1074,6 +1086,18 @@ function bindMeFilterPills() {
     maximumAge: 0,
   }
 );
+
+return; // 🔥 OBLIGATOIRE
+
+      }
+            // 👀 VIEWERS
+      if (mode === "viewers") {
+        nearbyActive = false;
+        myPosition = null;
+
+        console.log("👀 Viewers ENABLED");
+        loadLeaderboardUsers();
+        return;
       }
     };
   });
