@@ -895,7 +895,7 @@ window.loadLeaderboardUsers = async function () {
         : ""
     }
 
-    <div class="lb-user-socials-full">
+        <div class="lb-user-socials-full">
       ${user.instagram ? `
         <a class="lb-social ig" href="https://www.instagram.com/${user.instagram}" target="_blank" rel="noopener">
           ${ICON_INSTAGRAM}
@@ -911,28 +911,45 @@ window.loadLeaderboardUsers = async function () {
           ${ICON_MESSENGER}
         </a>` : ""}
     </div>
+
+    <!-- ✅ AJOUT ICI -->
+    <button class="lb-view-less" type="button">View less</button>
   </div>
 `;
 
   grid.appendChild(card);
   const viewMoreBtn = card.querySelector(".lb-view-more");
+const viewLessBtn = card.querySelector(".lb-view-less");
 const fullOverlay = card.querySelector(".lb-user-overlay-full");
 
 if (viewMoreBtn && fullOverlay) {
+  // 👉 OPEN overlay
   viewMoreBtn.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
+
     fullOverlay.classList.remove("hidden");
-  });
-
-  fullOverlay.addEventListener("click", () => {
-    fullOverlay.classList.add("hidden");
-  });
-
-  fullOverlay.querySelectorAll("a").forEach((a) => {
-    a.addEventListener("click", (e) => e.stopPropagation());
+    card.classList.add("is-open");
+    viewMoreBtn.classList.add("hidden");
   });
 }
+
+if (viewLessBtn && fullOverlay) {
+  // 👉 CLOSE overlay
+  viewLessBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    fullOverlay.classList.add("hidden");
+    card.classList.remove("is-open");
+    viewMoreBtn?.classList.remove("hidden");
+  });
+}
+
+// 🔒 Empêche les liens sociaux de fermer l’overlay
+fullOverlay?.querySelectorAll("a").forEach((a) => {
+  a.addEventListener("click", (e) => e.stopPropagation());
+});
 });
   } catch (err) {
     console.error("❌ leaderboard error", err);

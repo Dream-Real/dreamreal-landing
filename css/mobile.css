@@ -4123,9 +4123,9 @@ button {
   border: none;
   padding: 0;
 
-  font-size: 14px;
-  font-weight: 500;
-  color: #eecd79;
+  font-size: 16px;
+  font-weight: 600;
+  color: #93C5FD;
 
   cursor: pointer;
 }
@@ -4140,8 +4140,7 @@ button {
   justify-content: center;
   gap: 16px;
 
-  background: rgba(11, 17, 32, 0.92);
-  backdrop-filter: blur(8px);
+  background: rgba(11, 17, 32, 0.74);
 
   z-index: 5;
 }
@@ -4185,4 +4184,189 @@ button {
 .lb-user-mood,
 .lb-user-socials {
   display: none;
+}
+/* =========================
+   LEADERBOARD — TEXT GRADIENT OVERLAY
+   (USERNAME + VIEW MORE ONLY)
+========================= */
+
+.lb-user-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  padding: 16px 12px 14px;
+  z-index: 2;
+}
+
+/* 🎯 Gradient noir pour lisibilité texte */
+.lb-user-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.65) 0%,
+    rgba(0, 0, 0, 0.45) 35%,
+    rgba(0, 0, 0, 0.15) 60%,
+    rgba(0, 0, 0, 0.0) 100%
+  );
+
+  z-index: -1;              /* 🔑 reste DERRIÈRE le texte */
+  pointer-events: none;     /* 🔒 ne bloque aucun clic */
+}
+/* =========================
+   LEADERBOARD — OVERLAY TEXT STACK
+========================= */
+
+.lb-user-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;   /* ⬅️ ALIGN LEFT */
+  gap: 6px;                  /* ⬅️ espace entre nom et View more */
+}
+
+/* Username */
+.lb-user-name {
+  text-align: left;
+}
+
+/* View more */
+.lb-view-more {
+  align-self: flex-start;    /* ⬅️ reste à gauche */
+  margin: 0;
+
+  background: none;
+  border: none;
+  padding: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+  color: #93C5FD;            /* 🔵 BLEU DESKTOP (CONFIRMÉ) */
+
+  cursor: pointer;
+  line-height: 1;
+}
+
+.lb-view-more:hover {
+  opacity: 0.85;
+}
+/* =========================
+   LEADERBOARD — USERNAME + VIEW MORE BLOCK
+========================= */
+
+.lb-user-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* 🔥 Bloc texte remonté */
+.lb-user-name,
+.lb-view-more {
+  position: relative;
+  top: -10px;   /* ⬅️ AJUSTE ICI : -6 / -8 / -10 / -12 */
+}
+
+/* Espacement interne propre */
+.lb-user-name {
+  margin-bottom: 4px;
+}
+
+.lb-view-more {
+  margin: 0;
+
+  background: none;
+  border: none;
+  padding: 0;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #93C5FD;   /* 🔵 bleu desktop */
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.lb-view-more:hover {
+  opacity: 0.85;
+}
+.lb-user-name {
+  margin-bottom: -4px; /* ⬅️ au lieu de 4px */
+}
+.lb-user-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px; /* ⬅️ augmente pour descendre le bloc */
+  padding: 12px;
+}
+/* 🔼 Remonte UNIQUEMENT le username quand il n'y a PAS de View more */
+.lb-user-card:not(:has(.lb-view-more)) .lb-user-name {
+  position: relative;
+  top: -14px; /* ajuste : -6 / -8 / -10 / -12 */
+}
+.lb-view-less {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.lb-user-card.is-open {
+  z-index: 10;
+}
+/* 🔁 View less = View more (même design exact) */
+.lb-view-less {
+  all: unset;
+  cursor: pointer;
+}
+
+/* Hérite visuellement de View more */
+.lb-view-less {
+  font-size: 15px;
+  font-weight: 600;
+  color: #93C5FD;
+  line-height: 1;
+}
+
+.lb-view-less:hover {
+  opacity: 0.85;
+}
+/* 🎯 View less — centré, même style que View more */
+.lb-view-less {
+  all: unset;
+  display: block;        /* ⬅️ permet le centrage */
+  margin: 16px auto 0;   /* ⬅️ centre horizontalement */
+  text-align: center;
+
+  font-size: 15px;
+  font-weight: 600;
+  color: #93C5FD;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lb-view-less:hover {
+  opacity: 0.85;
+}
+/* 🎯 Centre verticalement les pills TEXTE SEUL (sauf "All") */
+.me-filters .chip:not(:has(img)):not(:has(span)):not(:has(.icon)):not(:contains("All")) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2px;   /* ajuste : 1px / 2px / 3px */
+}
+/* 🎯 Fix définitif — centrer verticalement Nearby & Viewers */
+.me-filters .chip[data-filter="nearby"],
+.me-filters .chip[data-filter="viewers"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 32px;        /* ⬅️ même hauteur que les autres pills */
+  line-height: 32px;  /* ⬅️ CLÉ DU CENTRAGE */
+
+  padding-top: 0;     /* neutralise tout décalage hérité */
+  padding-bottom: 0;
 }
