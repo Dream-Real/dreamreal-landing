@@ -4547,7 +4547,7 @@ button {
   margin-top: 0;        /* ⬅️ sécurité */
 }
 .mobile-drawer .leaderboard-heading {
-  margin-top: -18px; /* ajuste : -6 / -8 / -10 / -12 */
+  margin-top: -14px; /* ajuste : -6 / -8 / -10 / -12 */
 }
 
 /* =========================
@@ -4706,7 +4706,7 @@ button {
   position: relative;
 
   padding: 20px 22px;
-  border-radius: 16px;
+  border-radius: 12px;
 
   background: rgba(255,255,255,0.075);
   border: 1px solid rgba(255,255,255,0.16);
@@ -4896,4 +4896,65 @@ button {
 /* 🎯 PODIUM — AVATAR RING (SOURCE OF TRUTH) */
 .mobile-drawer .avatar-ring {
   padding: 3px; /* change ici UNIQUEMENT */
+}
+/* 🎯 XP — UNIFIED */
+.mobile-drawer .podium-card small,
+.mobile-drawer .row-xp {
+  font-size: 14px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+/* =========================
+   LEADERBOARD — OFFSET RANK + XP
+   Positions 4–10
+========================= */
+
+/* Décale le numéro (4, 5, …) */
+.mobile-drawer .leaderboard-card .rank {
+  padding-left: 6px;   /* ajuste : 4 / 6 / 8 */
+}
+
+/* Décale le XP vers la droite */
+.mobile-drawer .leaderboard-card .row-xp {
+  padding-right: 2px;  /* ajuste : 6 / 8 / 10 */
+}
+/* =========================
+   PODIUM — VERTICAL RHYTHM
+========================= */
+
+/* Prénom ↔ Nom */
+.mobile-drawer .podium-name {
+  line-height: 1.25;        /* ⬅️ augmente l’interligne interne */
+  gap: 2px;                 /* sécurité si flex-column */
+}
+
+/* Nom ↔ XP */
+.mobile-drawer .podium-card small {
+  margin-top: 2px;          /* ⬅️ espace entre nom et XP */
+}
+/* Décale les chiffres bleus (4,5,…) vers la gauche */
+.mobile-drawer .leaderboard-card .rank {
+  transform: translateX(-6px); /* ajuste : -4 / -6 / -8 */
+}
+/* Chiffres bleus (positions 4–10) */
+.mobile-drawer .leaderboard-card .rank {
+  font-size: 14px;      /* avant ~15px → ajuste : 12 / 13 / 14 */
+  font-weight: 700;     /* avant 700 → plus léger, plus élégant */
+}
+/* Prénom + nom — cartes positions 4–10 */
+.mobile-drawer .leaderboard-card .row-name {
+  line-height: 1.25;   /* ajuste : 1 / 1.05 / 1.1 */
+}
+/* =========================
+   LEADERBOARD — UNIFIED CARD RADIUS
+========================= */
+
+/* Podium container */
+.mobile-drawer .leaderboard-podium-card {
+  border-radius: 14px;
+}
+
+/* Cards positions 4–10 */
+.mobile-drawer .leaderboard-card {
+  border-radius: 14px;
 }
