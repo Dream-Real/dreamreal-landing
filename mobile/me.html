@@ -32,7 +32,12 @@
 
     <header class="mobile-header">
       <div class="mobile-header-left">
-        <button class="mobile-back-btn" onclick="history.back()">←</button>
+       <button
+  class="filters-back-btn dr-back-yellow"
+  aria-label="Back"
+  type="button"
+  onclick="goBackSmart()"
+></button>
       </div>
       <div class="mobile-header-right"></div>
     </header>
@@ -106,5 +111,17 @@
   </script>
 
   <script src="/js/mobile.js"></script>
+  <script>
+  function goBackSmart() {
+    // S'il y a un historique réel
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback app-like (non connecté ou accès direct)
+      window.location.href = "/mobile.html";
+      // ou "/login.html" si tu préfères
+    }
+  }
+</script>
 </body>
 </html>

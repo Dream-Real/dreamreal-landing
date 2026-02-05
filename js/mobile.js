@@ -219,6 +219,7 @@ let lookingForContainer = null;
 ----------------------------------------- */
 
 document.addEventListener("DOMContentLoaded", () => {
+closeMobileDrawer(true); // 🔥 reset DUR dès l’arrivée
   initMobileApp();
   initCreatePost();
   initHeaderAvatar();
@@ -1080,6 +1081,49 @@ function bindMeFilterPills() {
   console.log("✅ Me filter pills bound");
   return true;
 }
+/* -----------------------------------------
+   MOBILE DRAWER — HARD RESET
+----------------------------------------- */
+function closeMobileDrawer(force = false) {
+  const drawer = document.getElementById("mobile-drawer");
+  const overlay = document.getElementById("mobile-drawer-overlay");
+  const burgerBtn = document.getElementById("mobile-burger-btn");
+
+  if (!drawer || !overlay) return;
+
+  drawer.classList.remove("is-open");
+  drawer.setAttribute("aria-hidden", "true");
+
+  if (burgerBtn) {
+    burgerBtn.setAttribute("aria-expanded", "false");
+  }
+
+  document.body.style.overflow = "";
+
+  if (force) {
+    overlay.classList.add("hidden");
+    drawer.classList.add("hidden");
+  } else {
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+      drawer.classList.add("hidden");
+    }, 180);
+  }
+}
+/* -----------------------------------------
+   SMART BACK NAVIGATION (MOBILE)
+----------------------------------------- */
+function goBackSmart() {
+  // 🔥 Toujours fermer le drawer avant navigation
+  closeMobileDrawer(true);
+
+  // 🔑 Navigation intelligente
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = "/mobile.html";
+  }
+}
 // =========================
 // MOBILE DRAWER — MENU
 // =========================
@@ -1137,4 +1181,10 @@ document.addEventListener("DOMContentLoaded", () => {
   tabMe.addEventListener("click", () => {
     window.location.href = "/mobile/me.html";
   });
+});
+/* -----------------------------------------
+   MOBILE — HARD RESET ON BACK (iOS SAFE)
+----------------------------------------- */
+window.addEventListener("pageshow", () => {
+  closeMobileDrawer(true);
 });

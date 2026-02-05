@@ -3389,16 +3389,38 @@ body.mobile.me {
 }
 
 .me-avatar-wrapper {
-  background: #ffffff;
-  padding: 4px;
-  border-radius: 74px;
+  width: 148px;                 /* 140 + 4 + 4 */
+  height: 148px;
+
+  border-radius: 50%;
+  border: 4px solid #ffffff;   /* 🔥 ring via border, PAS padding */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  /* 🔑 anti-blur iOS */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .me-avatar-wrapper img {
   width: 140px;
   height: 140px;
-  border-radius: 70px;
+
+  border-radius: 50%;
   object-fit: cover;
+
+  display: block;
+
+  /* 🔥 iOS CRISP FIX */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  image-rendering: auto;
 }
 
 /* ---------- LOGOUT BUTTON ---------- */
@@ -4004,4 +4026,14 @@ button {
 .btn-burger {
   font-size: 0 !important;
   line-height: 0 !important;
+}
+.mobile-user-avatar {
+  transform: translateX(-38px); /* ajuste : -6 / -8 / -10 / -12 */
+}
+/* =========================================
+   BACK ARROW — DREAM REAL YELLOW (ME SCREEN)
+========================================= */
+
+.dr-back-yellow {
+  color: #EECD79 !important; /* 💛 jaune Dream Real */
 }
