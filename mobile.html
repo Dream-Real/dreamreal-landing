@@ -45,17 +45,12 @@
     ＋
   </button>
 
-  <!-- ☰ BURGER -->
-<button
+  <button
   class="btn-burger"
   id="mobile-burger-btn"
   aria-label="Menu"
-  aria-expanded="false"
-  aria-controls="mobile-drawer"
   type="button"
->
-  ☰
-</button>
+></button>
 
   <!-- 👤 AVATAR USER (hidden par défaut) -->
   <button
@@ -177,9 +172,90 @@
     </button>
   </div>
 
-  <div class="mobile-drawer-body">
-    <!-- Volet vierge pour l’instant -->
-  </div>
+ <div class="mobile-drawer-body">
+
+  <section class="leaderboard">
+
+    <div class="leaderboard-heading">
+      <h3>On the Leaderboard</h3>
+      <p class="leaderboard-sub">
+        See who’s gaining momentum.
+      </p>
+    </div>
+
+    <div class="leaderboard-podium-wrapper">
+      <div class="leaderboard-podium-card">
+        <div class="leaderboard-podium">
+
+          <!-- 🥈 -->
+          <div class="podium-card second">
+            <span class="rank-badge">2</span>
+            <div class="avatar-ring">
+              <img src="https://i.pravatar.cc/150?img=12" />
+            </div>
+            <div class="podium-name">
+  <span class="first-name">Liam</span>
+  <span class="last-name">Miller</span>
+</div>
+            <small>4520 XP</small>
+          </div>
+
+          <!-- 🥇 -->
+          <div class="podium-card first">
+            <img class="crown" src="/assets/icons/crownemoji.png" />
+            <div class="avatar-ring winner">
+              <img src="https://i.pravatar.cc/150?img=11" />
+            </div>
+           <div class="podium-name">
+  <span class="first-name">Ava</span>
+  <span class="last-name">Reyes</span>
+</div>
+            <small>4820 XP</small>
+          </div>
+
+          <!-- 🥉 -->
+          <div class="podium-card third">
+            <span class="rank-badge">3</span>
+            <div class="avatar-ring">
+              <img src="https://i.pravatar.cc/150?img=13" />
+            </div>
+            <div class="podium-name">
+  <span class="first-name">Zoe</span>
+  <span class="last-name">Nguyen</span>
+</div>
+            <small>4310 XP</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="leaderboard-divider"></div>
+
+    <div class="leaderboard-cards-clip">
+      <div class="leaderboard-cards">
+
+        <div class="leaderboard-card">
+          <span class="rank">4</span>
+          <img class="row-avatar" src="https://i.pravatar.cc/300?img=14" />
+          <span class="row-name">Noah Martin</span>
+          <span class="row-xp">3900 XP</span>
+        </div>
+
+        <div class="leaderboard-card">
+          <span class="rank">5</span>
+          <img class="row-avatar" src="https://i.pravatar.cc/300?img=15" />
+          <span class="row-name">Maya Lopez</span>
+          <span class="row-xp">3650 Views</span>
+        </div>
+
+        <!-- 6–10 idem -->
+      </div>
+    </div>
+
+  </section>
+
+</div>
 </aside>
 
     </div>

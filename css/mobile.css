@@ -4370,3 +4370,482 @@ button {
   padding-top: 0;     /* neutralise tout décalage hérité */
   padding-bottom: 0;
 }
+/* =========================
+   LEADERBOARD — STRUCTURE BASE
+   (SCOPED TO MOBILE DRAWER)
+========================= */
+
+.mobile-drawer .leaderboard {
+  display: block;
+}
+
+.mobile-drawer .leaderboard-podium-wrapper {
+  position: relative;
+}
+
+.mobile-drawer .leaderboard-podium {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-end;
+}
+
+.mobile-drawer .podium-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 72px;
+  text-align: center;
+}
+
+.mobile-drawer .avatar-ring {
+  border-radius: 50%;
+  background: #EECD79;
+  padding: 2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-drawer .avatar-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.mobile-drawer .rank-badge {
+  position: absolute;
+  top: -10px;
+
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+
+  background: #EECD79;
+  color: #0B1120;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.mobile-drawer .leaderboard-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+
+.mobile-drawer .leaderboard-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mobile-drawer .leaderboard-card {
+  position: relative;
+
+  display: grid;
+  align-items: center;
+
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.mobile-drawer .row-avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* =========================
+   LEADERBOARD — MOBILE DRAWER
+   (DESKTOP LEFT COLUMN PARITY)
+========================= */
+
+.mobile-drawer {
+  background: linear-gradient(
+    180deg,
+    #0b1120 0%,
+    #1b2340 100%
+  );
+}
+
+/* Scope STRICT : drawer uniquement */
+.mobile-drawer .leaderboard {
+  margin-top: 0;
+  padding: 20px 18px 28px;
+
+  transform: none;          /* ⛔ reset desktop offsets */
+}
+
+/* Header */
+.mobile-drawer .leaderboard-heading h3 {
+  font-size: 26px;          /* ↓ 44 → 26 */
+  margin-bottom: 6px;
+}
+
+.mobile-drawer .leaderboard-sub {
+  font-size: 16px;          /* ↓ 21 → 16 */
+  line-height: 1.45;
+  margin-bottom: 18px;
+}
+
+/* =====================================================
+   LEADERBOARD — MOBILE DRAWER
+   PARITY DESKTOP (ADAPTED, STABLE)
+===================================================== */
+
+/* Fond drawer */
+.mobile-drawer {
+  background: linear-gradient(
+    180deg,
+    #0b1120 0%,
+    #1b2340 100%
+  );
+  overflow-y: auto;
+}
+
+/* =========================
+   LEADERBOARD — CONTAINER
+========================= */
+
+.mobile-drawer .leaderboard {
+  padding: 24px 20px 32px;
+  margin: 0;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.mobile-drawer .leaderboard-heading h3 {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.mobile-drawer .leaderboard-sub {
+  font-size: 16px;
+  line-height: 1.45;
+  margin-bottom: 22px;
+  color: rgba(255,255,255,0.7);
+}
+
+/* =========================
+   PODIUM
+========================= */
+
+.mobile-drawer .leaderboard-podium-wrapper {
+  margin-bottom: 22px;
+}
+
+/* =========================
+   PODIUM — POLISH CARD (HERO FULL-BLEED)
+========================= */
+
+.mobile-drawer .leaderboard-podium-card {
+  width: calc(100% + 40px);   /* 🔥 +16px vs version précédente */
+  margin-left: -20px;         /* 🔥 compense padding drawer */
+  margin-right: -20px;
+
+  box-sizing: border-box;
+
+  padding: 30px 36px 36px;    /* ⬅️ encore plus d’air */
+  border-radius: 22px;
+
+  background: rgba(255,255,255,0.095);
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+/* 🔽 PODIUM — ESPACEMENT RÉDUIT ENTRE AVATARS */
+
+.mobile-drawer .leaderboard-podium {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1px; /* ajuste : 12 / 14 / 16 */
+}
+
+/* Podium item */
+.mobile-drawer .podium-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 88px;
+  text-align: center;
+}
+
+/* Rings */
+.mobile-drawer .avatar-ring {
+  background: #EECD79;
+  border-radius: 50%;
+  padding: 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🔽 AVATARS PODIUM — RÉDUCTION */
+
+.mobile-drawer .avatar-ring.winner {
+  width: 78px;
+  height: 78px;
+}
+
+.mobile-drawer .avatar-ring:not(.winner) {
+  width: 62px;
+  height: 62px;
+}
+
+.mobile-drawer .avatar-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Crown */
+.mobile-drawer .crown {
+  position: absolute;
+  top: -34px;
+  width: 42px;
+  height: 42px;
+}
+
+/* Rank badge */
+.mobile-drawer .rank-badge {
+  position: absolute;
+  top: -10px;
+
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+
+  background: #EECD79;
+  color: #0B1120;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.mobile-drawer .podium-card strong {
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mobile-drawer .podium-card small {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+/* =========================
+   DIVIDER
+========================= */
+
+.mobile-drawer .leaderboard-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 20px 0 18px;
+}
+
+/* =========================
+   LIST 4–10 (SCROLL)
+========================= */
+
+.mobile-drawer .leaderboard-cards-clip {
+  max-height: calc(100vh - 420px);
+  overflow-y: auto;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-drawer .leaderboard-cards-clip::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-drawer .leaderboard-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* =========================
+   LEADERBOARD CARD (4–10)
+========================= */
+
+.mobile-drawer .leaderboard-card {
+  position: relative;
+
+  padding: 20px 22px;
+  border-radius: 16px;
+
+  background: rgba(255,255,255,0.075);
+  border: 1px solid rgba(255,255,255,0.16);
+
+  display: grid;
+  grid-template-columns:
+    26px    /* rank */
+    52px    /* avatar */
+    1fr     /* name */
+    auto;   /* views */
+
+  align-items: center;
+  gap: 14px;
+}
+
+/* Rank */
+.mobile-drawer .rank {
+  text-align: center;
+  font-weight: 700;
+  color: #93c5fd;
+}
+
+/* Avatar */
+.mobile-drawer .row-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Name */
+.mobile-drawer .row-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Views */
+.mobile-drawer .row-xp {
+  font-size: 15px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+/* =========================
+   LEADERBOARD — WIDTH MAX (MOBILE DRAWER)
+========================= */
+
+.mobile-drawer .leaderboard-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 24px 28px; /* 🔥 PLUS LARGE */
+  border-radius: 18px;
+
+  display: grid;
+  grid-template-columns:
+    22px
+    60px
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+  gap: 16px;
+}
+/* =========================
+   PODIUM — SHIFT LEFT (INNER ONLY)
+========================= */
+
+.mobile-drawer .leaderboard-podium {
+  transform: translateX(-0px); /* ajuste : -8 / -12 / -16 */
+}
+/* =========================
+   PODIUM — NAME STACK
+========================= */
+
+.mobile-drawer .podium-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 8px;
+  line-height: 1.1;
+}
+
+.mobile-drawer .podium-name .first-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.mobile-drawer .podium-name .last-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.mobile-drawer .leaderboard-podium {
+  margin-top: 28px; /* ⬅️ ajuste : 8 / 12 / 16 / 20 */
+}
+
+/* =========================
+   LEADERBOARD — LIST FULL-BLEED (FIX FINAL)
+   (MATCH PODIUM CARD WIDTH)
+========================= */
+
+.mobile-drawer .leaderboard-cards-clip {
+  width: calc(100% + 40px);   /* full-bleed identique podium */
+  margin-left: -20px;
+  margin-right: -20px;
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+  overflow-x: hidden;        /* 🔒 aucune coupe horizontale */
+}
+
+.mobile-drawer .leaderboard-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  margin: 0;                 /* ❌ AUCUNE margin latérale */
+  padding: 24px 28px;        /* ✅ même retrait visuel que podium */
+
+  border-radius: 18px;
+}
+/* =========================
+   LEADERBOARD — CARD (FINAL TIGHT)
+========================= */
+
+.mobile-drawer .leaderboard-card {
+  padding: 24px 28px 24px 14px;
+
+  display: grid;
+  align-items: center;
+
+  grid-template-columns:
+    14px
+    40px
+    1fr
+    auto;
+
+  gap: 10px;
+}
+
+.mobile-drawer .rank {
+  text-align: left;
+}
+
+.mobile-drawer .row-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* Username */
+.mobile-drawer .leaderboard-card .row-name {
+  font-size: 15px;      /* ⬅️ réduit (16 → 14) */
+  font-weight: 700;
+}
