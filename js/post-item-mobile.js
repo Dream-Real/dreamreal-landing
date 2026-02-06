@@ -34,10 +34,12 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
     FALLBACK_AVATAR;
 
   const location =
-    post.location ||
-    post.localLocation?.label ||
-    post.location?.label ||
-    null;
+  typeof post.location === "string"
+    ? post.location
+    : post.location?.label ||
+      post.localLocation?.label ||
+      post.location?.name ||
+      null;
 
   const createdAt =
     post.createdAt ||

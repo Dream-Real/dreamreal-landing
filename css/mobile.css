@@ -5135,3 +5135,51 @@ button {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* =========================================
+   MAP — POST SHEET SCROLL (CRITICAL)
+========================================= */
+
+.map-post-sheet {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-post-scroll {
+  flex: 1; /* 🔑 prend l’espace restant */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 🔑 iOS */
+}
+/* =========================================
+   MAP — POST SHEET (HIDE SCROLLBAR)
+   Scoped: MAP ONLY
+========================================= */
+
+#map-post-overlay .map-post-scroll {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge */
+}
+
+#map-post-overlay .map-post-scroll::-webkit-scrollbar {
+  display: none;                /* iOS / Chrome / Safari */
+}
+/* =========================================
+   MAP — REMOVE POST SEPARATOR
+   Scoped: MAP ONLY
+========================================= */
+
+#map-post-overlay .post-item-mobile {
+  border-bottom: none !important;
+}
+/* =========================================
+   MAP — REMOVE POST SEPARATOR (REAL FIX)
+   Scoped: MAP POST SHEET ONLY
+========================================= */
+
+#map-post-overlay .post-item-mobile::after {
+  content: none !important;
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+}

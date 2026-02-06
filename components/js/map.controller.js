@@ -347,56 +347,106 @@ window.applyMapFilters = function applyMapFilters() {
 
 /* =========================================
    MAP → POST SHEET (RN PostModal parity)
-   ✅ SINGLE SOURCE OF TRUTH (no duplicate function names)
 ========================================= */
 
 window.openPostSheet = function openPostSheet(posts) {
-
   if (!Array.isArray(posts) || !posts.length) return;
 
-  // store selection (parity)
-  window.MAP_STATE.selectedPosts = posts;
-
   const overlay = document.getElementById("map-post-overlay");
-  const sheet = document.getElementById("map-post-sheet");
-  const scroll = document.getElementById("map-post-scroll");
+  const sheet   = document.getElementById("map-post-sheet");
+  const scroll  = document.getElementById("map-post-scroll");
 
   if (!overlay || !sheet || !scroll) {
     console.warn("❌ Map post sheet DOM missing");
     return;
   }
 
+  // 🔒 RN parity — empêche double ouverture
+  if (!overlay.classList.contains("hidden")) {
+    return;
+  }
+
   overlay.classList.remove("hidden");
-  scroll.innerHTML = "";
+
+  // 🧹 reset contenu (ANTI DOUBLON)
+  while (scroll.firstChild) {
+    scroll.removeChild(scroll.firstChild);
+  }
+
+  // 🔑 reset scroll position (iOS safe)
+scroll.scrollTop = 0;
 
   const screenHeight = window.innerHeight;
   const isMulti = posts.length > 1;
 
-  // 🟢 RN PARITY — HEIGHT LOGIC (simple v1)
-  const height = isMulti ? screenHeight * 0.85 : screenHeight * 0.6;
-  sheet.style.height = `${Math.round(height)}px`;
+  // 🔍 RN hasTallMedia — images / carrousel / vidéo uploadée
+  const hasTallMedia = posts.some((post) => {
+    if (post.video || post.video_url) return true;
+    if (post.full_picture) return true;
+    if (Array.isArray(post.multiple_images) && post.multiple_images.length > 0)
+      return true;
 
-  // inject posts (reuse feed renderer)
-  posts.forEach((post) => {
-    if (typeof window.renderPostItemMobile === "function") {
-      const el = window.renderPostItemMobile(post);
-      scroll.appendChild(el);
-    } else {
-      // fallback minimal (never crash)
-      const div = document.createElement("div");
-      div.style.padding = "16px";
-      div.style.color = "#fff";
-      div.textContent =
-        (post.user_first_name || "") +
-        " " +
-        (post.user_last_name || "") +
-        " — " +
-        (post.message || "");
-      scroll.appendChild(div);
-    }
+    // ❌ link preview + YouTube restent compacts
+    return false;
   });
 
-  initMapPostSheetDrag(overlay, scroll);
+  // 🟡 RN parity — YouTube ONLY (compact, ignore rawHeight)
+const hasYouTubeOnly = posts.every((post) => {
+  return (
+    post.youtube_url &&
+    !post.video &&
+    !post.video_url &&
+    !post.full_picture &&
+    (!Array.isArray(post.multiple_images) ||
+      post.multiple_images.length === 0)
+  );
+});
+
+  // 1️⃣ INJECTION UNIQUE DES POSTS
+  posts.forEach((post) => {
+    const el = window.renderPostItemMobile(post);
+    scroll.appendChild(el);
+  });
+
+  // 2️⃣ MESURE APRÈS RENDER (RN onLayout équivalent)
+  requestAnimationFrame(() => {
+    const rawHeight = scroll.scrollHeight;
+    let height;
+
+    if (isMulti) {
+  height = screenHeight * 0.85;
+}
+
+/* 🟡 YOUTUBE — COMPACT FIX (RN PARITY) */
+else if (hasYouTubeOnly) {
+  height = screenHeight * 0.65;
+}
+
+/* 🟢 AUTRES CAS */
+else {
+  const BASE_MIN_HEIGHT  = screenHeight * 0.18;
+  const MEDIA_MIN_HEIGHT = hasTallMedia
+    ? screenHeight * 0.75
+    : BASE_MIN_HEIGHT;
+
+  const MAX_HEIGHT = hasTallMedia
+    ? screenHeight * 0.88
+    : screenHeight * 0.85;
+
+  height = Math.min(
+    Math.max(rawHeight + 48, MEDIA_MIN_HEIGHT),
+    MAX_HEIGHT
+  );
+}
+
+    sheet.style.height = `${Math.round(height)}px`;
+  });
+
+  // 3️⃣ INIT DRAG — UNE SEULE FOIS (RN canCloseRef)
+  if (!overlay.__dragInit) {
+    initMapPostSheetDrag(overlay, scroll);
+    overlay.__dragInit = true;
+  }
 };
 
 /* -----------------------------------------
@@ -412,7 +462,7 @@ function initMapPostSheetDrag(overlay, scroll) {
   if (!handle) return;
 
   scroll.onscroll = () => {
-    canClose = scroll.scrollTop <= 0;
+    canClose = scroll.scrollTop <= 2;
   };
 
   // Touch
