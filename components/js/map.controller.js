@@ -216,12 +216,26 @@ function createGoogleMapAdapter() {
       }
 
       map = new google.maps.Map(el, {
-        zoom: 13,
-        disableDefaultUI: true,
-        gestureHandling: "greedy", // ✅ iOS Safari UX
-      });
+  zoom: 13,
+  disableDefaultUI: true,
+  gestureHandling: "greedy",
+
+  // ✅ OBLIGATOIRE pour AdvancedMarker + disparition de l’erreur
+  mapId: "b23295c573f16a42930135b7",
+});
 
       this.renderMarkers();
+            // 🟡 iOS / Mobile Google Maps FIX
+      // Google Maps peut nettoyer les overlays APRES init
+      // → on force un re-render sécurisé
+
+      setTimeout(() => {
+        this.renderMarkers();
+      }, 500);
+
+      google.maps.event.addListenerOnce(map, "idle", () => {
+        this.renderMarkers();
+      });
     },
 
     centerOnUser(coords) {
@@ -260,48 +274,44 @@ function createGoogleMapAdapter() {
 
         let marker;
 
-        // ✅ Prefer AdvancedMarkerElement when available
-        // ⚠️ On iOS Safari it can be undefined depending on version/config.
         const AdvancedMarker = google.maps.marker?.AdvancedMarkerElement;
 
-        if (AdvancedMarker) {
-          const content = document.createElement("img");
-          content.src = post.user_avatar;
-          content.style.width = "42px";
-          content.style.height = "42px";
-          content.style.borderRadius = "50%";
-          content.style.objectFit = "cover";
-          content.style.boxShadow = "0 2px 6px rgba(0,0,0,0.35)";
+if (AdvancedMarker) {
+  const wrapper = document.createElement("div");
+  wrapper.style.width = "42px";
+  wrapper.style.height = "42px";
+  wrapper.style.borderRadius = "50%";
+  wrapper.style.overflow = "hidden";
+  wrapper.style.boxShadow = "0 2px 6px rgba(0,0,0,0.35)";
+  wrapper.style.cursor = "pointer";
+  wrapper.style.pointerEvents = "auto"; // ✅ CRITIQUE
 
-          marker = new AdvancedMarker({
-            position,
-            map,
-            content,
-          });
+  const img = document.createElement("img");
+  img.src = post.user_avatar;
+  img.style.width = "100%";
+  img.style.height = "100%";
+  img.style.objectFit = "cover";
+  img.style.pointerEvents = "none"; // ✅ CRITIQUE
 
-          marker.__post = post;
+  wrapper.appendChild(img);
 
-          // AdvancedMarker click event
-          marker.addListener("gmp-click", () => {
-            window.openPostSheet([post]);
-          });
-        } else {
-          // ✅ Fallback: classic Marker works everywhere
-          marker = new google.maps.Marker({
-            position,
-            map,
-            icon: {
-              url: post.user_avatar,
-              scaledSize: new google.maps.Size(42, 42),
-            },
-          });
+  marker = new AdvancedMarker({
+    position,
+    map,
+    content: wrapper,
+  });
 
-          marker.__post = post;
+  marker.__post = post;
 
-          marker.addListener("click", () => {
-            window.openPostSheet([post]);
-          });
-        }
+  // ✅ CLICK DOM (PAS gmp-click)
+  wrapper.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log("🟢 MARKER DOM CLICK", post.id);
+    window.openPostSheet([post]);
+  });
+}
 
         return marker;
       });
@@ -341,6 +351,7 @@ window.applyMapFilters = function applyMapFilters() {
 ========================================= */
 
 window.openPostSheet = function openPostSheet(posts) {
+
   if (!Array.isArray(posts) || !posts.length) return;
 
   // store selection (parity)

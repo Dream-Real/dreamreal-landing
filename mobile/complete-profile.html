@@ -38,25 +38,26 @@
           <div class="cpf-form">
 
             <div class="cpf-avatar-section">
-              <label class="cpf-avatar-circle">
-                <img id="cpf-avatar-preview" class="hidden" />
-                <span id="cpf-avatar-placeholder">+</span>
-                <input
-                  id="cpf-avatar-input"
-                  type="file"
-                  accept="image/*"
-                  hidden
-                />
-              </label>
+  <label class="cpf-avatar-circle" id="cpf-avatar-circle">
+    <img id="cpf-avatar-preview" class="hidden" alt="Avatar preview" />
+    <span id="cpf-avatar-placeholder">+</span>
 
-              <button
-                id="cpf-avatar-btn"
-                type="button"
-                class="cpf-avatar-btn"
-              >
-                Add avatar
-              </button>
-            </div>
+    <!-- 🔥 IMPORTANT : PAS DE "hidden" -->
+    <input
+      id="cpf-avatar-input"
+      type="file"
+      accept="image/*"
+    />
+  </label>
+
+  <button
+    id="cpf-avatar-btn"
+    type="button"
+    class="cpf-avatar-btn"
+  >
+    Add avatar
+  </button>
+</div>
 
             <input
               id="cpf-first-name"

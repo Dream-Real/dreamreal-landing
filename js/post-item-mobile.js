@@ -3,6 +3,8 @@
    Mirrors App UX (PUBLIC SAFE)
 ========================================= */
 
+console.log("🔥 post-item-mobile.js start");
+
 const CDN_URL = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 const FALLBACK_AVATAR =
   "https://cdn-icons-png.flaticon.com/512/847/847969.png";
@@ -353,3 +355,4 @@ function extractYouTubeId(url) {
     url.match(/youtu\.be\/([^?&]+)/);
   return match ? match[1] : null;
 }
+console.log("🔥 post-item-mobile.js end");

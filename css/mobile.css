@@ -5056,3 +5056,82 @@ button {
   background: rgba(255,255,255,0.14);
   color: #ffffff;
 }
+/* =========================
+   MAP POST SHEET
+========================= */
+
+.map-post-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 999;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.map-post-overlay.hidden {
+  display: none;
+}
+
+.map-post-sheet {
+  width: 100%;
+  background: #1A1A2E;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  overflow: hidden;
+  padding-top: 6px;
+  touch-action: none;
+}
+
+.map-post-handle {
+  padding-top: 2px;
+  padding-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.map-post-handle-bar {
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.3);
+}
+
+.map-post-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 24px;
+}
+/* 🔥 MAP POST OVERLAY — FIX GOOGLE MAPS */
+.map-post-overlay {
+  position: fixed;
+  inset: 0;
+
+  /* PLUS HAUT QUE TOUT CE QUE GOOGLE MAPS INJECTE */
+  z-index: 2147483647;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: flex-end;
+
+  pointer-events: auto;
+}
+
+.map-post-overlay.hidden {
+  display: none;
+}
+
+.map-post-sheet {
+  width: 100%;
+  background: #0b1120;
+  border-radius: 18px 18px 0 0;
+  max-height: 90vh;
+
+  transform: translateZ(0); /* 🔥 iOS Safari fix */
+}
+
+.map-post-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}

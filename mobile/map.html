@@ -111,28 +111,21 @@
     <script src="/components/constants/feelings.js"></script>
     <script src="/components/constants/activities.js"></script>
 
+    <!-- POST RENDERER (OBLIGATOIRE AVANT MAP) -->
+<script src="../js/post-item-mobile.js"></script>
+
     <!-- =========================
          MAP ENGINE
          (Google Maps — Apple Maps auto si dispo via MapKit JS)
     ========================== -->
     <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCP_iTdeKpPF4HuEyMzNExAaAh0kKFudrc&libraries=places"
-      async
-      defer
-    ></script>
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCP_iTdeKpPF4HuEyMzNExAaAh0kKFudrc&libraries=places,marker"
+></script>
 
     <!-- =========================
          MAP CONTROLLER (CRITIQUE)
     ========================== -->
-    <script>
-  console.log("🔥 BEFORE map.controller.js");
-</script>
-
-<script src="/components/js/map.controller.js"></script>
-
-<script>
-  console.log("🔥 AFTER map.controller.js");
-</script>
+    <script src="../components/js/map.controller.js"></script>
 
     <!-- =========================
          PAGE INIT
@@ -165,5 +158,24 @@
         }
       })();
     </script>
+    <!-- =========================
+     MAP → POST SHEET
+     (RN PostModal parity)
+========================= -->
+<div id="map-post-overlay" class="map-post-overlay hidden">
+  <div id="map-post-sheet" class="map-post-sheet">
+
+    <!-- HANDLE (drag only) -->
+    <div id="map-post-handle" class="map-post-handle">
+      <div class="map-post-handle-bar"></div>
+    </div>
+
+    <!-- SCROLLABLE CONTENT -->
+    <div id="map-post-scroll" class="map-post-scroll">
+      <!-- injected posts -->
+    </div>
+
+  </div>
+</div>
   </body>
 </html>
