@@ -1022,6 +1022,32 @@ fullOverlay?.querySelectorAll("a").forEach((a) => {
   }
 };
 
+/* =========================
+   LEADERBOARD — SEARCH (MOBILE)
+   Desktop parity
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("leaderboard-search-input");
+  if (!input) return;
+
+  input.addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase().trim();
+
+    const cards = document.querySelectorAll(
+      ".mobile-drawer .leaderboard-card"
+    );
+
+    cards.forEach((card) => {
+      const nameEl = card.querySelector(".row-name");
+      if (!nameEl) return;
+
+      const name = nameEl.textContent.toLowerCase();
+      card.style.display = name.includes(query) ? "" : "none";
+    });
+  });
+});
+
 /* =========================================
    MOBILE — ME SCREEN
    Ready to engage (desktop logic reuse)

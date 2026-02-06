@@ -5222,3 +5222,171 @@ button {
     #5c3b84 100%
   );
 }
+/* =========================
+   LEADERBOARD — SEARCH (WIDER, PREMIUM)
+========================= */
+
+.mobile-drawer .leaderboard-search {
+  margin: 20px 0 -6px;
+
+  /* 🔥 FULL BLEED PLUS LARGE */
+  width: calc(100% + 92px);   /* avant +40px */
+  margin-left: -46px;         /* avant -20px */
+  padding: 0 28px;
+
+  box-sizing: border-box;
+}
+
+.mobile-drawer .leaderboard-search input {
+  width: 100%;
+  height: 54px;
+
+  padding: 0 16px;
+
+  border-radius: 12px; /* 🔑 identique aux cards */
+  border: 1px solid rgba(255,255,255,0.16);
+
+  background: rgba(255,255,255,0.075); /* 🔑 EXACT cards */
+  backdrop-filter: blur(6px);           /* 🔑 polish */
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+}
+
+/* Placeholder */
+.mobile-drawer .leaderboard-search input::placeholder {
+  color: rgba(255,255,255,0.45);
+  font-weight: 500;
+}
+
+/* Focus neutre (desktop parity) */
+.mobile-drawer .leaderboard-search input:focus,
+.mobile-drawer .leaderboard-search input:focus-visible {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.10);
+  outline: none;
+  box-shadow: none;
+}
+/* =========================
+   MOBILE DRAWER — CLOSE BUTTON
+   (PARITY WITH FILTERS MODAL)
+========================= */
+
+.mobile-drawer-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+
+  width: 44px;
+  height: 44px;
+
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  cursor: pointer;
+}
+
+/* ❌ supprime tout ancien cadre / fond */
+.mobile-drawer-close::after {
+  content: none !important;
+}
+
+/* ✅ CROIX — IDENTIQUE MODALES FILTERS */
+.mobile-drawer-close::before {
+  content: "✕";
+
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #ffffff; /* 🔑 BLANC */
+
+  display: block;
+  text-align: center;
+
+  /* 🎯 centrage optique (iOS-safe) */
+  transform: translateY(-8px);
+}
+/* =========================
+   MOBILE DRAWER — CLOSE ICON POSITION
+========================= */
+
+.mobile-drawer-close {
+  position: absolute;
+  right: 10px;      /* 🔥 DÉCALAGE VERS LA DROITE */
+  
+  transform: none;  /* sécurité si un ancien translate existe */
+}
+/* =========================================
+   MOBILE DRAWER — KILL OLD CLOSE ICON
+========================================= */
+
+.mobile-drawer-close {
+  font-size: 0 !important;        /* 🔥 tue tout texte interne */
+  background: none !important;    /* 🔥 tue icône background */
+}
+
+.mobile-drawer-close svg,
+.mobile-drawer-close img {
+  display: none !important;       /* 🔥 tue SVG éventuel */
+}
+
+/* =========================
+   MOBILE DRAWER — TITLE
+   (MATCH "On the Leaderboard")
+========================= */
+
+.mobile-drawer-title {
+  font-family: inherit;   /* 🔑 même police que leaderboard */
+  font-size: 20px;        /* 🔑 identique au h3 leaderboard */
+  font-weight: 600;       /* 🔑 idem */
+  line-height: 1;
+
+  color: #ffffff;
+
+  margin: 0;
+}
+/* =========================================
+   MOBILE DRAWER — HIDE SCROLLBAR ONLY
+   (ne change PAS le scroll / ne change PAS overflow)
+========================================= */
+
+/* Drawer lui-même (si c’est lui qui scroll) */
+.mobile-drawer {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / old Edge */
+}
+.mobile-drawer::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;     /* Chrome/Safari/iOS */
+}
+
+/* Body interne (si c’est lui qui scroll) */
+.mobile-drawer .mobile-drawer-body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mobile-drawer .mobile-drawer-body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* Clip leaderboard (si c’est lui qui scroll) */
+.mobile-drawer .leaderboard-cards-clip {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mobile-drawer .leaderboard-cards-clip::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
