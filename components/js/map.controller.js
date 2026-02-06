@@ -206,6 +206,7 @@ function loadGoogleMap() {
 function createGoogleMapAdapter() {
   let map;
   let markers = [];
+  let userMarker = null;
 
   return {
     init() {
@@ -244,9 +245,34 @@ function createGoogleMapAdapter() {
       map.setZoom(14);
     },
 
-    updateUserLocation() {
-      // optional: blue dot later
-    },
+    updateUserLocation(coords) {
+  if (!map || !coords) return;
+
+  const AdvancedMarker = google.maps.marker?.AdvancedMarkerElement;
+  if (!AdvancedMarker) return;
+
+  // 🔵 création UNE SEULE FOIS
+  if (!userMarker) {
+    const dot = document.createElement("div");
+dot.style.width = "20px";              // ⬆️ plus visible
+dot.style.height = "20px";
+dot.style.borderRadius = "50%";
+dot.style.background = "#3B82F6";
+dot.style.border = "3px solid white";  // ⬆️ lisibilité sur la map
+dot.style.boxShadow = "0 0 0 6px rgba(59,130,246,0.28)"; // halo plus large
+dot.style.pointerEvents = "none";
+
+    userMarker = new AdvancedMarker({
+      position: coords,
+      map,
+      content: dot,
+      zIndex: 9999,
+    });
+  } else {
+    // 🔄 mise à jour fluide
+    userMarker.position = coords;
+  }
+},
 
     clearMarkers() {
       // AdvancedMarkerElement does NOT implement setMap(null)

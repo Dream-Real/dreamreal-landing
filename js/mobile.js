@@ -745,6 +745,9 @@ window.setFilterFeeling = function (feeling) {
   window.renderFilteredFeed();
   renderActiveFilters();
   updateFiltersButton();
+  if (typeof window.applyMapFilters === "function") {
+  window.applyMapFilters();
+}
 };
 
 window.setFilterActivity = function (activity) {
@@ -753,6 +756,9 @@ window.setFilterActivity = function (activity) {
   window.renderFilteredFeed();
   renderActiveFilters();
   updateFiltersButton();
+  if (typeof window.applyMapFilters === "function") {
+  window.applyMapFilters();
+}
 };
 
 window.clearFilters = function () {
@@ -762,6 +768,14 @@ window.clearFilters = function () {
   window.renderFilteredFeed();
   renderActiveFilters();
   updateFiltersButton();
+  if (typeof window.applyMapFilters === "function") {
+  window.applyMapFilters();
+}
+  // 🟡 UX fine — ferme la modale filters si ouverte
+  const filtersModal = document.getElementById("filters-modal");
+  if (filtersModal && !filtersModal.hidden) {
+    closeMobileFilters();
+  }
 };
 
 /* -----------------------------------------

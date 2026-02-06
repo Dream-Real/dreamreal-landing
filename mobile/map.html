@@ -89,13 +89,13 @@
         <div class="map-header-title">Map</div>
 
         <button
-          class="map-header-btn"
-          onclick="location.href='/mobile.html'"
-          aria-label="Feed"
-        >
-          Feed
-        </button>
-      </header>
+  id="open-filters-btn"
+  class="map-header-btn"
+  aria-label="Filters"
+>
+  Filters
+</button>
+</header>
 
       <!-- =========================
            MAP FULLSCREEN
@@ -113,6 +113,9 @@
 
     <!-- POST RENDERER (OBLIGATOIRE AVANT MAP) -->
 <script src="../js/post-item-mobile.js"></script>
+
+<!-- LOGIQUE FEED + FILTERS (OBLIGATOIRE POUR MAP) -->
+<script src="../js/mobile.js"></script>
 
     <!-- =========================
          MAP ENGINE
@@ -158,9 +161,19 @@
         }
       })();
     </script>
+
     <!-- =========================
+     FILTERS MODAL (SHARED WITH FEED)
+     (UNE SEULE FOIS)
+========================= -->
+<div id="filters-modal" hidden>
+  <div class="filters-sheet"></div>
+</div>
+
+<!-- =========================
      MAP → POST SHEET
      (RN PostModal parity)
+     (UNE SEULE FOIS)
 ========================= -->
 <div id="map-post-overlay" class="map-post-overlay hidden">
   <div id="map-post-sheet" class="map-post-sheet">
