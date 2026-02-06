@@ -738,6 +738,7 @@ function updateFiltersButton() {
 // =========================
 // FILTER ACTIONS — SOURCE UNIQUE (MOBILE PARITY)
 // =========================
+
 window.setFilterFeeling = function (feeling) {
   window.FEED_FILTERS.feeling = feeling;
   window.FEED_FILTERS.activity = null;
@@ -745,9 +746,8 @@ window.setFilterFeeling = function (feeling) {
   window.renderFilteredFeed();
   renderActiveFilters();
   updateFiltersButton();
-  if (typeof window.applyMapFilters === "function") {
-  window.applyMapFilters();
-}
+
+  syncMapFilters(); // ✅ UNIQUE PONT FEED → MAP
 };
 
 window.setFilterActivity = function (activity) {
@@ -756,9 +756,8 @@ window.setFilterActivity = function (activity) {
   window.renderFilteredFeed();
   renderActiveFilters();
   updateFiltersButton();
-  if (typeof window.applyMapFilters === "function") {
-  window.applyMapFilters();
-}
+
+  syncMapFilters(); // ✅ UNIQUE PONT FEED → MAP
 };
 
 window.clearFilters = function () {
@@ -768,9 +767,9 @@ window.clearFilters = function () {
   window.renderFilteredFeed();
   renderActiveFilters();
   updateFiltersButton();
-  if (typeof window.applyMapFilters === "function") {
-  window.applyMapFilters();
-}
+
+  syncMapFilters(); // ✅ UNIQUE PONT FEED → MAP
+
   // 🟡 UX fine — ferme la modale filters si ouverte
   const filtersModal = document.getElementById("filters-modal");
   if (filtersModal && !filtersModal.hidden) {
@@ -1303,3 +1302,17 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("pageshow", () => {
   closeMobileDrawer(true);
 });
+/* =========================================
+   FEED → MAP FILTER SYNC (SOURCE UNIQUE)
+========================================= */
+
+function syncMapFilters() {
+  if (!window.MAP_STATE) return;
+
+  window.MAP_STATE.filters.feeling  = window.FEED_FILTERS.feeling;
+  window.MAP_STATE.filters.activity = window.FEED_FILTERS.activity;
+
+  if (typeof window.applyMapFilters === "function") {
+    window.applyMapFilters();
+  }
+}

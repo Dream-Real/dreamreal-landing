@@ -61,6 +61,11 @@ window.initMobileMap = function initMobileMap(posts) {
 
     window.MAP_STATE.filteredPosts = window.MAP_STATE.posts;
 
+    // 🔑 Sync immédiat avec le feed si déjà filtré
+if (typeof window.syncMapFiltersFromFeed === "function") {
+  window.syncMapFiltersFromFeed();
+}
+
     console.log("📍 Map posts:", window.MAP_STATE.posts.length);
 
     if (MAP_ENGINE === "apple") {
@@ -518,4 +523,16 @@ function initMapPostSheetDrag(overlay, scroll) {
 
 window.__MAP_DEBUG__ = {
   state: window.MAP_STATE,
+};
+/* -----------------------------------------
+   FEED → MAP FILTER SYNC (CRITIQUE)
+----------------------------------------- */
+
+window.syncMapFiltersFromFeed = function () {
+  if (!window.FEED_FILTERS || !window.MAP_STATE) return;
+
+  window.MAP_STATE.filters.feeling  = window.FEED_FILTERS.feeling;
+  window.MAP_STATE.filters.activity = window.FEED_FILTERS.activity;
+
+  window.applyMapFilters();
 };
