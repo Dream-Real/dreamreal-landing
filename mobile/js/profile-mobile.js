@@ -160,12 +160,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
 
       <p
-        class="m-profile-bio"
-        id="profile-bio"
-        ${user.bio ? "" : "hidden"}
-      >
-        ${user.bio || ""}
-      </p>
+  class="m-profile-bio"
+  id="profile-bio"
+  ${user.bio ? "" : "hidden"}
+>
+  ${user.bio || ""}
+</p>
+
+<!-- ✅ SOCIAL BUTTONS TARGET (REQUIRED) -->
+<div class="m-profile-socials" id="profile-socials"></div>
     </div>
 
   </section>
@@ -211,22 +214,50 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* =========================
-     SOCIALS (EXTERNAL ONLY)
-  ========================= */
-  if (socials) socials.innerHTML = "";
+   SOCIALS (OWN + EXTERNAL)
+========================= */
+if (socials) socials.innerHTML = "";
 
-  if (foreignUserId && socials) {
-    if (user.facebook_url) {
-      socials.innerHTML += `<button class="m-btn m-btn--facebook" onclick="window.open('${user.facebook_url}','_blank')">Facebook</button>`;
-    }
-    if (user.instagram_username) {
-      const ig = user.instagram_username.replace("@", "");
-      socials.innerHTML += `<button class="m-btn m-btn--instagram" onclick="window.open('https://instagram.com/${ig}','_blank')">Instagram</button>`;
-    }
-    if (user.messenger_url) {
-      socials.innerHTML += `<button class="m-btn m-btn--messenger" onclick="window.open('${user.messenger_url}','_blank')">Messenger</button>`;
-    }
-  }
+const facebookUrl  = user.facebook_url || null;
+const igUsername   = user.instagram_username || null;
+const messengerUrl = user.messenger_url || null;
+
+if (facebookUrl && socials) {
+  socials.innerHTML += `
+    <button
+      class="m-btn m-btn--facebook"
+      type="button"
+      onclick="window.open('${facebookUrl}', '_blank')"
+    >
+      Facebook
+    </button>
+  `;
+}
+
+if (igUsername && socials) {
+  const ig = igUsername.replace("@", "");
+  socials.innerHTML += `
+    <button
+      class="m-btn m-btn--instagram"
+      type="button"
+      onclick="window.open('https://www.instagram.com/${ig}', '_blank')"
+    >
+      Instagram
+    </button>
+  `;
+}
+
+if (messengerUrl && socials) {
+  socials.innerHTML += `
+    <button
+      class="m-btn m-btn--messenger"
+      type="button"
+      onclick="window.open('${messengerUrl}', '_blank')"
+    >
+      Messenger
+    </button>
+  `;
+}
 
   /* =========================
      FEED — LOADING
