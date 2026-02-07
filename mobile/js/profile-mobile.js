@@ -6,7 +6,12 @@
 console.log("👤 profile-mobile.js LOADED");
 
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("👤 profile-mobile DOMContentLoaded");
+    
+    /* =========================
+     ROUTING / CONTEXT
+  ========================= */
+  const params        = new URLSearchParams(window.location.search);
+  const foreignUserId = params.get("userId"); // null | string
 
   /* =========================
      DOM TARGETS
@@ -14,7 +19,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const header  = document.getElementById("profile-header");
   const actions = document.getElementById("profile-actions");
   const feed    = document.getElementById("profile-feed");
-  const socials = document.getElementById("profile-socials");
 
   if (!header || !actions || !feed) {
     console.error("❌ Profile DOM nodes missing");
@@ -25,14 +29,18 @@ document.addEventListener("DOMContentLoaded", async () => {
      AUTH / SESSION
   ========================= */
   const token   = localStorage.getItem("token");
-  const userRaw = localStorage.getItem("user");
+const userRaw = localStorage.getItem("user");
 
-  if (!token || !userRaw) {
-    window.location.href = "/mobile/login.html";
-    return;
-  }
+// 🔐 Auth requise UNIQUEMENT pour MON profil
+if (!foreignUserId && (!token || !userRaw)) {
+  window.location.href = "/mobile/login.html";
+  return;
+}
 
-  let user;
+  let user = null;
+
+// 👉 MON profil UNIQUEMENT
+if (!foreignUserId) {
   try {
     user = JSON.parse(userRaw);
   } catch {
@@ -44,12 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("❌ user.id missing");
     return;
   }
-
-  /* =========================
-     ROUTING / CONTEXT
-  ========================= */
-  const params        = new URLSearchParams(window.location.search);
-  const foreignUserId = params.get("userId"); // null | string
+}
 
   const API_BASE =
     window.API_BASE ||
@@ -61,21 +64,55 @@ document.addEventListener("DOMContentLoaded", async () => {
   const FALLBACK_COVER  = `${CDN}/default-cover.jpg`;
 
   /* =========================
-     EXTERNAL PROFILE (LOAD FIRST)
-  ========================= */
-  if (foreignUserId) {
-    try {
-      const res = await fetch(`${API_BASE}/api/users/${foreignUserId}`);
-      if (res.ok) {
-        user = await res.json();
-        console.log("👤 External profile loaded", user);
-      } else {
-        console.warn("⚠️ External user not found");
-      }
-    } catch (err) {
-      console.error("❌ External profile fetch error", err);
+   EXTERNAL PROFILE (PUBLIC SAFE)
+========================= */
+if (foreignUserId) {
+  try {
+    const res = await fetch(`${API_BASE}/api/posts?userId=${foreignUserId}`);
+    if (!res.ok) throw new Error("Posts fetch failed");
+
+    const json = await res.json();
+    const posts = Array.isArray(json)
+      ? json
+      : json.posts || json.data || [];
+
+    if (!posts.length) {
+      console.warn("⚠️ No posts for external user");
+      user = null;
+    } else {
+      const p = posts[0];
+
+      user = {
+        id: foreignUserId,
+        first_name: p.user_first_name || "",
+        last_name: p.user_last_name || "",
+        name: p.user?.name || "",
+        avatar: p.user_avatar || p.profile_picture || null,
+        cover_photo: p.cover_photo || null,
+        bio: p.user_bio || "",
+        today_feeling: p.feeling || null,
+        facebook_url: p.facebook_url || null,
+        instagram_username: p.instagram_username || null,
+        messenger_url: p.messenger_url || null,
+      };
+
+      console.log("👤 External profile reconstructed", user);
     }
+  } catch (err) {
+    console.error("❌ External profile load failed", err);
+    user = null;
   }
+}
+
+if (!user) {
+  header.innerHTML = `
+    <div style="padding:32px;text-align:center;opacity:.6">
+      User not found
+    </div>
+  `;
+  feed.innerHTML = "";
+  return;
+}
 
   /* =========================
      HEADER (APP PARITY)
@@ -174,6 +211,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   </section>
 `;
 
+/* 🔑 REBIND SOCIALS — MUST BE AFTER header.innerHTML */
+const socials = document.getElementById("profile-socials");
+
+if (!socials) {
+  console.warn("⚠️ profile-socials not found after render");
+}
+
   /* =========================
      TODAY MOOD
   ========================= */
@@ -268,8 +312,10 @@ if (messengerUrl && socials) {
      POSTS FETCH (APP PARITY)
   ========================= */
   const postsUrl = foreignUserId
-    ? `${API_BASE}/api/posts?userId=${foreignUserId}`
-    : `${API_BASE}/api/posts/me`;
+  ? `${API_BASE}/api/posts?userId=${foreignUserId}`
+  : `${API_BASE}/api/posts/me`;
+
+  console.log("🧪 POSTS URL =", postsUrl);
 
   try {
     const res = await fetch(postsUrl, {

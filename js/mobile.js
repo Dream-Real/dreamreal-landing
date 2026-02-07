@@ -313,6 +313,13 @@ function normalizePostForMobile(post) {
   return {
     id: post.id,
 
+    // ✅ AJOUT CRITIQUE
+    user_id:
+      post.user?.id ||
+      post.user_id ||
+      post.author_id ||
+      null,
+
     user_first_name: post.user_first_name || "",
     user_last_name: post.user_last_name || "",
     user_avatar:

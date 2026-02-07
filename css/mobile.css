@@ -5656,3 +5656,25 @@ body.profile-page main {
   color: #ffffff;
   margin: 0 12px;
 }
+/* =========================================
+   POST USERNAME — FORCE NATIVE NAVIGATION
+========================================= */
+
+.post-user {
+  pointer-events: auto; /* 🔑 laisse passer les clics */
+}
+
+.post-username,
+.post-username-link {
+  pointer-events: auto; /* 🔑 autorise le lien */
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-username-link {
+  cursor: pointer;
+}
+
+.post-username-link:active {
+  opacity: 0.6; /* feedback iOS */
+}

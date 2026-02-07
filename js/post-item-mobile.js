@@ -33,6 +33,14 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
     post.profile_picture ||
     FALLBACK_AVATAR;
 
+    const userId =
+  post.user?.id ||
+  post.user_id ||
+  post.userId ||
+  post.author_id ||
+  post.author?.id ||
+  null;
+
   const location =
   typeof post.location === "string"
     ? post.location
@@ -78,6 +86,15 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
   /* ----------------------------------------
      HEADER
   ----------------------------------------- */
+
+const isProfilePage = document.body.classList.contains("profile-page");
+const profileHref = userId
+  ? `/mobile/profile-mobile.html?userId=${encodeURIComponent(userId)}`
+  : "";
+
+  console.log("🧩 isProfilePage =", document.body.classList.contains("profile-page"));
+console.log("🧩 userId =", userId, "post keys:", Object.keys(post || {}), "post.user:", post.user);
+  
   container.innerHTML = `
     <header class="post-header">
       <img
@@ -87,13 +104,19 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
       />
       <div class="post-meta">
         <div class="post-user">
-          ${userName}
-          ${
-            location
-              ? `<span class="post-location"> in ${location}</span>`
-              : ""
-          }
-        </div>
+  ${
+    !isProfilePage && profileHref
+      ? `<a class="post-username post-username-link" href="${profileHref}">
+           ${userName}
+         </a>`
+      : `<span class="post-username">${userName}</span>`
+  }
+  ${
+    location
+      ? `<span class="post-location"> in ${location}</span>`
+      : ""
+  }
+</div>
         <div class="post-date">
           ${
             createdAt
@@ -356,5 +379,33 @@ function extractYouTubeId(url) {
     url.match(/[?&]v=([^&]+)/) ||
     url.match(/youtu\.be\/([^?&]+)/);
   return match ? match[1] : null;
+}
+/* =========================================
+   GLOBAL — Username → Profile (HOME ONLY)
+   Anti preventDefault / anti click hijack
+========================================= */
+if (!window.__drUsernameNavBound) {
+  window.__drUsernameNavBound = true;
+
+  document.addEventListener(
+    "click",
+    (e) => {
+      const a = e.target.closest("a.post-username-link");
+      if (!a) return;
+
+      // ❌ pas de navigation depuis une page profile
+      const isProfilePage = document.body.classList.contains("profile-page");
+      if (isProfilePage) return;
+
+      // 🔥 on coupe tout ce qui pourrait voler le clic
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      const href = a.getAttribute("href");
+      if (href) window.location.assign(href);
+    },
+    true // 🔑 CAPTURE = avant tous les autres handlers
+  );
 }
 console.log("🔥 post-item-mobile.js end");
