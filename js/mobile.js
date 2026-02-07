@@ -1267,6 +1267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = document.getElementById("mobile-drawer-close");
   const tabMe = document.getElementById("mobile-drawer-tab-me");
     const tabMap = document.getElementById("mobile-drawer-tab-map");
+    const tabProfile = document.getElementById("mobile-drawer-tab-profile");
 
   if (!burgerBtn || !overlay || !drawer || !closeBtn || !tabMe) {
     console.warn("❌ Drawer elements missing");
@@ -1321,6 +1322,15 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "/mobile/map.html";
     });
   }
+  // Tab "Profile" → route vers profile-mobile.html
+if (tabProfile) {
+  tabProfile.addEventListener("click", () => {
+    console.log("👤 Profile tab clicked");
+
+    closeDrawer(); // 🔑 fermeture propre du menu
+    window.location.href = "/mobile/profile-mobile.html";
+  });
+}
 });
 /* -----------------------------------------
    MOBILE — HARD RESET ON BACK (iOS SAFE)

@@ -480,8 +480,14 @@ const submitHandler = (e) => {
   console.log("🟢 SUBMIT HANDLER FIRED", e.type);
 
   if (isSubmitting) return;
-  updateSubmit();
-  if (submit.classList.contains("disabled")) return;
+
+  // ❌ NE PAS rappeler updateSubmit ici
+  // updateSubmit();
+
+  if (submit.classList.contains("disabled")) {
+    console.warn("⛔ submit blocked (disabled)");
+    return;
+  }
 
   submitCreatePost();
 };
@@ -1495,7 +1501,6 @@ console.log("🧪 SNAPSHOT LINK PREVIEW (SUBMIT)", linkPreviewSnapshot);
 
   const draftMediaSnapshot = [...draftMedia];
 
-  // 🔥 GARANTIE MESSAGE NON VIDE POUR YOUTUBE (OBLIGATOIRE)
 // 🔥 GARANTIE MESSAGE NON VIDE (YOUTUBE + LINK CLASSIQUE)
 let finalMessage = message.value;
 

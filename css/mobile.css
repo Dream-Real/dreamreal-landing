@@ -5390,3 +5390,32 @@ button {
   height: 0 !important;
   display: none !important;
 }
+/* =========================
+   PROFILE — HEADER (MOBILE)
+========================= */
+
+.profile-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.profile-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar {
+  width: 56px;          /* 🔑 taille app-like */
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-family: "Suez One", serif;
+  font-size: 18px;
+  line-height: 1.2;
+  color: #fff;
+}

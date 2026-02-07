@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <title>Dream Real — Profile</title>
+
+    <!-- MOBILE CORE CSS (ABSOLUTE PATH) -->
+    <link rel="stylesheet" href="/css/mobile.css" />
+
+    <!-- FONT (APP PARITY) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="dr-mobile profile-page">
+
+    <!-- =========================
+         APP ROOT
+    ========================== -->
+    <div id="app">
+
+      <!-- =========================
+           PROFILE HEADER
+      ========================== -->
+      <header class="profile-header" id="profile-header">
+        <!-- injecté par profile-mobile.js -->
+      </header>
+
+      <!-- =========================
+           PROFILE ACTIONS
+      ========================== -->
+      <div class="profile-actions" id="profile-actions">
+        <!-- Edit profile / Add post -->
+      </div>
+
+      <!-- =========================
+           PROFILE FEED
+      ========================== -->
+      <main class="profile-feed" id="profile-feed">
+        <!-- posts injectés via post-item-mobile.js -->
+      </main>
+
+    </div>
+
+    <!-- =========================
+         CREATE POST OVERLAY
+         (shared component)
+    ========================== -->
+    <div id="create-post-root"></div>
+
+    <!-- =========================
+         SCRIPTS — ORDER MATTERS
+    ========================== -->
+
+    <!-- AUTH (MUST BE FIRST) -->
+    <script src="/mobile/mobile-auth.js"></script>
+
+    <!-- CONSTANTS -->
+    <script src="/components/constants/feelings.js"></script>
+    <script src="/components/constants/activities.js"></script>
+
+    <!-- POST RENDERER (MOBILE) -->
+    <script src="/js/post-item-mobile.js"></script>
+
+    <!-- CREATE POST (SHARED) -->
+    <script src="/components/js/create-post.js"></script>
+
+    <!-- PROFILE LOGIC -->
+    <script src="/mobile/js/profile-mobile.js"></script>
+
+    <!-- SAFETY LOG -->
+    <script>
+      console.log("✅ profile-mobile.html LOADED");
+    </script>
+  </body>
+</html>
