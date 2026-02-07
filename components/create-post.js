@@ -4,6 +4,14 @@
 
    console.log("🟢 create-post.js START");
 
+   function getAuthToken() {
+  return (
+    window.AUTH?.token ||
+    localStorage.getItem("token") ||
+    null
+  );
+}
+
    // =========================
 // GOOGLE PLACES — SAFE LOAD (MOBILE)
 // =========================
@@ -26,31 +34,47 @@ function waitForGooglePlaces(cb) {
 
 window.CDN_URL = window.CDN_URL || "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
 
-async function uploadMediaFile(file) {
+async function uploadMediaFile(file, token) {
   const API_BASE = "https://dreamreal-api.onrender.com";
 
   /* =========================================================
-     IMAGE → BACKEND CLASSIQUE (INCHANGÉ)
-     ========================================================= */
-  if (file.type.startsWith("image/")) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch(`${API_BASE}/api/upload/image`, {
+   IMAGE → PRESIGN + PUT DIRECT S3 (iOS SAFE)
+   ========================================================= */
+if (file.type.startsWith("image/")) {
+  const presignRes = await fetch(
+    `${API_BASE}/api/upload/presign-image`,
+    {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${window.AUTH.token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error("Image upload failed: " + text);
+      body: JSON.stringify({
+        mimeType: file.type,
+      }),
     }
+  );
 
-    return res.json(); // { url }
+  if (!presignRes.ok) {
+    throw new Error("Image presign failed");
   }
+
+  const { uploadUrl, publicUrl } = await presignRes.json();
+
+  const uploadRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+    },
+    body: file,
+  });
+
+  if (!uploadRes.ok) {
+    throw new Error("S3 image upload failed");
+  }
+
+  return { url: publicUrl };
+}
 
   /* =========================================================
      VIDEO (WEB) → PRESIGN + PUT DIRECT S3
@@ -63,7 +87,7 @@ async function uploadMediaFile(file) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${window.AUTH.token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           mimeType: file.type,
@@ -445,7 +469,28 @@ overlay.onclick = (e) => {
   }
 };
 
-  const submit = document.getElementById("cp-submit");
+let isSubmitting = false; // 🔒 source de vérité unique
+
+const submit = document.getElementById("cp-submit");
+
+const submitHandler = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  console.log("🟢 SUBMIT HANDLER FIRED", e.type);
+
+  if (isSubmitting) return;
+  updateSubmit();
+  if (submit.classList.contains("disabled")) return;
+
+  submitCreatePost();
+};
+
+// ✅ UN SEUL HANDLER, 3 EVENTS
+submit.addEventListener("click", submitHandler);
+submit.addEventListener("touchstart", submitHandler, { passive: false });
+submit.addEventListener("pointerup", submitHandler);
+
   const message = document.getElementById("cp-message");
  const preview = document.getElementById("cp-preview");
 const mediaSlot = document.getElementById("cp-media-slot");
@@ -504,8 +549,7 @@ const triggers = document.querySelectorAll(".btn-create");
 
   let mood = null;
 let location = null;
-localLinkPreview = null; // ✅ ICI ET SEULEMENT ICI
-let isSubmitting = false; // 🔒 sécurité anti double submit
+let localLinkPreview = null;
 
 // 🔑 MEDIA DRAFT (PARITÉ APP)
 let draftMedia = [];           // [{ file, url }]
@@ -1414,9 +1458,31 @@ if (mood) {
   submit.classList.toggle("disabled", !valid);
 }
 
-  submit.onclick = () => {
-    if (isSubmitting) return;
-isSubmitting = true;
+async function startCreatePost() {
+  // 🔥 on appelle EXACTEMENT le même code que dans submit.onclick
+  await submitCreatePost();
+}
+
+  async function submitCreatePost() {
+  // 🔒 VERROU SYNCHRONE CRITIQUE (iOS Safari)
+  if (isSubmitting) {
+    console.warn("⛔ submitCreatePost ignored: already submitting");
+    return;
+  }
+
+  isSubmitting = true;
+
+  console.warn("🚨 submitCreatePost() ENTERED");
+
+  try {
+    alert("submitCreatePost ENTERED (mobile)"); // ⛔️ TEMPORAIRE
+  } catch (e) {}
+
+    console.warn("🧪 isSubmitting =", isSubmitting);
+  console.warn("🧪 submit.disabled =", submit.classList.contains("disabled"));
+  console.warn("🧪 draftMedia =", draftMedia);
+  console.warn("🧪 Array.isArray(draftMedia) =", Array.isArray(draftMedia));
+  console.warn("🧪 message.value =", message?.value);
 
   // 🔒 SNAPSHOT LINK PREVIEW (CRITIQUE)
   const linkPreviewSnapshot = localLinkPreview
@@ -1425,15 +1491,9 @@ isSubmitting = true;
 console.log("🧪 SNAPSHOT LINK PREVIEW (SUBMIT)", linkPreviewSnapshot);
   console.log("🟢 CLICK SUR POST BOUTON");
 
-  // 🔥 RECALCUL FORCÉ AVANT TEST
-  updateSubmit();
-
-  if (submit.classList.contains("disabled")) {
-    console.warn("🔴 SUBMIT BLOQUÉ (disabled)");
-    return;
-  }
-
   console.log("🟢 SUBMIT AUTORISÉ — ON CONTINUE");
+
+  const draftMediaSnapshot = [...draftMedia];
 
   // 🔥 GARANTIE MESSAGE NON VIDE POUR YOUTUBE (OBLIGATOIRE)
 // 🔥 GARANTIE MESSAGE NON VIDE (YOUTUBE + LINK CLASSIQUE)
@@ -1520,30 +1580,37 @@ video_url: null,
     reactions_count: 1,
   };
 
- // =========================
+// =========================
 // BACKEND PERSISTENCE (WEB)
 // =========================
-(async () => {
-  try {
-    const token = window.AUTH?.token;
-    if (!token) return;
+try {
+  const token = getAuthToken();
 
-        const API_BASE = "https://dreamreal-api.onrender.com";
+  console.warn("🔐 RESOLVED AUTH TOKEN =", token);
+
+  if (!token) {
+    console.error("❌ NO AUTH TOKEN — abort submit");
+    isSubmitting = false; // 🔓 IMPORTANT
+    return;
+  }
+
+  const API_BASE = "https://dreamreal-api.onrender.com";
 
         // =========================
 // 🔼 UPLOAD MEDIA AVANT POST
 // =========================
+
 const uploadedImages = [];
 let uploadedVideo = null;
 
-for (const m of draftMedia) {
+for (const m of draftMediaSnapshot) {
   if (m.file.type.startsWith("image/")) {
-    const { url } = await uploadMediaFile(m.file);
+    const { url } = await uploadMediaFile(m.file, token);
     uploadedImages.push(url);
   }
 
   if (m.file.type.startsWith("video/")) {
-    const { url } = await uploadMediaFile(m.file);
+    const { url } = await uploadMediaFile(m.file, token);
     uploadedVideo = url;
   }
 }
@@ -1663,9 +1730,10 @@ if (typeof renderFeed === "function") {
 
     console.log("✅ Post persisted (WEB)");
   } catch (err) {
-    console.error("❌ createPost WEB error", err);
-  }
-})();
+      console.error(err);
+    } finally {
+      isSubmitting = false;
+    }
 
   // =========================
   // CLEANUP
