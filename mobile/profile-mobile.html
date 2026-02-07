@@ -22,25 +22,81 @@
   </head>
 
   <body class="dr-mobile profile-page">
+  <div class="mobile-app">
 
     <!-- =========================
          APP ROOT
     ========================== -->
     <div id="app">
 
-      <!-- =========================
-           PROFILE HEADER
-      ========================== -->
-      <header class="profile-header" id="profile-header">
-        <!-- injecté par profile-mobile.js -->
-      </header>
+      <header class="m-profile" id="profile-header">
 
-      <!-- =========================
-           PROFILE ACTIONS
-      ========================== -->
-      <div class="profile-actions" id="profile-actions">
-        <!-- Edit profile / Add post -->
-      </div>
+  <!-- 🌆 COVER -->
+  <div class="m-profile-cover">
+    <img
+      class="m-profile-cover-img"
+      id="profile-cover-img"
+      alt="Cover"
+    />
+
+    <button
+      class="m-profile-cover-btn"
+      id="profile-cover-btn"
+      type="button"
+    >
+      Change
+    </button>
+
+    <!-- 👤 AVATAR FLOTTANT -->
+    <button
+      class="m-profile-avatar-btn"
+      id="profile-avatar-btn"
+      type="button"
+      aria-label="Change avatar"
+    >
+      <span class="m-profile-avatar-ring">
+        <img
+          class="m-profile-avatar"
+          id="profile-avatar-img"
+          alt="Avatar"
+        />
+      </span>
+    </button>
+  </div>
+
+  <!-- ⬇️ CONTENU SOUS LA COVER -->
+  <div class="m-profile-top">
+
+    <!-- NOM -->
+    <div class="m-profile-name" id="profile-name"></div>
+
+    <!-- TODAY MOOD -->
+    <div class="m-profile-mood" id="profile-mood" hidden>
+      <button
+        class="m-profile-mood-btn"
+        id="profile-mood-btn"
+        type="button"
+      >
+        <span id="profile-mood-text"></span>
+        <img
+          id="profile-mood-icon"
+          class="m-profile-mood-icon"
+          alt=""
+        />
+      </button>
+    </div>
+
+    <!-- BIO -->
+    <div class="m-profile-bio" id="profile-bio" hidden></div>
+
+    <!-- ACTIONS (Add mood / Edit profile) -->
+    <div class="m-profile-buttons" id="profile-actions"></div>
+
+    <!-- SOCIALS -->
+    <div class="m-profile-socials" id="profile-socials"></div>
+
+  </div>
+</header>
 
       <!-- =========================
            PROFILE FEED
@@ -81,5 +137,6 @@
     <script>
       console.log("✅ profile-mobile.html LOADED");
     </script>
+    </div>
   </body>
 </html>

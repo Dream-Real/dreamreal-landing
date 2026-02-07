@@ -1,6 +1,6 @@
 /* =========================================
    DREAM REAL — PROFILE (MOBILE)
-   Final, app-aligned version
+   Final, app-aligned, SAFE version
 ========================================= */
 
 console.log("👤 profile-mobile.js LOADED");
@@ -8,9 +8,13 @@ console.log("👤 profile-mobile.js LOADED");
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("👤 profile-mobile DOMContentLoaded");
 
-  const header = document.getElementById("profile-header");
+  /* =========================
+     DOM TARGETS
+  ========================= */
+  const header  = document.getElementById("profile-header");
   const actions = document.getElementById("profile-actions");
-  const feed = document.getElementById("profile-feed");
+  const feed    = document.getElementById("profile-feed");
+  const socials = document.getElementById("profile-socials");
 
   if (!header || !actions || !feed) {
     console.error("❌ Profile DOM nodes missing");
@@ -18,13 +22,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   /* =========================
-     AUTH / USER
+     AUTH / SESSION
   ========================= */
-  const token = localStorage.getItem("token");
+  const token   = localStorage.getItem("token");
   const userRaw = localStorage.getItem("user");
 
   if (!token || !userRaw) {
-    console.warn("🔒 Not authenticated → redirect login");
     window.location.href = "/mobile/login.html";
     return;
   }
@@ -37,106 +40,224 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  if (!user.id) {
+  if (!user?.id) {
     console.error("❌ user.id missing");
     return;
   }
 
-  console.log("👤 Profile user:", user);
-
   /* =========================
-     HEADER (COMPACT, APP-LIKE)
+     ROUTING / CONTEXT
   ========================= */
-  header.innerHTML = `
-    <div class="profile-header-inner">
-      <img
-        class="profile-avatar"
-        src="${
-          user.avatar && user.avatar.startsWith("http")
-            ? user.avatar
-            : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-        }"
-        alt="Avatar"
-      />
-      <div class="profile-name">
-        ${
-          `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-          user.name ||
-          "User"
-        }
-      </div>
-    </div>
-  `;
+  const params        = new URLSearchParams(window.location.search);
+  const foreignUserId = params.get("userId"); // null | string
 
-  /* =========================
-     ACTIONS
-  ========================= */
-  actions.innerHTML = `
-    <button class="profile-btn primary" id="profile-add-post">
-      Add post
-    </button>
-  `;
-
-  const addPostBtn = document.getElementById("profile-add-post");
-  if (addPostBtn) {
-    addPostBtn.addEventListener("click", () => {
-      if (typeof window.openCreatePost === "function") {
-        window.openCreatePost();
-      } else {
-        console.warn("⚠️ openCreatePost not available");
-      }
-    });
-  }
-
-  /* =========================
-     FEED — LOADING STATE
-  ========================= */
-  feed.innerHTML = `
-    <div style="padding:24px;text-align:center;opacity:.6">
-      Loading your posts…
-    </div>
-  `;
-
-  /* =========================
-     FETCH USER POSTS ONLY
-  ========================= */
   const API_BASE =
     window.API_BASE ||
     window.API_URL ||
     "https://dreamreal-api.onrender.com";
 
-  try {
-    console.log("📡 Fetch profile posts for user_id =", user.id);
+  const CDN             = "https://dreamreal-images.s3.eu-west-3.amazonaws.com";
+  const FALLBACK_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  const FALLBACK_COVER  = `${CDN}/default-cover.jpg`;
 
-    const res = await fetch(
-  `${API_BASE}/api/posts/me`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+  /* =========================
+     EXTERNAL PROFILE (LOAD FIRST)
+  ========================= */
+  if (foreignUserId) {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${foreignUserId}`);
+      if (res.ok) {
+        user = await res.json();
+        console.log("👤 External profile loaded", user);
+      } else {
+        console.warn("⚠️ External user not found");
+      }
+    } catch (err) {
+      console.error("❌ External profile fetch error", err);
+    }
   }
-);
 
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
+  /* =========================
+     HEADER (APP PARITY)
+  ========================= */
+  const displayName =
+    (`${user.first_name || ""} ${user.last_name || ""}`.trim()) ||
+    user.name ||
+    "User";
+
+  const avatarUrl =
+    typeof user.avatar === "string" && user.avatar.startsWith("http")
+      ? user.avatar
+      : FALLBACK_AVATAR;
+
+  const coverUrl =
+    typeof user.cover_photo === "string" && user.cover_photo.startsWith("http")
+      ? user.cover_photo
+      : FALLBACK_COVER;
+
+  header.innerHTML = `
+  <section class="m-profile">
+
+    <!-- 🌆 COVER -->
+    <div class="m-profile-cover">
+      <img
+        class="m-profile-cover-img"
+        src="${coverUrl}"
+        alt="Cover"
+      />
+
+      <!-- 👤 AVATAR — 🔑 DOIT ÊTRE DANS LA COVER -->
+      <button
+        id="profile-avatar-btn"
+        class="m-profile-avatar-btn"
+        ${foreignUserId ? "disabled" : ""}
+        aria-label="Change avatar"
+        type="button"
+      >
+        <span class="m-profile-avatar-ring">
+          <img
+            class="m-profile-avatar"
+            src="${avatarUrl}"
+            alt="Avatar"
+          />
+        </span>
+      </button>
+
+      ${!foreignUserId ? `
+        <button
+          id="profile-cover-btn"
+          class="m-profile-cover-btn"
+          type="button"
+        >
+          Change
+        </button>
+      ` : ``}
+    </div>
+
+    <!-- 👤 INFOS -->
+    <div class="m-profile-top">
+      <h1 class="m-profile-name" id="profile-name">
+        ${displayName}
+      </h1>
+
+      <div
+        class="m-profile-mood"
+        id="profile-mood"
+        hidden
+      >
+        <button
+          class="m-profile-mood-btn"
+          id="profile-mood-btn"
+          type="button"
+        >
+          <img
+            class="m-profile-mood-icon"
+            id="profile-mood-icon"
+            alt=""
+          />
+          <span id="profile-mood-text"></span>
+        </button>
+      </div>
+
+      <p
+        class="m-profile-bio"
+        id="profile-bio"
+        ${user.bio ? "" : "hidden"}
+      >
+        ${user.bio || ""}
+      </p>
+    </div>
+
+  </section>
+`;
+
+  /* =========================
+     TODAY MOOD
+  ========================= */
+  const todayFeeling = user.today_feeling || null;
+
+  if (todayFeeling?.title && todayFeeling?.image) {
+    const moodWrap = document.getElementById("profile-mood");
+    const moodText = document.getElementById("profile-mood-text");
+    const moodIcon = document.getElementById("profile-mood-icon");
+
+    moodWrap.hidden = false;
+    moodText.textContent = `I’m feeling ${todayFeeling.title} today`;
+    moodIcon.src = `${CDN}/${todayFeeling.image}`;
+  }
+
+  /* =========================
+     ACTIONS (SECURED)
+  ========================= */
+  actions.innerHTML = "";
+
+  if (!foreignUserId) {
+    if (!todayFeeling) {
+      const btnMood = document.createElement("button");
+      btnMood.className = "m-btn";
+      btnMood.innerHTML = "💫 Add Today’s Mood";
+      btnMood.onclick = () =>
+        console.warn("TODO: open Today Mood selector (web)");
+      actions.appendChild(btnMood);
     }
 
-    const json = await res.json();
+    const btnEdit = document.createElement("button");
+    btnEdit.className = "m-btn m-btn--primary";
+    btnEdit.innerHTML = "✏️ Edit Profile";
+    btnEdit.onclick = () => {
+      window.location.href = "/mobile/settings.html";
+    };
+    actions.appendChild(btnEdit);
+  }
 
+  /* =========================
+     SOCIALS (EXTERNAL ONLY)
+  ========================= */
+  if (socials) socials.innerHTML = "";
+
+  if (foreignUserId && socials) {
+    if (user.facebook_url) {
+      socials.innerHTML += `<button class="m-btn m-btn--facebook" onclick="window.open('${user.facebook_url}','_blank')">Facebook</button>`;
+    }
+    if (user.instagram_username) {
+      const ig = user.instagram_username.replace("@", "");
+      socials.innerHTML += `<button class="m-btn m-btn--instagram" onclick="window.open('https://instagram.com/${ig}','_blank')">Instagram</button>`;
+    }
+    if (user.messenger_url) {
+      socials.innerHTML += `<button class="m-btn m-btn--messenger" onclick="window.open('${user.messenger_url}','_blank')">Messenger</button>`;
+    }
+  }
+
+  /* =========================
+     FEED — LOADING
+  ========================= */
+  feed.innerHTML = `<div style="padding:24px;text-align:center;opacity:.6">Loading posts…</div>`;
+
+  /* =========================
+     POSTS FETCH (APP PARITY)
+  ========================= */
+  const postsUrl = foreignUserId
+    ? `${API_BASE}/api/posts?userId=${foreignUserId}`
+    : `${API_BASE}/api/posts/me`;
+
+  try {
+    const res = await fetch(postsUrl, {
+      headers: foreignUserId
+        ? {}
+        : { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const json  = await res.json();
     const posts = Array.isArray(json)
       ? json
       : json.posts || json.data || [];
 
-    console.log("📦 Profile posts received:", posts.length);
-
     feed.innerHTML = "";
 
     if (!posts.length) {
-      feed.innerHTML = `
-        <div style="padding:24px;text-align:center;opacity:.6">
-          You haven’t posted anything yet.
-        </div>
-      `;
+      feed.innerHTML = `<div style="padding:24px;text-align:center;opacity:.6">No posts yet.</div>`;
       return;
     }
 
@@ -151,24 +272,16 @@ document.addEventListener("DOMContentLoaded", async () => {
           new Date(b.created_time).getTime() -
           new Date(a.created_time).getTime()
       )
-      .forEach((post, index) => {
-        try {
-          const el = window.renderPostItemMobile(post);
-          el.setAttribute("data-post-id", post.id);
-          feed.appendChild(el);
-        } catch (err) {
-          console.warn("⚠️ Failed to render post", index, err);
-        }
+      .forEach((post) => {
+        const el = window.renderPostItemMobile(post);
+        el.setAttribute("data-post-id", post.id);
+        feed.appendChild(el);
       });
 
-    console.log("✅ Profile feed rendered (user-only)");
+    console.log("✅ Profile feed rendered");
 
   } catch (err) {
     console.error("❌ Profile feed error:", err);
-    feed.innerHTML = `
-      <div style="padding:24px;text-align:center;color:#ef4444">
-        Failed to load your posts
-      </div>
-    `;
+    feed.innerHTML = `<div style="padding:24px;text-align:center;color:#ef4444">Failed to load posts</div>`;
   }
 });
