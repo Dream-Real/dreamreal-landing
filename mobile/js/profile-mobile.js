@@ -296,7 +296,7 @@ if (facebookUrl && socials) {
       type="button"
       onclick="window.open('${facebookUrl}', '_blank')"
     >
-      Facebook
+      View Facebook Profile
     </button>
   `;
 }
@@ -309,7 +309,7 @@ if (igUsername && socials) {
       type="button"
       onclick="window.open('https://www.instagram.com/${ig}', '_blank')"
     >
-      Instagram
+      View Instagram Profile
     </button>
   `;
 }
@@ -321,7 +321,7 @@ if (messengerUrl && socials) {
       type="button"
       onclick="window.open('${messengerUrl}', '_blank')"
     >
-      Messenger
+      Message on Messenger
     </button>
   `;
 }
