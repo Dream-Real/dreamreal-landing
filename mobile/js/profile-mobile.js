@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const params        = new URLSearchParams(window.location.search);
   const foreignUserId = params.get("userId"); // null | string
 
+  console.log("🧭 PROFILE ROUTE userId =", foreignUserId);
+
   /* =========================
      DOM TARGETS
   ========================= */
@@ -63,41 +65,23 @@ if (!foreignUserId) {
   const FALLBACK_AVATAR = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
   const FALLBACK_COVER  = `${CDN}/default-cover.jpg`;
 
-  /* =========================
-   EXTERNAL PROFILE (PUBLIC SAFE)
+ /* =========================
+   EXTERNAL PROFILE (PUBLIC — AUTHORITATIVE)
 ========================= */
 if (foreignUserId) {
   try {
-    const res = await fetch(`${API_BASE}/api/posts?userId=${foreignUserId}`);
-    if (!res.ok) throw new Error("Posts fetch failed");
+    const res = await fetch(
+      `${API_BASE}/api/users/public/${encodeURIComponent(foreignUserId)}`
+    );
 
-    const json = await res.json();
-    const posts = Array.isArray(json)
-      ? json
-      : json.posts || json.data || [];
-
-    if (!posts.length) {
-      console.warn("⚠️ No posts for external user");
-      user = null;
-    } else {
-      const p = posts[0];
-
-      user = {
-        id: foreignUserId,
-        first_name: p.user_first_name || "",
-        last_name: p.user_last_name || "",
-        name: p.user?.name || "",
-        avatar: p.user_avatar || p.profile_picture || null,
-        cover_photo: p.cover_photo || null,
-        bio: p.user_bio || "",
-        today_feeling: p.feeling || null,
-        facebook_url: p.facebook_url || null,
-        instagram_username: p.instagram_username || null,
-        messenger_url: p.messenger_url || null,
-      };
-
-      console.log("👤 External profile reconstructed", user);
+    if (!res.ok) {
+      throw new Error(`User fetch failed (${res.status})`);
     }
+
+    user = await res.json();
+
+    console.log("👤 External user loaded (PUBLIC API)", user);
+
   } catch (err) {
     console.error("❌ External profile load failed", err);
     user = null;
@@ -128,9 +112,11 @@ if (!user) {
       : FALLBACK_AVATAR;
 
   const coverUrl =
-    typeof user.cover_photo === "string" && user.cover_photo.startsWith("http")
+  typeof user.cover_photo === "string" && user.cover_photo
+    ? user.cover_photo.startsWith("http")
       ? user.cover_photo
-      : FALLBACK_COVER;
+      : `${CDN}/${user.cover_photo}`
+    : FALLBACK_COVER;
 
   header.innerHTML = `
   <section class="m-profile">
@@ -327,9 +313,14 @@ if (messengerUrl && socials) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const json  = await res.json();
-    const posts = Array.isArray(json)
-      ? json
-      : json.posts || json.data || [];
+    let posts = Array.isArray(json)
+  ? json
+  : json.posts || json.data || [];
+
+      // 🛑 SÉCURITÉ : ne garder QUE les posts du bon user
+if (foreignUserId) {
+  posts = posts.filter(p => String(p.user_id) === String(foreignUserId));
+}
 
     feed.innerHTML = "";
 
@@ -343,17 +334,16 @@ if (messengerUrl && socials) {
       return;
     }
 
-    posts
-      .sort(
-        (a, b) =>
-          new Date(b.created_time).getTime() -
-          new Date(a.created_time).getTime()
-      )
-      .forEach((post) => {
-        const el = window.renderPostItemMobile(post);
-        el.setAttribute("data-post-id", post.id);
-        feed.appendChild(el);
-      });
+    [...posts]
+  .sort((a, b) =>
+    new Date(b.created_time).getTime() -
+    new Date(a.created_time).getTime()
+  )
+  .forEach((post) => {
+    const el = window.renderPostItemMobile(post);
+    el.setAttribute("data-post-id", post.id);
+    feed.appendChild(el);
+  });
 
     console.log("✅ Profile feed rendered");
 

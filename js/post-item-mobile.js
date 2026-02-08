@@ -33,13 +33,33 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
     post.profile_picture ||
     FALLBACK_AVATAR;
 
-    const userId =
-  post.user?.id ||
-  post.user_id ||
-  post.userId ||
-  post.author_id ||
-  post.author?.id ||
+    // ✅ Author-first: on veut l'auteur du post, pas le viewer
+const userId =
+  post.author_id ??
+  post.author?.id ??
+  post.user_id ??
+  post.userId ??
+  post.user?.id ?? // en dernier recours seulement
   null;
+
+  const myUserId = (() => {
+  try {
+    return JSON.parse(localStorage.getItem("user"))?.id ?? null;
+  } catch {
+    return null;
+  }
+})();
+
+console.log("🧪 CLICK DEBUG", {
+  viewerId: JSON.parse(localStorage.getItem("user"))?.id,
+  postAuthorId:
+    post.user?.id ??
+    post.author?.id ??
+    post.user_id ??
+    post.author_id ??
+    null,
+  post,
+});
 
   const location =
   typeof post.location === "string"
@@ -88,9 +108,10 @@ window.renderPostItemMobile = function renderPostItemMobile(post) {
   ----------------------------------------- */
 
 const isProfilePage = document.body.classList.contains("profile-page");
-const profileHref = userId
-  ? `/mobile/profile-mobile.html?userId=${encodeURIComponent(userId)}`
-  : "";
+const profileHref =
+  userId
+    ? `/mobile/profile-mobile.html?userId=${encodeURIComponent(userId)}`
+    : null;
 
   console.log("🧩 isProfilePage =", document.body.classList.contains("profile-page"));
 console.log("🧩 userId =", userId, "post keys:", Object.keys(post || {}), "post.user:", post.user);
@@ -379,33 +400,5 @@ function extractYouTubeId(url) {
     url.match(/[?&]v=([^&]+)/) ||
     url.match(/youtu\.be\/([^?&]+)/);
   return match ? match[1] : null;
-}
-/* =========================================
-   GLOBAL — Username → Profile (HOME ONLY)
-   Anti preventDefault / anti click hijack
-========================================= */
-if (!window.__drUsernameNavBound) {
-  window.__drUsernameNavBound = true;
-
-  document.addEventListener(
-    "click",
-    (e) => {
-      const a = e.target.closest("a.post-username-link");
-      if (!a) return;
-
-      // ❌ pas de navigation depuis une page profile
-      const isProfilePage = document.body.classList.contains("profile-page");
-      if (isProfilePage) return;
-
-      // 🔥 on coupe tout ce qui pourrait voler le clic
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-
-      const href = a.getAttribute("href");
-      if (href) window.location.assign(href);
-    },
-    true // 🔑 CAPTURE = avant tous les autres handlers
-  );
 }
 console.log("🔥 post-item-mobile.js end");
