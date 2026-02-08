@@ -5678,3 +5678,50 @@ body.profile-page main {
 .post-username-link:active {
   opacity: 0.6; /* feedback iOS */
 }
+/* DEBUG: montre si un overlay couvre le header */
+.post-header,
+.post-meta,
+.post-user {
+  position: relative;
+  z-index: 5;
+}
+
+.post-header * {
+  pointer-events: auto;
+}
+
+/* IMPORTANT: si tu as des ::before/::after sur le post, ils doivent être non cliquables */
+.post-header::before,
+.post-header::after,
+.post-item-mobile::before,
+.post-item-mobile::after {
+  pointer-events: none;
+}
+/* 🔥 ERADICATE COVER PLACEHOLDER (Safari/WebKit) */
+.m-profile-cover,
+.m-profile-cover * {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.m-profile-cover::before,
+.m-profile-cover::after,
+.m-profile-cover-img::before,
+.m-profile-cover-img::after {
+  content: none !important;
+  display: none !important;
+}
+/* 🚫 prevent initial paint flash */
+.m-profile-cover-img {
+  opacity: 0;
+}
+
+.m-profile-cover-img[src] {
+  opacity: 1;
+}
+/* 🔑 RESTORE AVATAR RING (explicit opt-in) */
+.m-profile-avatar-ring {
+  background: #fff !important;
+  padding: 4px;
+  border-radius: 9999px;
+}

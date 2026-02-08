@@ -107,9 +107,13 @@ if (!user) {
     "User";
 
   const avatarUrl =
-    typeof user.avatar === "string" && user.avatar.startsWith("http")
-      ? user.avatar
-      : FALLBACK_AVATAR;
+  typeof user.avatar === "string" &&
+  (
+    user.avatar.startsWith("http") ||
+    user.avatar.startsWith("data:image")
+  )
+    ? user.avatar
+    : FALLBACK_AVATAR;
 
   const coverUrl =
   typeof user.cover_photo === "string" && user.cover_photo
@@ -124,10 +128,13 @@ if (!user) {
     <!-- 🌆 COVER -->
     <div class="m-profile-cover">
       <img
-        class="m-profile-cover-img"
-        src="${coverUrl}"
-        alt="Cover"
-      />
+  class="m-profile-cover-img"
+  src=""
+  data-src="${coverUrl}"
+  alt=""
+  draggable="false"
+  style="display:none"
+/>
 
       <!-- 👤 AVATAR — 🔑 DOIT ÊTRE DANS LA COVER -->
       <button
@@ -196,6 +203,36 @@ if (!user) {
 
   </section>
 `;
+
+// ✅ COVER: préload + swap (éradique le placeholder Safari: "cover" + cadre blanc)
+(() => {
+  const coverImg = header.querySelector(".m-profile-cover-img");
+  if (!coverImg) return;
+
+  // cache immédiatement (sans dépendre du CSS)
+  coverImg.style.display = "none";
+
+  const target = coverImg.getAttribute("data-src");
+  if (!target) return;
+
+  const reveal = () => {
+  coverImg.style.display = "block";
+  coverImg.style.opacity = "1";
+};
+
+  const pre = new Image();
+  pre.decoding = "async";
+  pre.onload = () => {
+    coverImg.onload = reveal;      // reveal seulement quand le DOM img a réellement chargé
+    coverImg.src = target;
+  };
+  pre.onerror = () => {
+    // fallback solide si une cover est invalide
+    coverImg.onload = reveal;
+    coverImg.src = FALLBACK_COVER;
+  };
+  pre.src = target;
+})();
 
 /* 🔑 REBIND SOCIALS — MUST BE AFTER header.innerHTML */
 const socials = document.getElementById("profile-socials");
