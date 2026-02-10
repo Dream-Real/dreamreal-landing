@@ -343,6 +343,26 @@ if (filtersBtn && filtersModal) {
 }
 
 /* =========================
+   PROFILE — FILTER SETTERS
+   (HOME PARITY — REQUIRED)
+========================= */
+
+window.setFilterFeeling = function (feeling) {
+  window.FEED_FILTERS.feeling = feeling;
+  window.FEED_FILTERS.activity = null;
+
+  renderProfileFilteredFeed();
+  renderProfileActiveFilters();
+};
+
+window.setFilterActivity = function (activity) {
+  window.FEED_FILTERS.activity = activity;
+
+  renderProfileFilteredFeed();
+  renderProfileActiveFilters();
+};
+
+/* =========================
    PROFILE — FILTERED FEED
    (LOCAL, SAFE)
 ========================= */
@@ -355,6 +375,7 @@ function renderProfileFilteredFeed() {
   if (!feeling && !activity) {
     feed.innerHTML = "";
     window.PROFILE_POSTS.forEach(renderProfilePost);
+    renderProfileActiveFilters(); // 👈 AJOUT ICI
     return;
   }
 
@@ -382,10 +403,93 @@ function renderProfileFilteredFeed() {
   }
 
   filtered.forEach(renderProfilePost);
+  renderProfileActiveFilters(); // 👈 AJOUT ICI
 }
 
-// 🔑 Bridge Home → Profile (OBLIGATOIRE)
-window.renderFilteredFeed = renderProfileFilteredFeed;
+/* =========================
+   PROFILE — ACTIVE FILTERS
+   (HOME PARITY — FIXED)
+========================= */
+function renderProfileActiveFilters() {
+  const container = document.getElementById("active-filters");
+  if (!container) {
+    console.warn("❌ #active-filters not found");
+    return;
+  }
+
+  const { feeling, activity } = window.FEED_FILTERS || {};
+
+  container.innerHTML = "";
+
+  // 🔒 Aucun filtre → cacher (FORCE)
+  if (!feeling && !activity) {
+    container.classList.add("hidden");
+    container.style.display = "none";
+    container.style.height = "0";
+    container.style.padding = "0";
+    return;
+  }
+
+  // ✅ Filtre actif → AFFICHAGE FORCÉ (ANTI-CSS)
+  container.classList.remove("hidden");
+  container.style.display = "flex";
+  container.style.flexWrap = "wrap";
+  container.style.alignItems = "center";
+  container.style.gap = "8px";
+  container.style.padding = "10px 14px";
+  container.style.height = "auto";
+  container.style.minHeight = "44px";
+  container.style.overflow = "visible";
+  container.style.position = "relative";
+  container.style.zIndex = "5";
+
+  // 🔹 FEELING
+  if (feeling) {
+    const pill = document.createElement("div");
+    pill.className = "active-filter-pill feeling";
+    pill.style.display = "inline-flex";
+    pill.style.alignItems = "center";
+    pill.style.gap = "8px";
+
+    pill.innerHTML = `
+      <img src="${CDN}/${feeling.image}" />
+      <span>${feeling.title}</span>
+    `;
+
+    pill.onclick = () => window.clearFilters();
+    container.appendChild(pill);
+  }
+
+  // 🔹 ACTIVITY
+  if (activity) {
+    const pill = document.createElement("div");
+    pill.className = "active-filter-pill activity";
+    pill.style.display = "inline-flex";
+    pill.style.alignItems = "center";
+    pill.style.gap = "8px";
+
+    pill.innerHTML = `
+      <img src="${CDN}/${activity.image}" />
+      <span>${activity.title}</span>
+    `;
+
+    pill.onclick = () => {
+      window.FEED_FILTERS.activity = null;
+      renderProfileFilteredFeed();
+      renderProfileActiveFilters();
+    };
+
+    container.appendChild(pill);
+  }
+
+  console.log("✅ Profile active filters rendered", {
+    feeling: feeling?.title,
+    activity: activity?.title,
+    children: container.children.length,
+    display: getComputedStyle(container).display,
+    height: getComputedStyle(container).height,
+  });
+}
 
 function renderProfilePost(post) {
   const el = window.renderPostItemMobile(post);
@@ -402,7 +506,37 @@ function renderProfilePost(post) {
 window.onFiltersUpdated = function () {
   console.log("🔁 Profile filters updated", window.FEED_FILTERS);
   renderProfileFilteredFeed();
+  renderProfileActiveFilters(); // 👈 AJOUT
 };
+
+/* =========================
+   PROFILE — FINAL FILTERS BRIDGE
+   (ABSOLUTELY REQUIRED)
+========================= */
+
+// 1️⃣ Intercepter les appels Home → renderFilteredFeed
+const originalRenderFilteredFeed = window.renderFilteredFeed;
+
+window.renderFilteredFeed = function () {
+  if (typeof originalRenderFilteredFeed === "function") {
+    originalRenderFilteredFeed();
+  }
+
+  renderProfileFilteredFeed();
+  renderProfileActiveFilters();
+};
+
+// 2️⃣ Intercepter clearFilters (Home logic)
+if (typeof window.clearFilters === "function") {
+  const originalClearFilters = window.clearFilters;
+
+  window.clearFilters = function () {
+    originalClearFilters();
+
+    renderProfileFilteredFeed();
+    renderProfileActiveFilters();
+  };
+}
 
   /* =========================
    TODAY MOOD
@@ -602,6 +736,7 @@ window.PROFILE_POSTS = posts.map(normalizePostForProfile);
 
     // 🔑 RENDU INITIAL (avec filtres)
 renderProfileFilteredFeed();
+renderProfileActiveFilters(); // 👈 AJOUT
 
     console.log("✅ Profile feed rendered");
 

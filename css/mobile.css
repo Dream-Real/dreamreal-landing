@@ -5938,3 +5938,23 @@ body.profile-page main {
   visibility: visible !important;
   pointer-events: auto !important;
 }
+/* =========================================
+   PROFILE — FEED HEADER (FIXED / STICKY)
+   APP PARITY
+========================================= */
+
+.profile-feed-header {
+  position: sticky;
+  top: 0; /* ou ajusté si navbar au-dessus */
+  z-index: 20;
+
+  backdrop-filter: blur(6px);      /* optionnel, joli */
+  
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Sécurité : le feed passe bien en dessous */
+.profile-feed {
+  position: relative;
+  z-index: 1;
+}
