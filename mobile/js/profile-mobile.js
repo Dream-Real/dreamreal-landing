@@ -14,6 +14,36 @@ window.FEED_FILTERS = window.FEED_FILTERS || {
   activity: null,
 };
 
+/* =========================
+   PROFILE — CLEAR FILTERS
+   (HOME PARITY — REQUIRED)
+========================= */
+window.clearFilters = function () {
+  window.FEED_FILTERS.feeling = null;
+  window.FEED_FILTERS.activity = null;
+
+  if (typeof window.onFiltersUpdated === "function") {
+    window.onFiltersUpdated();
+  }
+};
+
+window.setFilterFeeling = function (feeling) {
+  window.FEED_FILTERS.feeling = feeling;
+  window.FEED_FILTERS.activity = null;
+
+  if (typeof window.onFiltersUpdated === "function") {
+    window.onFiltersUpdated();
+  }
+};
+
+window.setFilterActivity = function (activity) {
+  window.FEED_FILTERS.activity = activity;
+
+  if (typeof window.onFiltersUpdated === "function") {
+    window.onFiltersUpdated();
+  }
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
     
     /* =========================
@@ -343,26 +373,6 @@ if (filtersBtn && filtersModal) {
 }
 
 /* =========================
-   PROFILE — FILTER SETTERS
-   (HOME PARITY — REQUIRED)
-========================= */
-
-window.setFilterFeeling = function (feeling) {
-  window.FEED_FILTERS.feeling = feeling;
-  window.FEED_FILTERS.activity = null;
-
-  renderProfileFilteredFeed();
-  renderProfileActiveFilters();
-};
-
-window.setFilterActivity = function (activity) {
-  window.FEED_FILTERS.activity = activity;
-
-  renderProfileFilteredFeed();
-  renderProfileActiveFilters();
-};
-
-/* =========================
    PROFILE — FILTERED FEED
    (LOCAL, SAFE)
 ========================= */
@@ -498,6 +508,26 @@ function renderProfilePost(post) {
 }
 
 /* =========================
+   PROFILE — FILTERS BUTTON STATE
+   (HOME PARITY)
+========================= */
+function updateProfileFiltersButton() {
+  const btn = document.getElementById("profile-filters-btn");
+  if (!btn) return;
+
+  const { feeling, activity } = window.FEED_FILTERS || {};
+  const hasFilters = !!(feeling || activity);
+
+  if (hasFilters) {
+    btn.textContent = "Clear";
+    btn.classList.add("is-clear");
+  } else {
+    btn.textContent = "Filters";
+    btn.classList.remove("is-clear");
+  }
+}
+
+/* =========================
    PROFILE — FILTERS BRIDGE
    (CRITICAL)
 ========================= */
@@ -507,36 +537,8 @@ window.onFiltersUpdated = function () {
   console.log("🔁 Profile filters updated", window.FEED_FILTERS);
   renderProfileFilteredFeed();
   renderProfileActiveFilters(); // 👈 AJOUT
+  updateProfileFiltersButton(); // ✅ AJOUT OBLIGATOIRE
 };
-
-/* =========================
-   PROFILE — FINAL FILTERS BRIDGE
-   (ABSOLUTELY REQUIRED)
-========================= */
-
-// 1️⃣ Intercepter les appels Home → renderFilteredFeed
-const originalRenderFilteredFeed = window.renderFilteredFeed;
-
-window.renderFilteredFeed = function () {
-  if (typeof originalRenderFilteredFeed === "function") {
-    originalRenderFilteredFeed();
-  }
-
-  renderProfileFilteredFeed();
-  renderProfileActiveFilters();
-};
-
-// 2️⃣ Intercepter clearFilters (Home logic)
-if (typeof window.clearFilters === "function") {
-  const originalClearFilters = window.clearFilters;
-
-  window.clearFilters = function () {
-    originalClearFilters();
-
-    renderProfileFilteredFeed();
-    renderProfileActiveFilters();
-  };
-}
 
   /* =========================
    TODAY MOOD
@@ -737,6 +739,7 @@ window.PROFILE_POSTS = posts.map(normalizePostForProfile);
     // 🔑 RENDU INITIAL (avec filtres)
 renderProfileFilteredFeed();
 renderProfileActiveFilters(); // 👈 AJOUT
+updateProfileFiltersButton(); // ✅ AJOUT
 
     console.log("✅ Profile feed rendered");
 

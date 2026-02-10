@@ -5826,10 +5826,11 @@ body.profile-page main {
   opacity: 1;
   pointer-events: auto;
 }
-/* =========================
-   PROFILE — FEED HEADER
-   (APP PARITY)
-========================= */
+/* =========================================
+   PROFILE — FEED HEADER (HOME PARITY — FINAL)
+   ❌ NOT STICKY
+   ❌ NO SCROLL EFFECT
+========================================= */
 
 .profile-feed-header {
   display: flex;
@@ -5838,123 +5839,92 @@ body.profile-page main {
 
   padding: 14px 12px 10px;
 
-  position: sticky;
-  top: 0;
-  z-index: 4;
+  /* 🔑 COMPORTEMENT NORMAL COMME HOME */
+  position: static;
+  top: auto;
+  z-index: auto;
 
   background: transparent;
 }
 
+/* Texte "Posts" */
 .profile-feed-title {
   color: #ffffff;
   font-size: 20px;
   font-weight: 700;
+
+  opacity: 1;
+  visibility: visible;
 }
 
+/* Bouton "Filters" */
 .profile-feed-filters {
   background: none;
   border: 0;
   padding: 0;
 
-  color: #EECD79; /* 🔥 même couleur que l’app */
+  color: #EECD79; /* même couleur que Home */
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0.2px;
 
   cursor: pointer;
+
+  opacity: 1;
+  visibility: visible;
 }
 
 .profile-feed-filters:active {
   opacity: 0.6;
 }
-/* =========================
-   PROFILE — FEED HEADER VISIBILITY FIX
-   (CRITICAL)
-========================= */
+/* =========================================
+   PROFILE — POSTS → ACTIVE FILTERS GAP FIX
+   (GUARANTEED)
+========================================= */
 
 .profile-feed-header {
-  position: relative;     /* sort du stacking context du header */
-  z-index: 10;            /* AU-DESSUS du profile header */
-  opacity: 1 !important;
-  pointer-events: auto;
-}
-
-.profile-feed-title,
-.profile-feed-filters {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-/* =========================
-   PROFILE — FEED HEADER FORCE VISIBILITY
-   (FINAL FIX)
-========================= */
-
-/* Le header de feed DOIT passer AU-DESSUS du profile header */
-.profile-feed-header {
-  position: sticky;
-  top: 0;
-
-  z-index: 20;              /* 🔥 AU-DESSUS de .m-profile (z=4/5) */
-  margin-top: 8px;          /* 🔑 sort du recouvrement */
-  padding-top: 12px;
-
-  background: transparent;
-
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .profile-feed-title {
-  color: #ffffff;
-  opacity: 1 !important;
-  visibility: visible !important;
+  margin-bottom: 0 !important;
+  line-height: 1.05;
+  display: inline-block;
 }
 
-.profile-feed-filters {
-  color: #EECD79 !important; /* 🔥 JAUNE FORCÉ */
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-/* =========================
-   PROFILE — FEED HEADER EXCLUSION
-   (CRITICAL FIX)
-========================= */
-
-/* Le feed header ne doit JAMAIS être neutralisé */
-.profile-feed-header,
-.profile-feed-header * {
-  opacity: 1 !important;
-  visibility: visible !important;
+#active-filters {
+  margin-top: 0 !important;
+  padding-top: 6px;
 }
 /* =========================================
-   PROFILE — FEED FINAL VISIBILITY FIX
-   (AUTHORITATIVE)
+   PROFILE — POSTS → ACTIVE FILTERS → FEED GAP FIX
+   (FINAL, HOME PARITY)
 ========================================= */
 
-.profile-feed,
-.profile-feed * {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-}
-/* =========================================
-   PROFILE — FEED HEADER (FIXED / STICKY)
-   APP PARITY
-========================================= */
-
-.profile-feed-header {
-  position: sticky;
-  top: 0; /* ou ajusté si navbar au-dessus */
-  z-index: 20;
-
-  backdrop-filter: blur(6px);      /* optionnel, joli */
-  
-  padding-top: env(safe-area-inset-top);
+#active-filters {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex;
+  flex-wrap: wrap;
 }
 
-/* Sécurité : le feed passe bien en dessous */
 .profile-feed {
-  position: relative;
-  z-index: 1;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+/* =========================================
+   PROFILE — FIRST POST TOP SPACING
+   (HOME PARITY, TARGETED)
+========================================= */
+
+.profile-feed > :first-child {
+  margin-top: 8px; /* ajuste à 6px / 10px si besoin */
+}
+/* =========================================
+   PROFILE — FILTERS CLEAR (HOME PARITY)
+========================================= */
+
+#profile-filters-btn.is-clear {
+  color: #93C5FD;
 }
