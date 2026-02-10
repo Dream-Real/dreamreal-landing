@@ -196,20 +196,41 @@ if (!user) {
 `;
 
 /* =========================
-   PROFILE — FIRST PAINT REVEAL
+   PROFILE — FIRST PAINT REVEAL (FINAL)
 ========================= */
 requestAnimationFrame(() => {
-  const cover = header.querySelector(".m-profile-cover");
-  const avatar = header.querySelector(".m-profile-avatar-btn");
+  if (!header) return;
 
-  if (cover) {
-    cover.style.opacity = "1";
-    cover.style.pointerEvents = "auto";
+  // Réveille TOUT le header (textes inclus)
+  header.style.opacity = "1";
+  header.style.pointerEvents = "auto";
+
+  // Sécurité ciblée
+  const cover = header.querySelector(".m-profile-cover");
+  if (cover) cover.style.opacity = "1";
+
+  const avatar = header.querySelector(".m-profile-avatar-btn");
+  if (avatar) avatar.style.opacity = "1";
+});
+
+/* =========================
+   PROFILE — FEED VISIBILITY REVEAL
+   (CRITICAL)
+========================= */
+requestAnimationFrame(() => {
+  const feedHeader = document.querySelector(".profile-feed-header");
+  const feedRoot   = document.getElementById("profile-feed");
+
+  if (feedHeader) {
+    feedHeader.style.opacity = "1";
+    feedHeader.style.visibility = "visible";
+    feedHeader.style.pointerEvents = "auto";
   }
 
-  if (avatar) {
-    avatar.style.opacity = "1";
-    avatar.style.pointerEvents = "auto";
+  if (feedRoot) {
+    feedRoot.style.opacity = "1";
+    feedRoot.style.visibility = "visible";
+    feedRoot.style.pointerEvents = "auto";
   }
 });
 
@@ -282,20 +303,53 @@ if (!socials) {
   console.warn("⚠️ profile-socials not found after render");
 }
 
+/* =========================
+   PROFILE — FEED FILTERS (HOOK)
+   Ready, safe, optional
+========================= */
+const filtersBtn = document.getElementById("profile-filters-btn");
+
+if (filtersBtn) {
+  filtersBtn.addEventListener("click", () => {
+    console.log("🧪 Profile filters clicked");
+
+    // TODO (plus tard):
+    // openFiltersDrawer();
+    // openProfileFilters();
+  });
+} else {
+  console.warn("⚠️ profile-filters-btn not found");
+}
+
   /* =========================
-     TODAY MOOD
-  ========================= */
-  const todayFeeling = user.today_feeling || null;
+   TODAY MOOD
+========================= */
+const todayFeeling = user.today_feeling || null;
 
-  if (todayFeeling?.title && todayFeeling?.image) {
-    const moodWrap = document.getElementById("profile-mood");
-    const moodText = document.getElementById("profile-mood-text");
-    const moodIcon = document.getElementById("profile-mood-icon");
+if (todayFeeling?.title && todayFeeling?.image) {
+  const moodWrap = document.getElementById("profile-mood");
+  const moodText = document.getElementById("profile-mood-text");
+  const moodIcon = document.getElementById("profile-mood-icon");
 
-    moodWrap.hidden = false;
-    moodText.textContent = `I’m feeling ${todayFeeling.title} today`;
-    moodIcon.src = `${CDN}/${todayFeeling.image}`;
-  }
+  moodWrap.hidden = false;
+
+  // reset propre
+  moodText.textContent = "";
+
+  // Texte AVANT emoji
+  moodText.append("I’m feeling ");
+
+  // Emoji inline, aligné visuellement
+  moodIcon.src = `${CDN}/${todayFeeling.image}`;
+  moodIcon.alt = "";
+  moodIcon.setAttribute("aria-hidden", "true");
+  moodIcon.style.verticalAlign = "-0.15em";
+
+  moodText.appendChild(moodIcon);
+
+  // Texte APRÈS emoji
+  moodText.append(` ${todayFeeling.title} today`);
+}
 
   /* =========================
      ACTIONS (SECURED)

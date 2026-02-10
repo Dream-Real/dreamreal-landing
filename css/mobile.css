@@ -5503,7 +5503,7 @@ button {
   background: transparent;
   color: #fff;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .m-profile-mood-icon {
@@ -5760,4 +5760,181 @@ body.profile-page main {
 /* 🔒 COVER CHANGE — HIDDEN BY DEFAULT */
 .m-profile-cover-btn {
   display: none; /* 🔑 empêche tout flash */
+}
+/* 🔒 OWNER-ONLY UI — hidden by default (ANTI-FLASH) */
+.m-profile-cover-label,
+.m-profile-avatar-ring::after,
+.m-profile-avatar-ring::before {
+  display: none;
+}
+/* =========================================
+   PROFILE — EXTERNAL ANTI-FLASH (CRITICAL)
+========================================= */
+
+/* 1️⃣ Empêche la bulle opaque cover (pseudo-éléments) */
+.m-profile-cover::before,
+.m-profile-cover::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* 2️⃣ Empêche le flash du ring / bouton avatar */
+.m-profile-avatar-btn,
+.m-profile-avatar-ring {
+  visibility: hidden; /* 🔑 pas display:none → pas de shift */
+}
+/* =========================================
+   PROFILE — FIRST PAINT NEUTRALIZATION
+   (CRITICAL – DO NOT TOUCH)
+========================================= */
+
+/* neutralise les artefacts AVANT JS */
+.m-profile-cover,
+.m-profile-avatar-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+.m-btn--messenger {
+  background: linear-gradient(135deg, #00B2FF, #006AFF, #A033FF);
+  border-radius: 6px;
+
+  overflow: hidden;          /* 🔑 CLIP le gradient */
+  background-clip: padding-box; /* 🔑 Safari / iOS fix */
+}
+.m-btn {
+  box-sizing: border-box;
+}
+/* =========================
+   PROFILE — AVATAR FINAL REVEAL
+   (AFTER FIRST PAINT)
+========================= */
+
+/* Avatar visible par défaut */
+.m-profile-avatar-btn {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Ring visible */
+.m-profile-avatar-ring {
+  visibility: visible;
+}
+
+/* Cover visible */
+.m-profile-cover {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* =========================
+   PROFILE — FEED HEADER
+   (APP PARITY)
+========================= */
+
+.profile-feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 12px 10px;
+
+  position: sticky;
+  top: 0;
+  z-index: 4;
+
+  background: transparent;
+}
+
+.profile-feed-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profile-feed-filters {
+  background: none;
+  border: 0;
+  padding: 0;
+
+  color: #EECD79; /* 🔥 même couleur que l’app */
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+}
+
+.profile-feed-filters:active {
+  opacity: 0.6;
+}
+/* =========================
+   PROFILE — FEED HEADER VISIBILITY FIX
+   (CRITICAL)
+========================= */
+
+.profile-feed-header {
+  position: relative;     /* sort du stacking context du header */
+  z-index: 10;            /* AU-DESSUS du profile header */
+  opacity: 1 !important;
+  pointer-events: auto;
+}
+
+.profile-feed-title,
+.profile-feed-filters {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+/* =========================
+   PROFILE — FEED HEADER FORCE VISIBILITY
+   (FINAL FIX)
+========================= */
+
+/* Le header de feed DOIT passer AU-DESSUS du profile header */
+.profile-feed-header {
+  position: sticky;
+  top: 0;
+
+  z-index: 20;              /* 🔥 AU-DESSUS de .m-profile (z=4/5) */
+  margin-top: 8px;          /* 🔑 sort du recouvrement */
+  padding-top: 12px;
+
+  background: transparent;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.profile-feed-title {
+  color: #ffffff;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.profile-feed-filters {
+  color: #EECD79 !important; /* 🔥 JAUNE FORCÉ */
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+/* =========================
+   PROFILE — FEED HEADER EXCLUSION
+   (CRITICAL FIX)
+========================= */
+
+/* Le feed header ne doit JAMAIS être neutralisé */
+.profile-feed-header,
+.profile-feed-header * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+/* =========================================
+   PROFILE — FEED FINAL VISIBILITY FIX
+   (AUTHORITATIVE)
+========================================= */
+
+.profile-feed,
+.profile-feed * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
