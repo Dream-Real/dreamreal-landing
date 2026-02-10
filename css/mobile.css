@@ -5587,10 +5587,18 @@ button {
   outline: none;
 }
 
-/* forcer le clipping circulaire */
+/* 🔑 AVATAR RING — APP PARITY (FINAL) */
 .m-profile-avatar-ring {
-  overflow: hidden;
+  width: 140px;
+  height: 140px;
+
   border-radius: 50%;
+  border: 4px solid #ffffff; /* 🎯 épaisseur maîtrisée */
+
+  background: transparent !important;
+  padding: 0;               /* 🚫 PAS DE PADDING */
+
+  overflow: hidden;
 }
 
 /* image 100% circulaire */
@@ -5698,10 +5706,13 @@ body.profile-page main {
   pointer-events: none;
 }
 /* 🔥 ERADICATE COVER PLACEHOLDER (Safari/WebKit) */
-.m-profile-cover,
-.m-profile-cover * {
-  background: transparent !important;
-  border: 0 !important;
+/* 🔥 ERADICATE COVER PLACEHOLDER (SAFE) */
+.m-profile-cover::before,
+.m-profile-cover::after,
+.m-profile-cover-img::before,
+.m-profile-cover-img::after {
+  content: none !important;
+  display: none !important;
 }
 
 .m-profile-cover::before,
@@ -5719,9 +5730,34 @@ body.profile-page main {
 .m-profile-cover-img[src] {
   opacity: 1;
 }
-/* 🔑 RESTORE AVATAR RING (explicit opt-in) */
-.m-profile-avatar-ring {
-  background: #fff !important;
-  padding: 4px;
-  border-radius: 9999px;
+
+/* =========================
+   PROFILE — COVER TEXT LABEL
+========================= */
+
+.m-profile-cover-label {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+
+  padding: 6px 12px;
+  border-radius: 6px;
+
+  background: rgba(0, 0, 0, 0.45); /* 🔑 rectangle restauré */
+  backdrop-filter: blur(6px);     /* 🔥 iOS vibe */
+  -webkit-backdrop-filter: blur(6px);
+
+  z-index: 6;
+}
+
+.m-profile-cover-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+/* 🔒 COVER CHANGE — HIDDEN BY DEFAULT */
+.m-profile-cover-btn {
+  display: none; /* 🔑 empêche tout flash */
 }

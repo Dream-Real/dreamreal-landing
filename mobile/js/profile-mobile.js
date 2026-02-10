@@ -153,15 +153,6 @@ if (!user) {
         </span>
       </button>
 
-      ${!foreignUserId ? `
-        <button
-          id="profile-cover-btn"
-          class="m-profile-cover-btn"
-          type="button"
-        >
-          Change
-        </button>
-      ` : ``}
     </div>
 
     <!-- 👤 INFOS -->
@@ -203,6 +194,56 @@ if (!user) {
 
   </section>
 `;
+
+/* =========================
+   PROFILE — FIRST PAINT REVEAL
+========================= */
+requestAnimationFrame(() => {
+  const cover = header.querySelector(".m-profile-cover");
+  const avatar = header.querySelector(".m-profile-avatar-btn");
+
+  if (cover) {
+    cover.style.opacity = "1";
+    cover.style.pointerEvents = "auto";
+  }
+
+  if (avatar) {
+    avatar.style.opacity = "1";
+    avatar.style.pointerEvents = "auto";
+  }
+});
+
+/* =========================
+   COVER CHANGE BUTTON (OWN PROFILE ONLY)
+   🔒 Anti-flash, app parity
+========================= */
+if (!foreignUserId) {
+  const cover = header.querySelector(".m-profile-cover");
+
+  if (cover) {
+    const btn = document.createElement("button");
+    btn.id = "profile-cover-btn";
+    btn.className = "m-profile-cover-btn";
+    btn.type = "button";
+    btn.textContent = "Change";
+
+    // sécurité anti-flash (même si CSS régressait)
+    btn.style.display = "inline-flex";
+
+    cover.appendChild(btn);
+  }
+}
+
+/* =========================
+   OWNER-ONLY UI — SAFE REVEAL
+========================= */
+if (!foreignUserId) {
+  const avatarBtn = header.querySelector("#profile-avatar-btn");
+  if (avatarBtn) avatarBtn.style.visibility = "visible";
+
+  const avatarRing = header.querySelector(".m-profile-avatar-ring");
+  if (avatarRing) avatarRing.style.visibility = "visible";
+}
 
 // ✅ COVER: préload + swap (éradique le placeholder Safari: "cover" + cadre blanc)
 (() => {
