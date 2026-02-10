@@ -109,7 +109,12 @@ const grid = sheet.querySelector(".filters-grid");
     `;
 
     pill.onclick = () => {
-  // ❌ pas de commit ici
+  // ✅ COMMIT DU FEELING (CRITIQUE POUR PROFILE)
+  if (typeof window.setFilterFeeling === "function") {
+    window.setFilterFeeling(feeling);
+  }
+
+  // 👉 Ensuite navigation vers les activités
   renderMobileActivities(feeling.id, feeling);
 };
 
@@ -293,11 +298,10 @@ if (typeof window.initMobileMap === "function") {
   normalizedPosts.map(p => p.feeling)
 );
 
-      renderLookingFor(normalizedPosts);
+    renderLookingFor(normalizedPosts);
 
-    renderFeed(normalizedPosts);
-    renderActiveFilters(); // ✅ OBLIGATOIRE
-    updateFiltersButton(); // ✅ OBLIGATOIRE
+// 🔑 RENDU UNIQUE DU FEED (PARITÉ DESKTOP)
+window.renderFilteredFeed();
 
   } catch (err) {
     console.error("❌ Feed fetch error:", err);
@@ -649,6 +653,7 @@ window.renderFilteredFeed = function () {
   if (!feeling && !activity) {
     renderFeed(window.FEED_POSTS);
     renderActiveFilters();
+    updateFiltersButton(); // ✅ AJOUT ICI
     return;
   }
 

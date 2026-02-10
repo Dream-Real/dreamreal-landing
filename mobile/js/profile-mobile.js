@@ -5,6 +5,15 @@
 
 console.log("👤 profile-mobile.js LOADED");
 
+// =========================================
+// FILTERS STATE — PROFILE (MOBILE)
+// SOURCE UNIQUE (HOME PARITY)
+// =========================================
+window.FEED_FILTERS = window.FEED_FILTERS || {
+  feeling: null,
+  activity: null,
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
     
     /* =========================
@@ -304,22 +313,96 @@ if (!socials) {
 }
 
 /* =========================
-   PROFILE — FEED FILTERS (HOOK)
-   Ready, safe, optional
+   PROFILE — FEED FILTERS (HOME PARITY)
+   🔑 reuse existing mobile filters logic
 ========================= */
-const filtersBtn = document.getElementById("profile-filters-btn");
+const filtersBtn   = document.getElementById("profile-filters-btn");
+const filtersModal = document.getElementById("filters-modal");
 
-if (filtersBtn) {
+if (filtersBtn && filtersModal) {
   filtersBtn.addEventListener("click", () => {
-    console.log("🧪 Profile filters clicked");
+    const { feeling, activity } = window.FEED_FILTERS || {};
 
-    // TODO (plus tard):
-    // openFiltersDrawer();
-    // openProfileFilters();
+    // 🔁 MODE CLEAR (exactement comme HOME)
+    if (feeling || activity) {
+      window.clearFilters();
+      return;
+    }
+
+    // 🔓 OUVERTURE DE LA MODALE FILTERS (HOME LOGIC)
+    filtersModal.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    // ⏳ attendre le repaint avant injection (pixel-perfect)
+    requestAnimationFrame(() => {
+      renderMobileFeelings();
+    });
   });
 } else {
-  console.warn("⚠️ profile-filters-btn not found");
+  console.warn("⚠️ profile-filters-btn or filters-modal not found");
 }
+
+/* =========================
+   PROFILE — FILTERED FEED
+   (LOCAL, SAFE)
+========================= */
+function renderProfileFilteredFeed() {
+  if (!Array.isArray(window.PROFILE_POSTS)) return;
+
+  const { feeling, activity } = window.FEED_FILTERS || {};
+
+  // 🔹 Aucun filtre → feed complet
+  if (!feeling && !activity) {
+    feed.innerHTML = "";
+    window.PROFILE_POSTS.forEach(renderProfilePost);
+    return;
+  }
+
+  const filtered = window.PROFILE_POSTS.filter((post) => {
+    if ((feeling || activity) && !post.feeling) return false;
+
+    const matchFeeling =
+      !feeling || post.feeling?.title === feeling.title;
+
+    const matchActivity =
+      !activity || post.activity?.title === activity.title;
+
+    return matchFeeling && matchActivity;
+  });
+
+  feed.innerHTML = "";
+
+  if (!filtered.length) {
+    feed.innerHTML = `
+      <div style="padding:24px;text-align:center;opacity:.6">
+        No posts match these filters
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(renderProfilePost);
+}
+
+// 🔑 Bridge Home → Profile (OBLIGATOIRE)
+window.renderFilteredFeed = renderProfileFilteredFeed;
+
+function renderProfilePost(post) {
+  const el = window.renderPostItemMobile(post);
+  el.setAttribute("data-post-id", post.id);
+  feed.appendChild(el);
+}
+
+/* =========================
+   PROFILE — FILTERS BRIDGE
+   (CRITICAL)
+========================= */
+
+// 🔁 Appelé automatiquement quand les filtres changent (Home logic)
+window.onFiltersUpdated = function () {
+  console.log("🔁 Profile filters updated", window.FEED_FILTERS);
+  renderProfileFilteredFeed();
+};
 
   /* =========================
    TODAY MOOD
@@ -426,6 +509,54 @@ if (messengerUrl && socials) {
   ========================= */
   feed.innerHTML = `<div style="padding:24px;text-align:center;opacity:.6">Loading posts…</div>`;
 
+  function normalizePostForProfile(post) {
+  return {
+    id: post.id,
+
+    user_id:
+      post.user?.id ||
+      post.user_id ||
+      post.author_id ||
+      null,
+
+    user_first_name: post.user_first_name || "",
+    user_last_name: post.user_last_name || "",
+    user_avatar:
+      post.user_avatar ||
+      post.profile_picture ||
+      "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+
+    message: post.message || "",
+
+    localLocation: post.localLocation || post.location || null,
+
+    // 🔑 CRITIQUE POUR LES FILTRES
+    feeling: post.feeling || null,
+    activity: post.activity || null,
+
+    youtube_url: post.youtube_url || null,
+    youtube_thumbnail: post.youtube_thumbnail || null,
+    video_url: post.video_url || null,
+
+    link_preview: post.link_preview || null,
+
+    multiple_images:
+      Array.isArray(post.multiple_images) && post.multiple_images.length
+        ? post.multiple_images
+        : null,
+
+    full_picture: post.full_picture || null,
+
+    reactions_summary: post.reactions_summary || "👍",
+    reactions_count: post.reactions_count || 0,
+    comments_count: post.comments_count || 0,
+
+    permalink_url: post.permalink_url || null,
+
+    created_time: post.created_time,
+  };
+}
+
   /* =========================
      POSTS FETCH (APP PARITY)
   ========================= */
@@ -449,10 +580,13 @@ if (messengerUrl && socials) {
   ? json
   : json.posts || json.data || [];
 
-      // 🛑 SÉCURITÉ : ne garder QUE les posts du bon user
+// 🛑 SÉCURITÉ : ne garder QUE les posts du bon user
 if (foreignUserId) {
   posts = posts.filter(p => String(p.user_id) === String(foreignUserId));
 }
+
+// 🔑 SOURCE PROFILE — NORMALISÉE (OBLIGATOIRE)
+window.PROFILE_POSTS = posts.map(normalizePostForProfile);
 
     feed.innerHTML = "";
 
@@ -466,16 +600,8 @@ if (foreignUserId) {
       return;
     }
 
-    [...posts]
-  .sort((a, b) =>
-    new Date(b.created_time).getTime() -
-    new Date(a.created_time).getTime()
-  )
-  .forEach((post) => {
-    const el = window.renderPostItemMobile(post);
-    el.setAttribute("data-post-id", post.id);
-    feed.appendChild(el);
-  });
+    // 🔑 RENDU INITIAL (avec filtres)
+renderProfileFilteredFeed();
 
     console.log("✅ Profile feed rendered");
 

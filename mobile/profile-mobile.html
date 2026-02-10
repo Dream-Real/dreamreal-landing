@@ -125,6 +125,15 @@ aria-hidden="true"
     <div id="create-post-root"></div>
 
     <!-- =========================
+     FILTER MODAL (REQUIRED)
+========================= -->
+<div class="filters-modal" id="filters-modal" hidden>
+  <div class="filters-sheet">
+    <!-- content injected by renderMobileFeelings() -->
+  </div>
+</div>
+
+    <!-- =========================
          SCRIPTS — ORDER MATTERS
     ========================== -->
 
@@ -137,6 +146,8 @@ aria-hidden="true"
 
     <!-- POST RENDERER (MOBILE) -->
     <script src="/js/post-item-mobile.js"></script>
+
+    <script src="/js/mobile.js"></script>
 
     <!-- CREATE POST (SHARED) -->
     <script src="/components/js/create-post.js"></script>
