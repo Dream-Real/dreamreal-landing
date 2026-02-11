@@ -5928,3 +5928,437 @@ body.profile-page main {
 #profile-filters-btn.is-clear {
   color: #93C5FD;
 }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: linear-gradient(#0B1120, #2A2D59, #5C3B84);
+  color: white;
+}
+
+.settings-root {
+  padding: 16px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-header h1 {
+  font-size: 26px;
+}
+
+.back-btn {
+  font-size: 22px;
+  background: none;
+  color: white;
+  border: none;
+}
+
+.avatar-section {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.avatar-section img {
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+}
+
+.link-btn {
+  color: #93C5FD;
+  background: none;
+  border: none;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+h2 {
+  color: #9CA3AF;
+  margin-top: 32px;
+}
+
+.row {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.logout {
+  margin-top: 48px;
+  padding: 14px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  color: white;
+  border-radius: 10px;
+}
+
+/* MODAL */
+#edit-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #2A2D59;
+  padding: 16px;
+  border-radius: 12px;
+  width: 90%;
+}
+
+.modal input {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  color: white;
+  background: #1E1F44;
+  border: none;
+  border-radius: 8px;
+}
+
+.actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 16px;
+}
+/* =========================================
+   SETTINGS — MOBILE (APP PARITY PATCH)
+========================================= */
+
+/* Page wrapper */
+.mobile-page {
+  min-height: 100vh;
+  background: linear-gradient(#0B1120, #2A2D59, #5C3B84);
+}
+
+/* Header */
+.mobile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.mobile-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Icon back */
+.icon-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Content */
+.mobile-content {
+  padding: 16px;
+}
+
+/* Avatar */
+.settings-avatar {
+  text-align: center;
+  margin: 24px 0 12px;
+}
+
+.settings-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+  object-fit: cover;
+}
+
+/* Cover */
+.settings-cover {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Link buttons (Edit / Change) */
+.link-btn {
+  color: #93C5FD;
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Section titles */
+.settings-section {
+  color: #9CA3AF;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 28px 0 6px;
+}
+
+/* Rows */
+.settings-row {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.settings-row .label {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.settings-row .value {
+  font-size: 18px;
+  color: #9CA3AF;
+  max-width: 60%;
+  text-align: right;
+}
+
+.settings-row .value.multiline {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Logout */
+.logout-btn {
+  margin-top: 64px;
+  width: 100%;
+  padding: 14px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: white;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+/* =========================
+   SETTINGS — HEADER FIX
+   (TEXT JUST AFTER BACK ARROW)
+========================= */
+
+.mobile-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+}
+
+/* Flèche */
+.icon-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Titre : collé à droite de la flèche */
+.mobile-title {
+  margin: 0 0 0 12px;   /* 🔑 DÉCALAGE EXPLICITE */
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* =========================================
+   SETTINGS — AVATAR BLOCK (APP PARITY)
+========================================= */
+
+.settings-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-top: 20px;
+  margin-bottom: 28px; /* 🔑 espace AVANT la cover / suite */
+}
+
+.settings-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+  object-fit: cover;
+
+  margin-bottom: 16px; /* 🔑 espace GARANTI sous l’avatar */
+}
+
+.settings-avatar .link-btn {
+  line-height: 1;
+  padding: 0;
+}
+/* =========================================
+   SETTINGS — AVATAR / COVER SPACING TUNING
+   (FINAL APP PARITY)
+========================================= */
+
+/* Avatar block */
+.settings-avatar img {
+  margin-bottom: 20px; /* ⬇️ descend "Edit avatar" */
+}
+
+/* Bouton Edit avatar */
+.settings-avatar .link-btn {
+  margin-bottom: 8px; /* espace contrôlé avant la cover */
+}
+
+/* Cover block */
+.settings-cover {
+  margin-top: 4px;    /* ⬆️ remonte "Change cover photo" */
+  margin-bottom: 20px;
+}
+/* =========================================
+   SETTINGS — AVATAR / COVER SPACING
+   (AUTHORITATIVE FIX)
+========================================= */
+
+.settings-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;              /* 🔑 ESPACEMENT RÉEL */
+  margin-top: 12px;
+  margin-bottom: 20px;
+}
+
+/* Avatar image */
+.settings-avatar img {
+  display: block;         /* 🔑 CRITIQUE */
+  width: 120px;
+  height: 120px;
+  border-radius: 60px;
+  object-fit: cover;
+}
+
+/* Bouton Edit avatar */
+.settings-avatar .link-btn {
+  margin: 0;              /* on neutralise les hacks précédents */
+}
+
+/* Cover button — remonté visuellement */
+.settings-cover {
+  margin-top: 4px;        /* ⬆️ */
+  margin-bottom: 20px;
+}
+/* =========================================
+   SETTINGS — SECTION TITLES SPACING
+   (TIGHTER, APP PARITY)
+========================================= */
+
+.settings-section {
+  margin-top: 24px;     /* on garde l’espace AVANT */
+  margin-bottom: Opx;   /* 🔑 RÉDUCTION ICI (au lieu de 6–12px) */
+  line-height: 1.2;
+}
+/* =========================================
+   SETTINGS — HIDE SCROLLBAR (SAFE)
+========================================= */
+
+.mobile-page {
+  -ms-overflow-style: none;  /* IE / Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.mobile-page::-webkit-scrollbar {
+  display: none;             /* Chrome / Safari */
+}
+.mobile-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.mobile-content::-webkit-scrollbar {
+  display: none;
+}
+/* =====================================================
+   SETTINGS — SCOPE ISOLATION (CRITICAL FIX)
+   Prevents CSS leak to Home / Feed
+===================================================== */
+
+/* Titres Settings UNIQUEMENT */
+.settings-page .settings-section {
+  color: #9CA3AF;
+}
+
+/* ⛔️ NE JAMAIS styler h2 globalement */
+.settings-page h2 {
+  color: #9CA3AF;
+}
+
+/* Header Settings UNIQUEMENT */
+.settings-page .mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px;
+}
+
+/* Bouton back Settings UNIQUEMENT */
+.settings-page .icon-btn {
+  font-size: 22px;
+  padding: 0;
+}
+
+/* Titre Settings UNIQUEMENT */
+.settings-page .mobile-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+}
+/* SETTINGS ONLY — HARD SCOPE */
+body.settings-page h2 {
+  color: #9CA3AF;
+}
+
+body.settings-page .mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 16px;
+}
+
+body.settings-page .icon-btn {
+  font-size: 22px;
+  padding: 0;
+}
+
+body.settings-page .mobile-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+}
+/* =========================================
+   HOME — FORCE TITLE COLOR (OVERRIDE FINAL)
+   This MUST win against any leaked rule
+========================================= */
+
+body:not(.settings-page) h2 {
+  color: #ffffff !important;
+}

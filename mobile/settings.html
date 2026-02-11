@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+
+    <title>Dream Real — Settings</title>
+
+    <meta name="theme-color" content="#0B1120" />
+
+    <!-- FONT (APP PARITY) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Suez+One&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- MOBILE BASE CSS -->
+    <link rel="stylesheet" href="/css/mobile.css" />
+  </head>
+
+  <body class="mobile-page settings-page">
+
+    <!-- HEADER -->
+    <header class="mobile-header">
+      <button class="icon-btn" onclick="history.back()">←</button>
+      <h1 class="mobile-title">Settings</h1>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="mobile-content">
+
+      <!-- AVATAR -->
+      <section class="settings-avatar">
+        <img
+          id="settings-avatar"
+          src=""
+          alt="Avatar"
+        />
+        <button
+          id="settings-edit-avatar"
+          class="link-btn"
+          type="button"
+        >
+          Edit avatar
+        </button>
+      </section>
+
+      <!-- COVER -->
+      <section class="settings-cover">
+        <button
+          id="settings-edit-cover"
+          class="link-btn"
+          type="button"
+        >
+          Change cover photo
+        </button>
+      </section>
+
+      <!-- PROFILE -->
+      <h2 class="settings-section">Profile</h2>
+
+      <div class="settings-row" id="edit-name">
+        <span class="label">Name</span>
+        <span class="value" id="settings-name">—</span>
+      </div>
+
+      <div class="settings-row" id="edit-bio">
+        <span class="label">Bio</span>
+        <span class="value multiline" id="settings-bio">—</span>
+      </div>
+
+      <!-- SOCIAL -->
+      <h2 class="settings-section">Social links</h2>
+
+      <div class="settings-row" id="edit-instagram">
+        <span class="label">Instagram</span>
+        <span class="value" id="settings-instagram">—</span>
+      </div>
+
+      <div class="settings-row" id="edit-facebook">
+        <span class="label">Facebook</span>
+        <span class="value" id="settings-facebook">—</span>
+      </div>
+
+      <div class="settings-row" id="edit-messenger">
+        <span class="label">Messenger</span>
+        <span class="value" id="settings-messenger">—</span>
+      </div>
+
+      <!-- LOGOUT -->
+      <button
+        id="settings-logout"
+        class="logout-btn"
+        type="button"
+      >
+        Log out
+      </button>
+
+    </main>
+
+    <!-- SETTINGS LOGIC -->
+    <script src="/mobile/js/settings.js"></script>
+
+    <!-- EDIT MODAL (APP PARITY) -->
+    <div id="edit-modal" hidden>
+      <div class="modal">
+        <h3 id="modal-title"></h3>
+
+        <input
+          id="modal-input"
+          type="text"
+          placeholder=""
+          autocomplete="off"
+        />
+
+        <div class="actions">
+          <button id="modal-cancel" type="button">Cancel</button>
+          <button id="modal-save" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
