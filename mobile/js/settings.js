@@ -7,19 +7,18 @@
 console.log("⚙️ settings.js LOADED");
 
 /* ---------------------------------------------------------
-   API helpers (same logic as mobile)
+   API helpers — HARD FIX
 --------------------------------------------------------- */
-const RAW_API_BASE = window.API_BASE || window.API_URL || "";
-const API_BASE = RAW_API_BASE.replace(/\/$/, "");
+const API_BASE = "https://dreamreal-api.onrender.com";
 
 function apiUrl(path) {
-  return API_BASE.endsWith("/api")
-    ? `${API_BASE}${path}`
-    : `${API_BASE}/api${path}`;
+  return `${API_BASE}/api${path}`;
 }
 
+console.log("🚀 SETTINGS FORCE API =", API_BASE);
+
 /* ---------------------------------------------------------
-   STATE (EXACT APP MENTAL MODEL)
+   STATE
 --------------------------------------------------------- */
 let profile = null;
 let editingField = null;
@@ -42,9 +41,13 @@ if (!token) {
 --------------------------------------------------------- */
 async function loadProfile() {
   try {
+    console.log("📡 Calling /users/me...");
+
     const res = await fetch(apiUrl("/users/me"), {
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    console.log("📡 Response status:", res.status);
 
     if (!res.ok) throw new Error("Profile fetch failed");
 
@@ -58,24 +61,73 @@ async function loadProfile() {
 }
 
 /* ---------------------------------------------------------
-   RENDER
+   RENDER + BINDINGS (🔑 KEY FIX)
 --------------------------------------------------------- */
 function renderProfile() {
-  if (!profile) return;
+  console.log("🔥 renderProfile called", profile);
 
-  $("settings-avatar").src =
-    profile.avatar ||
-    "https://dreamreal-images.s3.eu-west-3.amazonaws.com/avatar-placeholder.png";
+  if (!profile) {
+    console.log("❌ profile is null");
+    return;
+  }
+
+  const avatar = $("settings-avatar");
+
+if (avatar) {
+  const fallback =
+    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+
+  avatar.src =
+    profile.avatar && profile.avatar.trim()
+      ? profile.avatar
+      : fallback;
+
+  avatar.onerror = () => {
+    avatar.src = fallback;
+  };
+}
 
   setText("settings-name", getDisplayName(profile));
   setText("settings-bio", profile.bio || "—");
   setText("settings-instagram", profile.instagram_username || "—");
   setText("settings-facebook", profile.facebook_url || "—");
   setText("settings-messenger", profile.messenger_url || "—");
+
+  /* 🔑 CLICK BINDINGS — AFTER PROFILE EXISTS (APP PARITY) */
+  $("edit-name").onclick = () =>
+    openEdit("name", "Name", getDisplayName(profile), "Your name");
+
+  $("edit-bio").onclick = () =>
+    openEdit("bio", "Bio", profile.bio || "", "Your bio");
+
+  $("edit-instagram").onclick = () =>
+    openEdit(
+      "instagram",
+      "Instagram",
+      profile.instagram_username || "",
+      "@username"
+    );
+
+  $("edit-facebook").onclick = () =>
+    openEdit(
+      "facebook",
+      "Facebook",
+      profile.facebook_url || "",
+      "Facebook URL"
+    );
+
+  $("edit-messenger").onclick = () =>
+    openEdit(
+      "messenger",
+      "Messenger",
+      profile.messenger_url || "",
+      "Messenger link"
+    );
 }
 
 function setText(id, value) {
-  if ($(id)) $(id).textContent = value;
+  const el = $(id);
+  if (el) el.textContent = value;
 }
 
 function getDisplayName(p) {
@@ -107,7 +159,7 @@ async function saveProfilePatch(patch) {
 }
 
 /* ---------------------------------------------------------
-   SAVE SOCIAL LINKS (EXACT APP LOGIC)
+   SAVE SOCIAL LINKS
 --------------------------------------------------------- */
 async function saveSocial(field, value) {
   const clean = value.trim();
@@ -147,7 +199,7 @@ async function saveSocial(field, value) {
 }
 
 /* ---------------------------------------------------------
-   IMAGE UPLOAD (AVATAR / COVER)
+   IMAGE UPLOAD
 --------------------------------------------------------- */
 async function uploadAndSaveImage(field) {
   const input = document.createElement("input");
@@ -179,29 +231,41 @@ async function uploadAndSaveImage(field) {
 }
 
 /* ---------------------------------------------------------
-   INLINE EDIT MODAL (EXACT APP PARITY)
+   EDIT MODAL
 --------------------------------------------------------- */
 function openEdit(field, title, value, placeholder) {
   editingField = field;
 
-  $("edit-title").textContent = title;
-  $("edit-input").value = value || "";
-  $("edit-input").placeholder = placeholder || "";
+  const modal = $("edit-modal");
+  const titleEl = $("modal-title");
+  const input = $("modal-input");
 
-  $("edit-modal").hidden = false;
+  if (!modal || !titleEl || !input) return;
+
+  titleEl.textContent = title;
+  input.value = value || "";
+  input.placeholder = placeholder || "";
+
+  modal.hidden = false;
   document.body.style.overflow = "hidden";
 
-  setTimeout(() => $("edit-input").focus(), 0);
+  requestAnimationFrame(() => input.focus());
 }
 
 function closeEdit() {
   editingField = null;
-  $("edit-modal").hidden = true;
+  const modal = $("edit-modal");
+  if (modal) modal.hidden = true;
   document.body.style.overflow = "";
 }
 
 async function saveEdit() {
-  const value = $("edit-input").value;
+  if (!editingField) return;
+
+  const input = $("modal-input");
+  if (!input) return;
+
+  const value = input.value;
 
   if (editingField === "name") {
     const [first_name, ...rest] = value.trim().split(" ");
@@ -235,48 +299,29 @@ function logout() {
 }
 
 /* ---------------------------------------------------------
-   BIND UI (NO PROMPT — APP PARITY)
+   INIT
 --------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
+  const modal = $("edit-modal");
+  if (modal) modal.hidden = true;
+
   loadProfile();
 
-  $("settings-edit-avatar").onclick = () =>
-    uploadAndSaveImage("avatar");
-  $("settings-edit-cover").onclick = () =>
-    uploadAndSaveImage("cover_photo");
+  $("settings-edit-avatar")?.addEventListener("click", () =>
+    uploadAndSaveImage("avatar")
+  );
 
-  $("edit-name").onclick = () =>
-    openEdit("name", "Name", getDisplayName(profile), "Your name");
+  $("settings-edit-cover")?.addEventListener("click", () =>
+    uploadAndSaveImage("cover_photo")
+  );
 
-  $("edit-bio").onclick = () =>
-    openEdit("bio", "Bio", profile.bio || "", "Your bio");
+  $("modal-cancel")?.addEventListener("click", closeEdit);
+  $("modal-save")?.addEventListener("click", saveEdit);
 
-  $("edit-instagram").onclick = () =>
-    openEdit(
-      "instagram",
-      "Instagram",
-      profile.instagram_username || "",
-      "@username"
-    );
-
-  $("edit-facebook").onclick = () =>
-    openEdit(
-      "facebook",
-      "Facebook",
-      profile.facebook_url || "",
-      "Facebook URL"
-    );
-
-  $("edit-messenger").onclick = () =>
-    openEdit(
-      "messenger",
-      "Messenger",
-      profile.messenger_url || "",
-      "Messenger link"
-    );
-
-  $("edit-cancel").onclick = closeEdit;
-  $("edit-save").onclick = saveEdit;
-
-  $("settings-logout").onclick = logout;
+  $("settings-logout")?.addEventListener("click", logout);
 });
+/* ---------------------------------------------------------
+   EXPOSE FUNCTIONS TO WINDOW (HTML BINDING)
+--------------------------------------------------------- */
+window.openEdit = openEdit;
+window.uploadAndSaveImage = uploadAndSaveImage;

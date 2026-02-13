@@ -6362,3 +6362,107 @@ body.settings-page .mobile-title {
 body:not(.settings-page) h2 {
   color: #ffffff !important;
 }
+/* =========================
+   SETTINGS — EDIT MODAL
+========================= */
+
+#edit-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+
+  display: none;              /* 🔑 PAR DÉFAUT CACHÉ */
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+}
+
+#edit-modal.is-open {
+  display: flex;              /* 🔑 OUVERT UNIQUEMENT VIA JS */
+}
+.hidden {
+  display: none !important;
+}
+
+.edit-inline {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 8px;
+  border: none;
+  background: #2A2D59;
+  color: white;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.edit-actions .btn-cancel {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-size: 16px;
+}
+
+.edit-actions .btn-save {
+  background: none;
+  border: none;
+  color: #93C5FD;
+  font-size: 16px;
+  font-weight: 600;
+}
+/* =========================
+   SETTINGS — MODAL HARD KILL
+   (CRITICAL FIX)
+========================= */
+
+#edit-modal[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+/* SETTINGS MODAL — HARD FIX */
+#edit-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#edit-modal[hidden] {
+  display: none !important;
+}
+
+#edit-modal .modal {
+  width: 90%;
+  max-width: 420px;
+  background: #2A2D59;
+  border-radius: 14px;
+  padding: 16px;
+}
+/* =========================================
+   SETTINGS — FORCE INTERACTION
+========================================= */
+
+.settings-page .settings-row {
+  pointer-events: auto;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.settings-page .mobile-content {
+  pointer-events: auto;
+}

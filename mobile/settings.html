@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/css/mobile.css" />
   </head>
 
+  <!-- 🔑 scope isolation -->
   <body class="mobile-page settings-page">
 
     <!-- HEADER -->
@@ -40,36 +41,38 @@
           id="settings-avatar"
           src=""
           alt="Avatar"
+          onclick="uploadAndSaveImage('avatar')"
+          style="cursor:pointer"
         />
-        <button
-          id="settings-edit-avatar"
-          class="link-btn"
-          type="button"
-        >
-          Edit avatar
-        </button>
-      </section>
-
-      <!-- COVER -->
-      <section class="settings-cover">
-        <button
-          id="settings-edit-cover"
-          class="link-btn"
-          type="button"
-        >
-          Change cover photo
-        </button>
       </section>
 
       <!-- PROFILE -->
       <h2 class="settings-section">Profile</h2>
 
-      <div class="settings-row" id="edit-name">
+      <!-- NAME -->
+      <div
+        class="settings-row"
+        onclick="openEdit(
+          'name',
+          'Name',
+          document.getElementById('settings-name').textContent,
+          'Your name'
+        )"
+      >
         <span class="label">Name</span>
         <span class="value" id="settings-name">—</span>
       </div>
 
-      <div class="settings-row" id="edit-bio">
+      <!-- BIO -->
+      <div
+        class="settings-row"
+        onclick="openEdit(
+          'bio',
+          'Bio',
+          document.getElementById('settings-bio').textContent,
+          'Your bio'
+        )"
+      >
         <span class="label">Bio</span>
         <span class="value multiline" id="settings-bio">—</span>
       </div>
@@ -77,17 +80,41 @@
       <!-- SOCIAL -->
       <h2 class="settings-section">Social links</h2>
 
-      <div class="settings-row" id="edit-instagram">
+      <div
+        class="settings-row"
+        onclick="openEdit(
+          'instagram',
+          'Instagram',
+          document.getElementById('settings-instagram').textContent,
+          '@username'
+        )"
+      >
         <span class="label">Instagram</span>
         <span class="value" id="settings-instagram">—</span>
       </div>
 
-      <div class="settings-row" id="edit-facebook">
+      <div
+        class="settings-row"
+        onclick="openEdit(
+          'facebook',
+          'Facebook',
+          document.getElementById('settings-facebook').textContent,
+          'Facebook URL'
+        )"
+      >
         <span class="label">Facebook</span>
         <span class="value" id="settings-facebook">—</span>
       </div>
 
-      <div class="settings-row" id="edit-messenger">
+      <div
+        class="settings-row"
+        onclick="openEdit(
+          'messenger',
+          'Messenger',
+          document.getElementById('settings-messenger').textContent,
+          'Messenger link'
+        )"
+      >
         <span class="label">Messenger</span>
         <span class="value" id="settings-messenger">—</span>
       </div>
@@ -106,7 +133,9 @@
     <!-- SETTINGS LOGIC -->
     <script src="/mobile/js/settings.js"></script>
 
-    <!-- EDIT MODAL (APP PARITY) -->
+    <!-- ===================================================
+         EDIT MODAL — SINGLE SOURCE OF TRUTH (APP PARITY)
+    ==================================================== -->
     <div id="edit-modal" hidden>
       <div class="modal">
         <h3 id="modal-title"></h3>
